@@ -106,7 +106,7 @@ export default function Community() {
     return "/lovable-uploads/fa4d554f-323c-4bd2-b5aa-7cd1f2289c3c.png";
   }, [asset?.photo_path]);
 
-  const addressLine = asset?.address_line || "17179 Ludovica Lane, Boca Raton, FL 33496";
+  const addressLine = asset?.address_line || "Boca Raton, FL 33496";
   const contactPhone = asset?.contact_phone || null;
   const phoneDigits = contactPhone?.replace(/\D/g, "");
   const e164Phone = phoneDigits ? (phoneDigits.length === 10 ? `+1${phoneDigits}` : `+${phoneDigits}`) : null;
