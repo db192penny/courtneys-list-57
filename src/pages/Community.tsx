@@ -289,7 +289,7 @@ export default function Community() {
               </div>
 
               {/* Right: CTAs */}
-              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-2 w-full sm:w-auto bg-background/80 backdrop-blur-sm border border-border rounded-lg p-1.5">
                 <Button
                   onClick={() => navigate(`/signin?community=${communityName}`)}
                   size="sm"
@@ -312,10 +312,10 @@ export default function Community() {
                     }
                   }}
                   size="sm"
-                  className="flex-1 sm:flex-initial font-semibold shadow-lg flex items-center gap-2 bg-primary hover:bg-primary/90"
+                  className="flex-1 sm:flex-initial font-semibold shadow-lg flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white"
                 >
                   <UserPlus className="h-4 w-4" />
-                  Sign Up Free
+                  Sign Up
                 </Button>
               </div>
             </div>
