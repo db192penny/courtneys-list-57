@@ -1,70 +1,63 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 type AccessGateModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  contentType: 'reviews' | 'costs' | 'rate';
+  contentType: "reviews" | "costs" | "rate";
   communityName: string;
   vendorName?: string;
 };
 
-const getContent = (type: 'reviews' | 'costs' | 'rate', communityName: string) => {
+const getContent = (type: "reviews" | "costs" | "rate", communityName: string) => {
   switch (type) {
-    case 'reviews':
+    case "reviews":
       return {
         title: communityName,
         subtitle: "Full Reviews",
-        message: `Join ${communityName} to see full neighbor reviews`
+        message: `Join ${communityName} to see full neighbor reviews`,
       };
-    case 'costs':
+    case "costs":
       return {
         title: communityName,
         subtitle: "Cost Details",
-        message: "Find out who got the deal and who got... the other thing"
+        message: "Find out who got the deal and who got... the other thing",
       };
-    case 'rate':
+    case "rate":
       return {
         title: communityName,
         subtitle: "Rate This Vendor",
-        message: `Rating fun will be a click away once you join ${communityName}`
+        message: `Rating fun will be a click away once you join ${communityName}`,
       };
   }
 };
 
-export function AccessGateModal({ 
-  open, 
-  onOpenChange, 
-  contentType, 
-  communityName,
-}: AccessGateModalProps) {
+export function AccessGateModal({ open, onOpenChange, contentType, communityName }: AccessGateModalProps) {
   const navigate = useNavigate();
   const content = getContent(contentType, communityName);
-  
+
   const handleSignIn = () => {
     // Store current path before navigating
     const currentPath = window.location.pathname + window.location.search;
-    sessionStorage.setItem('auth_return_path', currentPath);
-    console.log('[AccessGateModal] Stored path before signin:', currentPath);
-    
+    sessionStorage.setItem("auth_return_path", currentPath);
+    console.log("[AccessGateModal] Stored path before signin:", currentPath);
+
     onOpenChange(false);
-    navigate('/signin');
+
+    // FIXED: Pass community parameter to signin
+    const communitySlug = communityName.toLowerCase().replace(/\s+/g, "-");
+    navigate(`/signin?community=${communitySlug}`);
   };
-  
+
   const handleRequestAccess = () => {
     // Store current path before navigating
     const currentPath = window.location.pathname + window.location.search;
-    sessionStorage.setItem('auth_return_path', currentPath);
-    console.log('[AccessGateModal] Stored path before signup:', currentPath);
-    
+    sessionStorage.setItem("auth_return_path", currentPath);
+    console.log("[AccessGateModal] Stored path before signup:", currentPath);
+
     onOpenChange(false);
-    const communitySlug = communityName.toLowerCase().replace(/\s+/g, '-');
+    const communitySlug = communityName.toLowerCase().replace(/\s+/g, "-");
     navigate(`/auth?community=${communitySlug}`);
   };
 
@@ -72,34 +65,20 @@ export function AccessGateModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold text-center">
-            {content.title}
-          </DialogTitle>
-          <p className="text-sm text-muted-foreground text-center pt-1">
-            {content.subtitle}
-          </p>
+          <DialogTitle className="text-2xl font-semibold text-center">{content.title}</DialogTitle>
+          <p className="text-sm text-muted-foreground text-center pt-1">{content.subtitle}</p>
         </DialogHeader>
-        
+
         <div className="space-y-6 py-4">
           <div className="text-center">
-            <p className="text-base text-foreground leading-relaxed">
-              {content.message}
-            </p>
+            <p className="text-base text-foreground leading-relaxed">{content.message}</p>
           </div>
-          
+
           <div className="flex gap-3">
-            <Button 
-              variant="outline" 
-              onClick={handleSignIn}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={handleSignIn} className="flex-1">
               Log In
             </Button>
-            <Button 
-              variant="cta" 
-              onClick={handleRequestAccess}
-              className="flex-1"
-            >
+            <Button variant="cta" onClick={handleRequestAccess} className="flex-1">
               Sign Up
             </Button>
           </div>
