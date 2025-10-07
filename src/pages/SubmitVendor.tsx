@@ -26,8 +26,12 @@ const SubmitVendor = () => {
   const [searchParams] = useSearchParams();
   const communityParam = searchParams.get("community") || "Boca Bridges";
 
+  // Read and validate category from URL parameter
+  const urlCategory = searchParams.get("category");
+  const initialCategory = urlCategory && CATEGORIES.includes(urlCategory as any) ? urlCategory : "";
+
   // form state
-  const [category, setCategory] = useState<string>("");
+  const [category, setCategory] = useState<string>(initialCategory);
   const [name, setName] = useState<string>("");
   const [contact, setContact] = useState<string>("");
   const [googlePlaceId, setGooglePlaceId] = useState<string>("");
