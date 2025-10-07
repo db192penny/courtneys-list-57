@@ -48,11 +48,21 @@ export function AccessGateModal({
   const content = getContent(contentType, communityName);
   
   const handleSignIn = () => {
+    // Store current path before navigating
+    const currentPath = window.location.pathname + window.location.search;
+    sessionStorage.setItem('auth_return_path', currentPath);
+    console.log('[AccessGateModal] Stored path before signin:', currentPath);
+    
     onOpenChange(false);
     navigate('/signin');
   };
   
   const handleRequestAccess = () => {
+    // Store current path before navigating
+    const currentPath = window.location.pathname + window.location.search;
+    sessionStorage.setItem('auth_return_path', currentPath);
+    console.log('[AccessGateModal] Stored path before signup:', currentPath);
+    
     onOpenChange(false);
     const communitySlug = communityName.toLowerCase().replace(/\s+/g, '-');
     navigate(`/auth?community=${communitySlug}`);
