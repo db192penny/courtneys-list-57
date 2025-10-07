@@ -20,6 +20,8 @@ import useIsHoaAdmin from "@/hooks/useIsHoaAdmin";
 import { useUserData } from "@/hooks/useUserData";
 import ReviewPreview from "@/components/ReviewPreview";
 import VendorNameInput, { type VendorSelectedPayload } from "@/components/VendorNameInput";
+import SubmitCostModal from "@/components/vendors/SubmitCostModal";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 const SubmitVendor = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -43,6 +45,9 @@ const SubmitVendor = () => {
   const [useForHome, setUseForHome] = useState(true);
   const [myReviewId, setMyReviewId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showCostConfirm, setShowCostConfirm] = useState(false);
+  const [showCostModal, setShowCostModal] = useState(false);
+  const [submittedVendorId, setSubmittedVendorId] = useState<string | null>(null);
   const { data: isAdmin } = useIsAdmin();
   const { data: isHoaAdmin } = useIsHoaAdmin();
   const isAdminUser = isAdmin || isHoaAdmin;
@@ -438,40 +443,7 @@ const SubmitVendor = () => {
       }
     }
 
-    // 3) Save cost entries to costs table
-    const validCostEntries = costEntries.filter(entry => entry.amount != null && entry.amount > 0);
-    if (validCostEntries.length > 0) {
-      // Get user's address for cost entries
-      const { data: userProfile } = await supabase
-        .from("users")
-        .select("address")
-        .eq("id", userId)
-        .single();
-
-      if (userProfile?.address) {
-        const costInserts = validCostEntries.map(entry => ({
-          vendor_id: vendorIdNew,
-          created_by: userId,
-          household_address: userProfile.address,
-          normalized_address: userProfile.address, // Will be processed by trigger
-          amount: entry.amount,
-          cost_kind: entry.cost_kind || null,
-          unit: entry.unit || null,
-          period: entry.period || null,
-          quantity: entry.quantity || null,
-          anonymous: !showNameInReview,
-          currency: "USD",
-        }));
-
-        const { error: costsErr } = await supabase
-          .from("costs")
-          .insert(costInserts);
-
-        if (costsErr) {
-          console.warn("[SubmitVendor] costs insert error (non-fatal):", costsErr);
-        }
-      }
-    }
+    // Costs will be handled separately via modal after confirmation
 
     // 4) Add to home_vendors table for ALL household members if user selected to use this vendor
     if (useForHome) {
@@ -517,9 +489,10 @@ const SubmitVendor = () => {
       description: "You earned 5 points! Keep contributing to level up your badge and earn rewards! ☕",
     });
 
-    // Navigate back to the community page with the category
-    const communitySlug = toSlug(communityParam);
-    navigate(`/communities/${communitySlug}?category=${category}`);
+    // Set vendor ID and show cost confirmation dialog
+    setSubmittedVendorId(vendorIdNew);
+    setSubmitting(false);
+    setShowCostConfirm(true);
   };
 
   return (
@@ -581,10 +554,6 @@ const SubmitVendor = () => {
               <Input id="contact" placeholder="phone or email" value={contact} onChange={(e) => setContact(e.currentTarget.value)} disabled={!!(vendorId && !canEditCore)} />
             </div>
 
-            <div className="grid gap-2">
-              <CostInputs category={category} value={costEntries} onChange={setCostEntries} />
-            </div>
-
             {(!isAdminUser || vendorId) && (
               <div className="grid gap-2">
                 <Label htmlFor="rating">Rating {!vendorId && !isAdminUser && <span className="text-red-500">*</span>}</Label>
@@ -594,10 +563,15 @@ const SubmitVendor = () => {
 
             <div className="grid gap-2">
               <Label htmlFor="comments">
-                Comments (Additional Color)
-                {!vendorId && !isAdminUser && <span className="text-red-500">* (minimum 5 words)</span>}
+                Your Review
+                {!vendorId && !isAdminUser && <span className="text-red-500"> *</span>}
               </Label>
-              <Textarea id="comments" placeholder="Any helpful insights — pricing, professionalism, customer service, responsiveness — the more detailed the better for your neighbors." value={comments} onChange={(e) => setComments(e.currentTarget.value)} />
+              <Textarea 
+                id="comments" 
+                placeholder="Share your experience with this provider - service quality, professionalism, responsiveness, value, etc. The more detail, the more helpful for your neighbors!" 
+                value={comments} 
+                onChange={(e) => setComments(e.currentTarget.value)} 
+              />
             </div>
 
             <div className="space-y-4">
@@ -636,6 +610,46 @@ const SubmitVendor = () => {
             </Button>
           </div>
         </form>
+
+        {/* Cost Confirmation Dialog */}
+        <AlertDialog open={showCostConfirm} onOpenChange={setShowCostConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>💰 Add Cost Information?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Would you like to add cost information to help your neighbors budget for this provider?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => {
+                const communitySlug = toSlug(communityParam);
+                navigate(`/communities/${communitySlug}?category=${category}`);
+              }}>
+                No Thanks
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                setShowCostConfirm(false);
+                setShowCostModal(true);
+              }}>
+                Yes, Add Costs
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Cost Modal */}
+        <SubmitCostModal
+          open={showCostModal}
+          onOpenChange={setShowCostModal}
+          vendorId={submittedVendorId || ""}
+          vendorName={name}
+          category={category}
+          onSuccess={() => {
+            setShowCostModal(false);
+            const communitySlug = toSlug(communityParam);
+            navigate(`/communities/${communitySlug}?category=${category}`);
+          }}
+        />
       </section>
     </main>
   );
