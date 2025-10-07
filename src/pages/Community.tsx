@@ -289,12 +289,12 @@ export default function Community() {
               </div>
 
               {/* Right: CTAs */}
-              <div className="flex items-center gap-2 w-full sm:w-auto bg-background/80 backdrop-blur-sm border border-border rounded-lg p-1.5">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Button
                   onClick={() => navigate(`/signin?community=${communityName}`)}
                   size="sm"
-                  variant="ghost"
-                  className="flex-1 sm:flex-initial text-muted-foreground hover:text-foreground"
+                  variant="outline"
+                  className="flex-1 sm:flex-initial"
                 >
                   Log In
                 </Button>
