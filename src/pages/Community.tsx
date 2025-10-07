@@ -275,7 +275,14 @@ export default function Community() {
             </p>
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <Button
-                onClick={() => navigate(`/signin?community=${communityName}`)}
+                onClick={() => {
+                  // Store current path before navigating
+                  const currentPath = window.location.pathname + window.location.search;
+                  sessionStorage.setItem('auth_return_path', currentPath);
+                  console.log('[Community Bottom Bar] Stored path before signin:', currentPath);
+                  
+                  navigate(`/signin?community=${communityName}`);
+                }}
                 size="sm"
                 variant="outline"
                 className="flex-1 sm:flex-initial bg-transparent border-white text-white hover:bg-white/20 transition-colors"
