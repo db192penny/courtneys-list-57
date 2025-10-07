@@ -60,6 +60,11 @@ export default function VendorNameInput({
         input.addEventListener('input', (e) => {
           const value = (e.target as HTMLInputElement).value;
           
+          // Clear the "Selected: X" helper when user starts typing
+          if (helper.startsWith('Selected:')) {
+            setHelper('');
+          }
+          
           // Clear existing timeout to debounce the input
           clearTimeout(inputTimeout);
           
