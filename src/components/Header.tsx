@@ -312,6 +312,11 @@ const Header = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => {
+                  // Store current path before navigating
+                  const currentPath = window.location.pathname + window.location.search;
+                  sessionStorage.setItem('auth_return_path', currentPath);
+                  console.log('[Header] Stored path before signin:', currentPath);
+                  
                   const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
                   navigate(`/signin?community=${communitySlug}`);
                 }}
@@ -351,6 +356,11 @@ const Header = () => {
               <Button 
                 variant="ghost" 
                 onClick={() => {
+                  // Store current path before navigating
+                  const currentPath = window.location.pathname + window.location.search;
+                  sessionStorage.setItem('auth_return_path', currentPath);
+                  console.log('[Header] Stored path before signin:', currentPath);
+                  
                   const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
                   navigate(`/signin?community=${communitySlug}`);
                 }}
