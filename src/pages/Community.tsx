@@ -270,7 +270,12 @@ export default function Community() {
               {/* Left: Value Proposition + Social Proof */}
               <div className="flex-1 text-center sm:text-left space-y-1">
                 <p className="text-sm sm:text-lg font-semibold text-foreground">
-                  <span className="sm:hidden">Find trusted local providers</span>
+                  <span className="sm:hidden">
+                    {activeUsers >= 100 
+                      ? `Join ${activeUsers}+ ${communityName} neighbors`
+                      : `Join ${communityName} neighbors`
+                    }
+                  </span>
                   <span className="hidden sm:inline">See who your neighbors are using and trust</span>
                 </p>
                 {activeUsers >= 100 && (
