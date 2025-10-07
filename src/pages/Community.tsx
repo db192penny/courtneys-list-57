@@ -272,8 +272,8 @@ export default function Community() {
                 <p className="text-sm sm:text-lg font-semibold text-foreground">
                   <span className="sm:hidden">
                     {activeUsers >= 100 
-                      ? `Join ${activeUsers}+ ${communityName} neighbors`
-                      : `Join ${communityName} neighbors`
+                      ? `Join ${activeUsers}+ ${communityName === "The Bridges" ? "your Bridges" : communityName} neighbors`
+                      : `Join ${communityName === "The Bridges" ? "your Bridges" : communityName} neighbors`
                     }
                   </span>
                   <span className="hidden sm:inline">See who your neighbors are using and trust</span>
