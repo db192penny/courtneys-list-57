@@ -17,7 +17,7 @@ export function MagicLinkLoader({ communityName: propsCommunityName }: MagicLink
     : "";
   
   // Use props first, then URL extraction, then default
-  const displayName = propsCommunityName || urlCommunityName || "Courtney's List";
+  const displayName = propsCommunityName || urlCommunityName || "Good Looking";
   
   console.log("🎯 MagicLinkLoader Debug:");
   console.log("- Props community name:", propsCommunityName);
