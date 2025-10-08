@@ -25,6 +25,7 @@ export const CATEGORIES = [
   "Painters",
   "Patio Screening",
   "Pest Control",
+  "Roofing",
   "Pet Grooming",
   "Plumbing",
   "Pool",

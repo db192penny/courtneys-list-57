@@ -44,6 +44,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Painters": PaintBucket,
   "Landscaping": Trees,
   "Landscape Lighting": Lightbulb,
+  "Roofing": Building2,
   "Generator": Zap,
   "Pest Control": Bug,
   "Power Washing": ShowerHead,

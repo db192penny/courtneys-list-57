@@ -108,6 +108,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
 
+  // Roofing: Per square foot + Full job
+  if (c === "roofing") {
+    return [
+      { cost_kind: "installation", amount: null, unit: "sqft", notes: null },
+      { cost_kind: "one_time", amount: null, unit: "job", notes: null },
+    ];
+  }
+
   // House Manager: Monthly fee
   if (c === "house manager") {
     return [
@@ -197,8 +205,8 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
   
-  // Roofing/General Contractor: No structured fields
-  if (c === "roofing" || c === "general contractor") {
+  // General Contractor: No structured fields
+  if (c === "general contractor") {
     return [];
   }
   
@@ -246,8 +254,8 @@ export default function CostInputs({
   const sections = useMemo(() => {
     const c = (category || "").toLowerCase();
     
-    // Show no cost fields for roofing/general contractor
-    if (c === "roofing" || c === "general contractor") {
+    // Show no cost fields for general contractor
+    if (c === "general contractor") {
       return [
         <div key="no-costs" className="text-sm text-muted-foreground">
           Please provide any additional cost guidance/experience in Comments below
@@ -332,7 +340,7 @@ export default function CostInputs({
     <div className="grid gap-4">
       {sections}
       {/* Comments field for all categories */}
-      {(category && category.toLowerCase() !== "roofing" && category.toLowerCase() !== "general contractor") && (
+      {(category && category.toLowerCase() !== "general contractor") && (
         <div className="grid gap-2">
           <Label>Comments (Optional)</Label>
           <Textarea
