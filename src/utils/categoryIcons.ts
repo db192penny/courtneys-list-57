@@ -29,6 +29,7 @@ import {
   Square,
   Tv,
   Plug,
+  UtensilsCrossed,
   LucideIcon 
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -55,6 +56,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Appliance Repair": Settings,
   "Auto Transport": Truck,
   "Bartenders": Wine,
+  "Catering": UtensilsCrossed,
   "Water Filtration": Filter,
   "Interior Design": Palette,
   "Moving Company": Truck,

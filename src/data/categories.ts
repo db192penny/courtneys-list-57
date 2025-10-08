@@ -3,6 +3,7 @@ export const CATEGORIES = [
   "Auto Transport",
   "Bartenders",
   "Car Service",
+  "Catering",
   "Car Wash & Detail",
   "Carpet/Upholstery Cleaning",
   "Damage Assessment/Restoration",

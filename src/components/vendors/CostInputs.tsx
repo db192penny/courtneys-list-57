@@ -92,6 +92,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
 
+  // Catering: Per person + Per event
+  if (c === "catering") {
+    return [
+      { cost_kind: "hourly", amount: null, unit: "person", notes: null },
+      { cost_kind: "one_time", amount: null, unit: "event", notes: null },
+    ];
+  }
+
   // House Manager: Monthly fee
   if (c === "house manager") {
     return [
@@ -242,7 +250,7 @@ export default function CostInputs({
     return entries.map((entry, idx) => {
       const label =
         entry.cost_kind === "service_call" ? "Service Call" :
-        entry.cost_kind === "hourly" ? (entry.unit === "room" ? "Per Room Cost" : entry.unit === "mile" ? "Per Mile Rate" : "Hourly Rate") :
+        entry.cost_kind === "hourly" ? (entry.unit === "person" ? "Per Person Cost" : entry.unit === "room" ? "Per Room Cost" : entry.unit === "mile" ? "Per Mile Rate" : "Hourly Rate") :
         entry.cost_kind === "yearly_plan" ? (entry.unit === "season" ? "Seasonal Package" : "Maintenance Plan") :
         entry.cost_kind === "installation" ? (entry.unit === "window" ? "Installation per Window" : "Installation Cost") :
         entry.cost_kind === "project_fee" ? "Project Fee" :
@@ -254,7 +262,7 @@ export default function CostInputs({
 
       const unitDisplay = 
         entry.cost_kind === "service_call" ? (entry.unit === "panel" ? " per Panel" : " per Visit") :
-        entry.cost_kind === "hourly" ? (entry.unit === "room" ? " per Room" : entry.unit === "mile" ? " per Mile" : " per Hour") :
+        entry.cost_kind === "hourly" ? (entry.unit === "person" ? " per Person" : entry.unit === "room" ? " per Room" : entry.unit === "mile" ? " per Mile" : " per Hour") :
         entry.cost_kind === "yearly_plan" ? (entry.unit === "season" ? " per Season" : " per Year") :
         entry.cost_kind === "installation" ? (entry.unit === "sq ft" ? " per Sq Ft" : entry.unit === "linear ft" ? " per Linear Ft" : entry.unit === "window" ? " per Window" : " (one-time)") :
         entry.cost_kind === "project_fee" ? " per Project" :
