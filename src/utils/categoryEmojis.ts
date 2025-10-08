@@ -25,6 +25,7 @@ export const categoryEmojiMap: Record<string, string> = {
   'Auto Transport': '🚛',
   'Bartenders': '🍸',
   'Catering': '🍽️',
+  'DJs': '🎧',
   'Painters': '🖌️',
   'Grill Cleaning': '🔥',
   'House Manager': '🏢',

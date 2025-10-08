@@ -100,6 +100,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
 
+  // DJs: Hourly rate + Event fee
+  if (c === "djs") {
+    return [
+      { cost_kind: "hourly", amount: null, unit: "hour", notes: null },
+      { cost_kind: "one_time", amount: null, unit: "event", notes: null },
+    ];
+  }
+
   // House Manager: Monthly fee
   if (c === "house manager") {
     return [
