@@ -58,6 +58,14 @@ const SubmitVendor = () => {
   const vendorId = searchParams.get("vendor_id");
   const canEditCore = !!isAdmin || !!isHoaAdmin || !vendorId;
 
+  // Pre-populate category from URL parameter after auth redirect
+  useEffect(() => {
+    const urlCategory = searchParams.get("category");
+    if (urlCategory && !category && !vendorId) {
+      setCategory(urlCategory);
+    }
+  }, [searchParams, category, vendorId]);
+
   useEffect(() => {
     console.log("[SubmitVendor] mounted");
     // If editing, prefill the form

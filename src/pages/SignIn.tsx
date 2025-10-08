@@ -169,8 +169,28 @@ const SignIn = () => {
       }
 
       if (statusResult === "approved") {
-        const communitySlug = community ? toSlug(community) : 'boca-bridges';
-        const redirectUrl = `${window.location.origin}/communities/${communitySlug}?welcome=true`;
+        // Check for returnPath with category
+        const returnPath = searchParams.get("returnPath");
+        const category = searchParams.get("category");
+        
+        let redirectUrl: string;
+        
+        if (returnPath) {
+          let finalDestination = returnPath;
+          if (category) {
+            const hasQuery = finalDestination.includes('?');
+            finalDestination += `${hasQuery ? '&' : '?'}category=${category}`;
+          }
+          const communitySlug = community || 'boca-bridges';
+          if (!finalDestination.includes('community=')) {
+            finalDestination += `${finalDestination.includes('?') ? '&' : '?'}community=${communitySlug}`;
+          }
+          redirectUrl = `${window.location.origin}${finalDestination}`;
+        } else {
+          const communitySlug = community ? toSlug(community) : 'boca-bridges';
+          redirectUrl = `${window.location.origin}/communities/${communitySlug}?welcome=true`;
+        }
+        
         console.log("[SignIn] handleSubmit redirectUrl:", redirectUrl);
         
         const { error: signInError } = await supabase.auth.signInWithOtp({

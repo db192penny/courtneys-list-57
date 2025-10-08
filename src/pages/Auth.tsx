@@ -96,6 +96,24 @@ const Auth = () => {
     }
     
     try {
+      // Check for returnPath with category
+      const returnPath = params.get("returnPath");
+      const category = params.get("category");
+      
+      if (returnPath) {
+        let finalDestination = returnPath;
+        if (category) {
+          const hasQuery = finalDestination.includes('?');
+          finalDestination += `${hasQuery ? '&' : '?'}category=${category}`;
+        }
+        const communitySlug = communityName || 'boca-bridges';
+        if (!finalDestination.includes('community=')) {
+          finalDestination += `${finalDestination.includes('?') ? '&' : '?'}community=${communitySlug}`;
+        }
+        navigate(finalDestination, { replace: true });
+        return;
+      }
+      
       // CRITICAL FIX: First check if we have a community from the URL
       if (communityName) {
         // User signed up via a specific community page - respect that choice!

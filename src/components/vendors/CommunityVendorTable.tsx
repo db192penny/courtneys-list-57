@@ -49,6 +49,7 @@ import { CostDisplay } from "@/components/vendors/CostDisplay";
 import { HorizontalSortControls } from "./HorizontalSortControls";
 import { HorizontalCategoryPills } from "./HorizontalCategoryPills";
 import { formatUSPhoneDisplay } from "@/utils/phone";
+import { AccessGateModal } from "@/components/vendors/AccessGateModal";
 
 export type CommunityVendorRow = {
   id: string;
@@ -174,6 +175,8 @@ export default function CommunityVendorTable({
   const [rateModalOpen, setRateModalOpen] = useState(false);
   const [costModalOpen, setCostModalOpen] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState<{ id: string; name: string; category: string } | null>(null);
+  const [addVendorModalOpen, setAddVendorModalOpen] = useState(false);
+  const [addVendorCategory, setAddVendorCategory] = useState<string>('');
 
 
   const handleCategoryChange = (newCategory: string) => {
@@ -223,6 +226,15 @@ export default function CommunityVendorTable({
   const openCosts = (row: CommunityVendorRow) => {
     setSelectedVendor({ id: row.id, name: row.name, category: row.category });
     setCostModalOpen(true);
+  };
+
+  const handleAddVendor = () => {
+    if (!isAuthenticated) {
+      setAddVendorCategory(category);
+      setAddVendorModalOpen(true);
+    } else {
+      navigate(`/submit?community=${communityName}&category=${category}`);
+    }
   };
 
   const formatted = useMemo(() => data || [], [data]);
@@ -280,7 +292,7 @@ export default function CommunityVendorTable({
                 {category} Providers
               </h3>
               <button
-                onClick={() => navigate(`/submit?community=${communityName}&category=${category}`)}
+                onClick={handleAddVendor}
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
                 <Plus className="h-3 w-3" />
@@ -362,6 +374,14 @@ export default function CommunityVendorTable({
             />
           </>
         )}
+
+        <AccessGateModal
+          open={addVendorModalOpen}
+          onOpenChange={setAddVendorModalOpen}
+          contentType="add_vendor"
+          communityName={communityName}
+          category={addVendorCategory}
+        />
 
       </div>
     </TooltipProvider>

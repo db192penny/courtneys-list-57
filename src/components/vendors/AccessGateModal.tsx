@@ -5,12 +5,13 @@ import { useNavigate } from "react-router-dom";
 type AccessGateModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  contentType: "reviews" | "costs" | "rate";
+  contentType: "reviews" | "costs" | "rate" | "add_vendor";
   communityName: string;
   vendorName?: string;
+  category?: string;
 };
 
-const getContent = (type: "reviews" | "costs" | "rate", communityName: string) => {
+const getContent = (type: "reviews" | "costs" | "rate" | "add_vendor", communityName: string) => {
   switch (type) {
     case "reviews":
       return {
@@ -30,10 +31,16 @@ const getContent = (type: "reviews" | "costs" | "rate", communityName: string) =
         subtitle: "Rate This Vendor",
         message: `Rating fun will be a click away once you join ${communityName}`,
       };
+    case "add_vendor":
+      return {
+        title: "Ready to help your neighbors?",
+        subtitle: "Add a Provider",
+        message: `Share a great vendor with your ${communityName} neighbors. Sign up to add your recommendation.`,
+      };
   }
 };
 
-export function AccessGateModal({ open, onOpenChange, contentType, communityName }: AccessGateModalProps) {
+export function AccessGateModal({ open, onOpenChange, contentType, communityName, category }: AccessGateModalProps) {
   const navigate = useNavigate();
   const content = getContent(contentType, communityName);
 
@@ -47,7 +54,13 @@ export function AccessGateModal({ open, onOpenChange, contentType, communityName
 
     // FIXED: Pass community parameter to signin
     const communitySlug = communityName.toLowerCase().replace(/\s+/g, "-");
-    navigate(`/signin?community=${communitySlug}`);
+    
+    // Handle add_vendor flow with category
+    if (contentType === 'add_vendor' && category) {
+      navigate(`/signin?community=${communitySlug}&returnPath=/submit&category=${category}`);
+    } else {
+      navigate(`/signin?community=${communitySlug}`);
+    }
   };
 
   const handleRequestAccess = () => {
@@ -58,7 +71,13 @@ export function AccessGateModal({ open, onOpenChange, contentType, communityName
 
     onOpenChange(false);
     const communitySlug = communityName.toLowerCase().replace(/\s+/g, "-");
-    navigate(`/auth?community=${communitySlug}`);
+    
+    // Handle add_vendor flow with category
+    if (contentType === 'add_vendor' && category) {
+      navigate(`/auth?community=${communitySlug}&returnPath=/submit&category=${category}`);
+    } else {
+      navigate(`/auth?community=${communitySlug}`);
+    }
   };
 
   return (
