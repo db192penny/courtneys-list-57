@@ -16,7 +16,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toSlug } from "@/utils/slug";
 import CostInputs, { buildDefaultCosts, type CostEntry } from "@/components/vendors/CostInputs";
 import useIsAdmin from "@/hooks/useIsAdmin";
-import useIsHoaAdmin from "@/hooks/useIsHoaAdmin";
+import { useCanSeedVendors } from "@/hooks/useCanSeedVendors";
 import { useUserData } from "@/hooks/useUserData";
 import ReviewPreview from "@/components/ReviewPreview";
 import VendorNameInput, { type VendorSelectedPayload } from "@/components/VendorNameInput";
@@ -49,14 +49,14 @@ const SubmitVendor = () => {
   const [showCostModal, setShowCostModal] = useState(false);
   const [submittedVendorId, setSubmittedVendorId] = useState<string | null>(null);
   const { data: isAdmin } = useIsAdmin();
-  const { data: isHoaAdmin } = useIsHoaAdmin();
-  const isAdminUser = isAdmin || isHoaAdmin;
+  const { data: canSeed } = useCanSeedVendors();
+  const isAdminUser = canSeed || false;
   const { data: userData } = useUserData();
 
   const canonical = typeof window !== "undefined" ? window.location.href : undefined;
 
   const vendorId = searchParams.get("vendor_id");
-  const canEditCore = !!isAdmin || !!isHoaAdmin || !vendorId;
+  const canEditCore = !!isAdmin || !vendorId;
 
   // Pre-populate category from URL parameter after auth redirect
   useEffect(() => {

@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CATEGORIES } from "@/data/categories";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import useIsAdmin from "@/hooks/useIsAdmin";
+import { useCanSeedVendors } from "@/hooks/useCanSeedVendors";
 import VendorNameInput, { type VendorSelectedPayload } from "@/components/VendorNameInput";
 
 const AdminVendorSeed = () => {
@@ -26,7 +26,7 @@ const AdminVendorSeed = () => {
   const [adminCommunity, setAdminCommunity] = useState<string>("");
   const [loading, setLoading] = useState(true);
   
-  const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
+  const { data: canSeed, isLoading: adminLoading } = useCanSeedVendors();
   
   const canonical = typeof window !== "undefined" ? window.location.href : undefined;
 
@@ -35,10 +35,10 @@ const AdminVendorSeed = () => {
     const loadAdminData = async () => {
       if (adminLoading) return;
       
-      if (!isAdmin) {
+      if (!canSeed) {
         toast({
           title: "Access denied",
-          description: "You must be a site admin to access this page.",
+          description: "You need vendor contributor or admin permissions to seed vendors.",
           variant: "destructive"
         });
         navigate("/admin");
@@ -66,7 +66,7 @@ const AdminVendorSeed = () => {
     };
 
     loadAdminData();
-  }, [isAdmin, adminLoading, navigate, toast]);
+  }, [canSeed, adminLoading, navigate, toast]);
 
   const handleVendorSelected = async (payload: VendorSelectedPayload) => {
     setName(payload.name);
@@ -247,11 +247,11 @@ const AdminVendorSeed = () => {
     );
   }
 
-  if (!isAdmin) {
+  if (!canSeed) {
     return (
       <main className="min-h-screen bg-background">
         <section className="container py-10 max-w-2xl">
-          <p className="text-sm text-muted-foreground">Access denied. You must be a site admin to access this page.</p>
+          <p className="text-sm text-muted-foreground">Access denied. You need vendor contributor or admin permissions to seed vendors.</p>
         </section>
       </main>
     );
