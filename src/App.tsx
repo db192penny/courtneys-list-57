@@ -43,6 +43,7 @@ import { AdminAnalytics } from "./pages/AdminAnalytics";
 import MessageBoardHelper from "@/components/admin/MessageBoardHelper";
 import MockupPreview from "./pages/MockupPreview";
 import LogoMockup from "./pages/LogoMockup";
+import RateVendors from "./pages/bridges/RateVendors";
 import Header from "./components/Header";
 import { AdminProtectedRoute } from "./components/AdminProtectedRoute";
 import { AnalyticsTracker } from "./components/AnalyticsTracker";
@@ -235,6 +236,7 @@ function AppContent() {
         <Route path="/mockup-preview" element={<MockupPreview />} />
         <Route path="/logo-mockup" element={<LogoMockup />} />
         <Route path="/homepage" element={<Index />} />
+        <Route path="/bridges/rate-vendors" element={<RateVendors />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
