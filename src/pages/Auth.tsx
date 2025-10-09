@@ -665,7 +665,7 @@ const Auth = () => {
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4" />
-                    I'm VIP - Let Me In!
+                    Join Now
                   </>
                 )}
               </Button>
