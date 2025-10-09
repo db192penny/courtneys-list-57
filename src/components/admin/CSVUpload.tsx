@@ -121,8 +121,8 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
       for (const person of selected) {
         const token = `survey_${person.name.toLowerCase().replace(/\s+/g, '_')}_2024`;
         
-        // Step 1: Insert survey response
-        const { data: response, error: respError } = await supabase
+        // Step 1: Insert survey response with proper error handling
+        const { data: responseData, error: respError } = await supabase
           .from("survey_responses" as any)
           .insert({
             session_token: token,
@@ -139,12 +139,22 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
           .select()
           .single();
 
-        if (respError) throw respError;
-        if (!response) throw new Error("Failed to create response");
+        // Check for errors BEFORE accessing .id
+        if (respError) {
+          console.error('Insert response error:', respError);
+          throw respError;
+        }
+        
+        if (!responseData) {
+          throw new Error("Failed to create response");
+        }
+
+        // NOW safe to use responseData.id with type assertion
+        const surveyResponseId = (responseData as any).id as string;
 
         // Step 2: Insert pending vendors using the response ID
         const vendorInserts = person.vendors.map(v => ({
-          survey_response_id: response.id,
+          survey_response_id: surveyResponseId,
           vendor_name: v.name,
           category: v.category,
           rated: false,
@@ -155,7 +165,10 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             .from("survey_pending_vendors" as any)
             .insert(vendorInserts);
 
-          if (vendError) throw vendError;
+          if (vendError) {
+            console.error('Insert vendors error:', vendError);
+            throw vendError;
+          }
         }
 
         links.push({ name: person.name, token });

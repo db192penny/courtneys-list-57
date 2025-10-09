@@ -74,32 +74,47 @@ export function RespondentsTable() {
     if (!confirmed) return;
 
     try {
-      // Step 1: Get survey_response_id
-      const { data: session, error: sessionError } = await supabase
+      // Step 1: Get survey_response_id with proper error handling
+      const { data: sessionData, error: sessionError } = await supabase
         .from('survey_responses' as any)
         .select('id')
         .eq('session_token', sessionToken)
         .single();
 
-      if (sessionError || !session) {
+      // Check for errors BEFORE accessing .id
+      if (sessionError) {
+        console.error('Session fetch error:', sessionError);
         throw new Error('Could not find survey response');
       }
+      
+      if (!sessionData) {
+        throw new Error('Survey response not found');
+      }
 
-      // Step 2: Delete ratings using the ID
+      // NOW safe to use sessionData.id with type assertion
+      const surveyResponseId = (sessionData as any).id as string;
+
+      // Step 2: Delete ratings
       const { error: deleteError } = await supabase
         .from('survey_vendor_ratings' as any)
         .delete()
-        .eq('survey_response_id', session.id);
+        .eq('survey_response_id', surveyResponseId);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('Delete ratings error:', deleteError);
+        throw deleteError;
+      }
 
-      // Step 3: Reset vendors using the ID  
+      // Step 3: Reset vendors
       const { error: updateError } = await supabase
         .from('survey_pending_vendors' as any)
         .update({ rated: false, rated_at: null })
-        .eq('survey_response_id', session.id);
+        .eq('survey_response_id', surveyResponseId);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Update vendors error:', updateError);
+        throw updateError;
+      }
 
       toast({
         title: "Data reset",

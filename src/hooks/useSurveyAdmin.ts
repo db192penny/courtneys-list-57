@@ -152,24 +152,38 @@ export function useSurveyRatings(sessionToken: string | null) {
     queryFn: async () => {
       if (!sessionToken) return [];
 
-      // Step 1: Get survey_response_id
-      const { data: response, error: respError } = await supabase
+      // Step 1: Get survey_response_id with proper error handling
+      const { data: responseData, error: respError } = await supabase
         .from("survey_responses" as any)
         .select("id")
         .eq("session_token", sessionToken)
         .single();
 
-      if (respError) throw respError;
-      if (!response) return [];
+      // Check for errors BEFORE accessing .id
+      if (respError) {
+        console.error('Response fetch error:', respError);
+        throw respError;
+      }
+      
+      if (!responseData) {
+        console.warn('No response found for token:', sessionToken);
+        return [];
+      }
+
+      // NOW safe to use responseData.id with type assertion
+      const surveyResponseId = (responseData as any).id as string;
 
       // Step 2: Get ratings using the ID
       const { data: ratings, error: ratError } = await supabase
         .from("survey_vendor_ratings" as any)
         .select("*")
-        .eq("survey_response_id", response.id)
+        .eq("survey_response_id", surveyResponseId)
         .order("created_at", { ascending: true });
 
-      if (ratError) throw ratError;
+      if (ratError) {
+        console.error('Ratings fetch error:', ratError);
+        throw ratError;
+      }
 
       return ratings?.map((r: any) => ({
         id: r.id,
