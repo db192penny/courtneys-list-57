@@ -26,91 +26,48 @@ const CompleteProfile = () => {
 
   const getCommunityDisplayName = (slug: string): string => {
     const normalized = slug.toLowerCase();
-    if (normalized === "the-bridges" || normalized === "bridges") {
-      return "The Bridges";
+    if (normalized === 'the-bridges' || normalized === 'bridges') {
+      return 'The Bridges';
     }
-    if (normalized === "boca-bridges") {
-      return "Boca Bridges";
+    if (normalized === 'boca-bridges') {
+      return 'Boca Bridges';
     }
     // Default formatting for other communities
-    return slug
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+    return slug.split('-').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
   };
 
   const communitySlug = searchParams.get("community") || "the-bridges";
   const communityName = getCommunityDisplayName(communitySlug);
-  const fromSignIn = searchParams.get("from") === "signin";
 
-  // ========================================
-  // ENHANCED GOOGLE USER HANDLING - NEW CODE
-  // ========================================
   useEffect(() => {
-    const checkAuthAndPrefill = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    // Check if user is authenticated and pre-fill name from Google
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         navigate("/auth", { replace: true });
         return;
       }
 
-      // Check if this is a Google OAuth user
-      const isGoogleUser = session.user.app_metadata?.provider === "google";
-
       // Pre-fill name from Google metadata
-      const googleName = session.user.user_metadata?.full_name || session.user.user_metadata?.name || "";
+      const googleName = session.user.user_metadata?.full_name || 
+                        session.user.user_metadata?.name || "";
       if (googleName) {
         setName(googleName);
       }
-
-      // Check if user already has a complete profile
-      const { data: existingUser } = await supabase
-        .from("users")
-        .select("id, name, address, is_verified")
-        .eq("id", session.user.id)
-        .maybeSingle();
-
-      if (existingUser) {
-        // User already has a profile
-        if (
-          existingUser.address &&
-          existingUser.address !== "Address Pending" &&
-          existingUser.address !== "Address Not Provided"
-        ) {
-          // Profile is complete, redirect to their community
-          console.log("Profile already complete, redirecting...");
-          const community = searchParams.get("community") || "boca-bridges";
-          navigate(`/communities/${community}?welcome=true`, { replace: true });
-          return;
-        }
-      }
-
-      // Show helpful message if coming from failed sign-in attempt
-      if (fromSignIn && isGoogleUser) {
-        toast({
-          title: "Almost There!",
-          description: "We just need your address to complete your account.",
-          duration: 6000,
-        });
-      }
     };
-
-    checkAuthAndPrefill();
-  }, [navigate, fromSignIn, searchParams, toast]);
-  // ========================================
-  // ENHANCED GOOGLE USER HANDLING - END
-  // ========================================
+    checkAuth();
+  }, [navigate]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (resident === "no") {
-      toast({
-        title: "Residents only",
-        description: "Currently, access is restricted to residents only.",
-        variant: "destructive",
+      toast({ 
+        title: "Residents only", 
+        description: "Currently, access is restricted to residents only.", 
+        variant: "destructive" 
       });
       return;
     }
@@ -124,7 +81,7 @@ const CompleteProfile = () => {
     const missingKeys = (Object.keys(fieldErrors) as Array<keyof typeof fieldErrors>).filter((k) => fieldErrors[k]);
     if (missingKeys.length > 0) {
       setErrors(fieldErrors);
-
+      
       // Show specific error for missing street number
       if (!address.trim()) {
         toast({
@@ -152,9 +109,7 @@ const CompleteProfile = () => {
     setLoading(true);
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({ title: "Not authenticated", description: "Please sign in again", variant: "destructive" });
         navigate("/auth");
@@ -164,8 +119,9 @@ const CompleteProfile = () => {
       const streetName = extractStreetName(address.trim());
 
       // UPSERT user profile - creates record for Google OAuth users or updates existing
-      const { error: upsertError } = await supabase.from("users").upsert(
-        {
+      const { error: upsertError } = await supabase
+        .from("users")
+        .upsert({
           id: user.id,
           email: user.email,
           name: name.trim(),
@@ -174,19 +130,17 @@ const CompleteProfile = () => {
           is_verified: true, // Auto-approve Google sign-ups
           signup_source: `community:${communitySlug}`,
           points: 5,
-          created_at: new Date().toISOString(),
-        },
-        {
-          onConflict: "id",
-        },
-      );
+          created_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
+        });
 
       if (upsertError) {
         console.error("Profile upsert error:", upsertError);
-        toast({
-          title: "Update failed",
-          description: "Could not update your profile. Please try again.",
-          variant: "destructive",
+        toast({ 
+          title: "Update failed", 
+          description: "Could not update your profile. Please try again.", 
+          variant: "destructive" 
         });
         setLoading(false);
         return;
@@ -194,31 +148,35 @@ const CompleteProfile = () => {
 
       // Log the signup bonus points to history
       // This is needed because Google OAuth bypasses the normal trigger
-      const { error: pointHistoryError } = await supabase.from("user_point_history").insert({
-        user_id: user.id,
-        activity_type: "join_site",
-        points_earned: 5,
-        description: "Welcome bonus for joining Courtney's List",
-      });
+      const { error: pointHistoryError } = await supabase
+        .from("user_point_history")
+        .insert({
+          user_id: user.id,
+          activity_type: 'join_site',
+          points_earned: 5,
+          description: 'Welcome bonus for joining Courtney\'s List'
+        });
 
       if (pointHistoryError) {
-        console.error("Failed to log signup points:", pointHistoryError);
+        console.error('Failed to log signup points:', pointHistoryError);
         // Don't block the flow - user creation was successful
       }
 
       // Create household-HOA mapping
       try {
-        const { data: normalizedAddr } = await supabase.rpc("normalize_address", {
-          _addr: address.trim(),
+        const { data: normalizedAddr } = await supabase.rpc("normalize_address", { 
+          _addr: address.trim() 
         });
-
-        await supabase.from("household_hoa").insert({
-          household_address: address.trim(),
-          normalized_address: normalizedAddr || address.trim(),
-          hoa_name: communityName,
-          created_by: user.id,
-          mapping_source: "google_oauth",
-        });
+        
+        await supabase
+          .from("household_hoa")
+          .insert({
+            household_address: address.trim(),
+            normalized_address: normalizedAddr || address.trim(),
+            hoa_name: communityName,
+            created_by: user.id,
+            mapping_source: 'google_oauth'
+          });
       } catch (mappingError) {
         console.error("Mapping creation error:", mappingError);
         // Don't fail the whole process if mapping fails
@@ -227,20 +185,20 @@ const CompleteProfile = () => {
       // Send admin notification for Google OAuth signup
       try {
         const displayCommunity = communityName === "The Bridges" ? "The Bridges" : communityName;
-
-        await supabase.functions.invoke("send-admin-notification", {
+        
+        await supabase.functions.invoke('send-admin-notification', {
           body: {
             userEmail: user.email,
             userName: name.trim(),
             userAddress: address.trim(),
             community: displayCommunity,
-            signupSource: `google_oauth:${communitySlug}`,
-          },
+            signupSource: `google_oauth:${communitySlug}`
+          }
         });
-
-        console.log("Admin notification sent for Google OAuth signup");
+        
+        console.log('Admin notification sent for Google OAuth signup');
       } catch (notificationError) {
-        console.error("Failed to send admin notification:", notificationError);
+        console.error('Failed to send admin notification:', notificationError);
         // Don't fail the signup if notification fails
       }
 
@@ -251,12 +209,13 @@ const CompleteProfile = () => {
 
       // Redirect to their community
       navigate(`/communities/${toSlug(communityName)}?welcome=true`, { replace: true });
+
     } catch (error) {
       console.error("Complete profile error:", error);
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
+      toast({ 
+        title: "Error", 
+        description: "Something went wrong. Please try again.", 
+        variant: "destructive" 
       });
       setLoading(false);
     }
@@ -268,26 +227,21 @@ const CompleteProfile = () => {
         title={`Complete Your Profile - ${communityName}`}
         description="Complete your profile to access exclusive vendor information"
       />
-
+      
       <section className="container max-w-xl py-4 sm:py-6 px-4 sm:px-6">
         <h1 className="text-3xl font-semibold mb-4 sm:mb-6">Complete Your Profile</h1>
         <Card>
           <CardHeader>
             <CardTitle>Welcome to {communityName}!</CardTitle>
             <CardDescription>
-              {fromSignIn
-                ? "We just need your address to complete your account."
-                : "We just need a bit more information to get you started."}
+              We just need a bit more information to get you started.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <form onSubmit={onSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">
-                  Name{" "}
-                  <span className="text-foreground" aria-hidden>
-                    *
-                  </span>
+                  Name <span className="text-foreground" aria-hidden>*</span>
                 </Label>
                 <Input
                   id="name"
@@ -302,15 +256,16 @@ const CompleteProfile = () => {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="address">
-                    Full Address{" "}
-                    <span className="text-foreground" aria-hidden>
-                      *
-                    </span>
+                    Full Address <span className="text-foreground" aria-hidden>*</span>
                   </Label>
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <button type="button" aria-label="Why we need your address" className="text-muted-foreground">
+                        <button 
+                          type="button" 
+                          aria-label="Why we need your address" 
+                          className="text-muted-foreground"
+                        >
                           <Info className="h-4 w-4" />
                         </button>
                       </TooltipTrigger>
@@ -336,10 +291,7 @@ const CompleteProfile = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="resident">
-                  Are you a resident?{" "}
-                  <span className="text-foreground" aria-hidden>
-                    *
-                  </span>
+                  Are you a resident? <span className="text-foreground" aria-hidden>*</span>
                 </Label>
                 <Select required value={resident} onValueChange={(v) => setResident(v as "yes" | "no")}>
                   <SelectTrigger id="resident" className={errors.resident ? "border-destructive" : undefined}>

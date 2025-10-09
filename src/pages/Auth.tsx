@@ -12,17 +12,10 @@ import { toSlug } from "@/utils/slug";
 import AddressInput, { AddressSelectedPayload } from "@/components/AddressInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Info, Crown, PartyPopper, ArrowLeft, Mail, AlertTriangle, Loader2, Sparkles } from "lucide-react";
-import { handleSignupInvite } from "@/lib/handle-signup-invite";
+import { handleSignupInvite } from '@/lib/handle-signup-invite';
 import { MagicLinkLoader } from "@/components/MagicLinkLoader";
 import { WelcomeBackModal } from "@/components/WelcomeBackModal";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
@@ -43,7 +36,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
-  const hasMagicLink = window.location.hash.includes("access_token=");
+  const hasMagicLink = window.location.hash.includes('access_token=');
 
   const communityName = useMemo(() => {
     const urlCommunity = params.get("community") || "";
@@ -59,14 +52,14 @@ const Auth = () => {
     if (!communityName && !hasMagicLink) {
       // Try to detect community from referrer
       const referrer = document.referrer;
-      if (referrer.includes("/communities/the-bridges")) {
-        navigate("/auth?community=the-bridges", { replace: true });
-      } else if (referrer.includes("/communities/boca-bridges")) {
-        navigate("/auth?community=boca-bridges", { replace: true });
+      if (referrer.includes('/communities/the-bridges')) {
+        navigate('/auth?community=the-bridges', { replace: true });
+      } else if (referrer.includes('/communities/boca-bridges')) {
+        navigate('/auth?community=boca-bridges', { replace: true });
       } else {
         // Default to The Bridges
-        console.log("⚠️ No community parameter in URL, defaulting to The Bridges");
-        navigate("/communities/the-bridges", { replace: true });
+        console.log('⚠️ No community parameter in URL, defaulting to The Bridges');
+        navigate('/communities/the-bridges', { replace: true });
       }
     }
   }, [communityName, hasMagicLink, navigate]);
@@ -76,7 +69,7 @@ const Auth = () => {
       const fallbackUrl = `/communities/${toSlug(communityName)}`;
       navigate(fallbackUrl, { replace: true });
     } else {
-      navigate("/communities/the-bridges", { replace: true });
+      navigate('/communities/the-bridges', { replace: true });
     }
   };
 
@@ -87,148 +80,144 @@ const Auth = () => {
     }
   }, [email, address, params]);
 
-  const finalizeOnboarding = useCallback(
-    async (userId: string, userEmail: string | null) => {
-      console.log("🎯 [finalizeOnboarding] CALLED with userId:", userId, "userEmail:", userEmail);
-      let destination = "/communities/boca-bridges?welcome=true";
-
-      // Handle signup invite processing
-      if (userId) {
-        console.log("🎯 [finalizeOnboarding] About to call handleSignupInvite");
-        try {
-          await handleSignupInvite(userId);
-          console.log("🎯 [finalizeOnboarding] Invite processing completed");
-        } catch (error) {
-          console.error("🎯 [finalizeOnboarding] Error processing invite:", error);
-        }
-      }
-
+  const finalizeOnboarding = useCallback(async (userId: string, userEmail: string | null) => {
+    console.log('🎯 [finalizeOnboarding] CALLED with userId:', userId, 'userEmail:', userEmail);
+    let destination = "/communities/boca-bridges?welcome=true";
+    
+    // Handle signup invite processing
+    if (userId) {
+      console.log('🎯 [finalizeOnboarding] About to call handleSignupInvite');
       try {
-        // Check for returnPath with category
-        const returnPath = params.get("returnPath");
-        const category = params.get("category");
-
-        if (returnPath) {
-          let finalDestination = returnPath;
-          if (category) {
-            const hasQuery = finalDestination.includes("?");
-            finalDestination += `${hasQuery ? "&" : "?"}category=${category}`;
-          }
-          const communitySlug = communityName || "boca-bridges";
-          if (!finalDestination.includes("community=")) {
-            finalDestination += `${finalDestination.includes("?") ? "&" : "?"}community=${communitySlug}`;
-          }
-          navigate(finalDestination, { replace: true });
-          return;
+        await handleSignupInvite(userId);
+        console.log('🎯 [finalizeOnboarding] Invite processing completed');
+      } catch (error) {
+        console.error('🎯 [finalizeOnboarding] Error processing invite:', error);
+      }
+    }
+    
+    try {
+      // Check for returnPath with category
+      const returnPath = params.get("returnPath");
+      const category = params.get("category");
+      
+      if (returnPath) {
+        let finalDestination = returnPath;
+        if (category) {
+          const hasQuery = finalDestination.includes('?');
+          finalDestination += `${hasQuery ? '&' : '?'}category=${category}`;
         }
+        const communitySlug = communityName || 'boca-bridges';
+        if (!finalDestination.includes('community=')) {
+          finalDestination += `${finalDestination.includes('?') ? '&' : '?'}community=${communitySlug}`;
+        }
+        navigate(finalDestination, { replace: true });
+        return;
+      }
+      
+      // CRITICAL FIX: First check if we have a community from the URL
+      if (communityName) {
+        // User signed up via a specific community page - respect that choice!
+        destination = `/communities/${toSlug(communityName)}?welcome=true`;
+        console.log('🎯 [finalizeOnboarding] Using community from URL:', communityName);
+      } else {
+        // No community in URL, check the database
+        const { data: userData, error: userErr } = await supabase
+          .from("users")
+          .select("address, signup_source")
+          .eq("id", userId)
+          .maybeSingle();
 
-        // CRITICAL FIX: First check if we have a community from the URL
-        if (communityName) {
-          // User signed up via a specific community page - respect that choice!
-          destination = `/communities/${toSlug(communityName)}?welcome=true`;
-          console.log("🎯 [finalizeOnboarding] Using community from URL:", communityName);
-        } else {
-          // No community in URL, check the database
-          const { data: userData, error: userErr } = await supabase
-            .from("users")
-            .select("address, signup_source")
-            .eq("id", userId)
-            .maybeSingle();
+        if (!userErr && userData) {
+          // PRIORITY 1: Check signup_source from database
+          if (userData?.signup_source && userData.signup_source.startsWith("community:")) {
+            const communityFromSignup = userData.signup_source.replace("community:", "");
+            destination = `/communities/${toSlug(communityFromSignup)}?welcome=true`;
+            console.log('🎯 [finalizeOnboarding] Using community from signup_source:', communityFromSignup);
+          } 
+          // ONLY use address mapping as a last resort if no community was specified
+          else if (userData?.address && userData.address !== "Address Not Provided") {
+            console.log('⚠️ [finalizeOnboarding] No community specified, falling back to address mapping');
+            const { data: normalizedAddr } = await supabase.rpc("normalize_address", { _addr: userData.address });
+            
+            const { data: mapping } = await supabase
+              .from("household_hoa")
+              .select("hoa_name, created_at, household_address")
+              .eq("household_address", normalizedAddr)
+              .order("created_at", { ascending: false })
+              .limit(1)
+              .maybeSingle();
 
-          if (!userErr && userData) {
-            // PRIORITY 1: Check signup_source from database
-            if (userData?.signup_source && userData.signup_source.startsWith("community:")) {
-              const communityFromSignup = userData.signup_source.replace("community:", "");
-              destination = `/communities/${toSlug(communityFromSignup)}?welcome=true`;
-              console.log("🎯 [finalizeOnboarding] Using community from signup_source:", communityFromSignup);
-            }
-            // ONLY use address mapping as a last resort if no community was specified
-            else if (userData?.address && userData.address !== "Address Not Provided") {
-              console.log("⚠️ [finalizeOnboarding] No community specified, falling back to address mapping");
-              const { data: normalizedAddr } = await supabase.rpc("normalize_address", { _addr: userData.address });
-
-              const { data: mapping } = await supabase
-                .from("household_hoa")
-                .select("hoa_name, created_at, household_address")
-                .eq("household_address", normalizedAddr)
-                .order("created_at", { ascending: false })
-                .limit(1)
-                .maybeSingle();
-
-              const hoaName = mapping?.hoa_name || "";
-              if (hoaName) {
-                destination = `/communities/${toSlug(hoaName)}?welcome=true`;
-                console.log("🎯 [finalizeOnboarding] Using community from address mapping:", hoaName);
-              } else {
-                try {
-                  const { data: hoaRes } = await supabase.rpc("get_my_hoa");
-                  const rpcHoa = (hoaRes?.[0]?.hoa_name as string | undefined) || "";
-                  if (rpcHoa) {
-                    destination = `/communities/${toSlug(rpcHoa)}?welcome=true`;
-                    console.log("🎯 [finalizeOnboarding] Using community from RPC:", rpcHoa);
-                  }
-                } catch (e) {
-                  console.log("🎯 [finalizeOnboarding] No community found, using default");
+            const hoaName = mapping?.hoa_name || "";
+            if (hoaName) {
+              destination = `/communities/${toSlug(hoaName)}?welcome=true`;
+              console.log('🎯 [finalizeOnboarding] Using community from address mapping:', hoaName);
+            } else {
+              try {
+                const { data: hoaRes } = await supabase.rpc("get_my_hoa");
+                const rpcHoa = (hoaRes?.[0]?.hoa_name as string | undefined) || "";
+                if (rpcHoa) {
+                  destination = `/communities/${toSlug(rpcHoa)}?welcome=true`;
+                  console.log('🎯 [finalizeOnboarding] Using community from RPC:', rpcHoa);
                 }
+              } catch (e) {
+                console.log('🎯 [finalizeOnboarding] No community found, using default');
               }
             }
           }
         }
-
-        const cleanDestination = destination.split("#")[0];
-
-        if (destination !== "/communities/boca-bridges?welcome=true") {
-          const communityMatch = destination.match(/\/communities\/(.+?)(\?|$)/);
-          const communityForDisplay = communityMatch
-            ? communityMatch[1].replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-            : communityName || "your community";
-
-          setDetectedCommunity(communityForDisplay);
-          setShowSuccessModal(true);
-
-          setTimeout(() => {
-            navigate(cleanDestination, { replace: true });
-          }, 100);
-          return;
-        }
-
-        navigate(cleanDestination, { replace: true });
-      } catch (e) {
-        toast({
-          title: "Navigation Issue",
-          description: "We're completing your signup. Please wait a moment.",
-          variant: "destructive",
-        });
-
-        navigate("/communities/boca-bridges?welcome=true", { replace: true });
       }
-    },
-    [navigate, toast, communityName, params],
-  );
+
+      const cleanDestination = destination.split('#')[0];
+      
+      if (destination !== "/communities/boca-bridges?welcome=true") {
+        const communityMatch = destination.match(/\/communities\/(.+?)(\?|$)/);
+        const communityForDisplay = communityMatch 
+          ? communityMatch[1].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+          : communityName || "your community";
+        
+        setDetectedCommunity(communityForDisplay);
+        setShowSuccessModal(true);
+        
+        setTimeout(() => {
+          navigate(cleanDestination, { replace: true });
+        }, 100);
+        return;
+      }
+      
+      navigate(cleanDestination, { replace: true });
+      
+    } catch (e) {
+      toast({ 
+        title: "Navigation Issue", 
+        description: "We're completing your signup. Please wait a moment.", 
+        variant: "destructive" 
+      });
+      
+      navigate("/communities/boca-bridges?welcome=true", { replace: true });
+    }
+  }, [navigate, toast, communityName]);
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("🔄 [Auth State Change] Event:", event, "Session:", session?.user?.email);
-
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔄 [Auth State Change] Event:', event, 'Session:', session?.user?.email);
+      
       // Check localStorage invite data
-      console.log("📦 [Auth] Current localStorage:", {
-        invite_code: localStorage.getItem("pending_invite_code"),
-        inviter_id: localStorage.getItem("pending_inviter_id"),
+      console.log('📦 [Auth] Current localStorage:', {
+        invite_code: localStorage.getItem('pending_invite_code'),
+        inviter_id: localStorage.getItem('pending_inviter_id')
       });
-
-      if (event === "SIGNED_IN" && session?.user?.id) {
-        console.log("✅ [Auth] SIGNED_IN event detected - calling finalizeOnboarding");
+      
+      if (event === 'SIGNED_IN' && session?.user?.id) {
+        console.log('✅ [Auth] SIGNED_IN event detected - calling finalizeOnboarding');
         // This is what was missing - call finalizeOnboarding after signup
         await finalizeOnboarding(session.user.id, session.user.email);
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("🔄 [Auth Debug] Initial session check:", !!session, "User:", session?.user?.email);
+      console.log('🔄 [Auth Debug] Initial session check:', !!session, 'User:', session?.user?.email);
       if (session?.user && isVerifiedMagicLink) {
-        console.log("🔄 [Auth Debug] Calling finalizeOnboarding from initial session check (verified magic link)");
+        console.log('🔄 [Auth Debug] Calling finalizeOnboarding from initial session check (verified magic link)');
         finalizeOnboarding(session.user.id, session.user.email ?? null);
       }
     });
@@ -244,47 +233,47 @@ const Auth = () => {
   const handleGoogleSignUp = async () => {
     try {
       setLoading(true);
-
+      
       // Get community context
-      const communityContext = communityName || "boca-bridges";
-
+      const communityContext = communityName || 'boca-bridges';
+      
       // Allow Google OAuth for all Bridges communities
-      if (!communityContext.toLowerCase().includes("bridges")) {
+      if (!communityContext.toLowerCase().includes('bridges')) {
         toast({
           title: "Feature not available",
           description: "Google sign-up is currently only available for Bridges communities.",
-          variant: "destructive",
+          variant: "destructive"
         });
         setLoading(false);
         return;
       }
-
+      
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback?context=${communityContext}&intent=signup`,
           queryParams: {
-            access_type: "offline",
-            prompt: "consent select_account",
-          },
-        },
+            access_type: 'offline',
+            prompt: 'consent select_account',
+          }
+        }
       });
-
+      
       if (error) {
-        console.error("Google signup error:", error);
+        console.error('Google signup error:', error);
         toast({
           title: "Sign up failed",
           description: error.message || "Could not sign up with Google. Please try email instead.",
-          variant: "destructive",
+          variant: "destructive"
         });
         setLoading(false);
       }
     } catch (error) {
-      console.error("Google signup error:", error);
+      console.error('Google signup error:', error);
       toast({
         title: "Sign up failed",
         description: "Could not sign up with Google. Please try email instead.",
-        variant: "destructive",
+        variant: "destructive"
       });
       setLoading(false);
     }
@@ -294,11 +283,7 @@ const Auth = () => {
     e.preventDefault();
 
     if (resident === "no") {
-      toast({
-        title: "Residents only",
-        description: "Currently, access is restricted to residents only.",
-        variant: "destructive",
-      });
+      toast({ title: "Residents only", description: "Currently, access is restricted to residents only.", variant: "destructive" });
       return;
     }
 
@@ -332,31 +317,31 @@ const Auth = () => {
 
     localStorage.removeItem("prefill_address");
     localStorage.removeItem("selected_community");
-
+    
     const targetEmail = email.trim().toLowerCase();
-
+    
     try {
       const { data: emailStatus, error: statusError } = await supabase.rpc("get_email_status", {
         _email: targetEmail,
       });
 
       if (statusError) {
-        toast({
-          title: "Account check failed",
-          description: "Unable to verify email status. Please try again.",
-          variant: "destructive",
+        toast({ 
+          title: "Account check failed", 
+          description: "Unable to verify email status. Please try again.", 
+          variant: "destructive" 
         });
         return;
       }
 
       if (emailStatus === "approved") {
         // Send magic link automatically for existing user
-        const communitySlug = communityName ? toSlug(communityName) : "boca-bridges";
+        const communitySlug = communityName ? toSlug(communityName) : 'boca-bridges';
         const redirectUrl = `${window.location.origin}/communities/${communitySlug}?welcome=true`;
-
+        
         const { error: signInError } = await supabase.auth.signInWithOtp({
           email: targetEmail,
-          options: { emailRedirectTo: redirectUrl },
+          options: { emailRedirectTo: redirectUrl }
         });
 
         if (signInError) {
@@ -379,6 +364,7 @@ const Auth = () => {
         });
         return;
       }
+      
     } catch (emailCheckError) {
       // Continue with signup attempt if email check fails
     }
@@ -388,7 +374,7 @@ const Auth = () => {
       name: name.trim(),
       address: address.trim(),
       street_name: extractStreetName(address.trim()),
-      signup_source: communityName ? `community:${communityName}` : null, // Use exact community from URL, not toSlug
+      signup_source: communityName ? `community:${communityName}` : null,  // Use exact community from URL, not toSlug
     };
 
     const tempPassword = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -397,87 +383,31 @@ const Auth = () => {
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email: targetEmail,
       password: tempPassword,
-      options: {
+      options: { 
         emailRedirectTo: redirectUrl,
-        data: metaData,
+        data: metaData
       },
     });
 
-    // ========================================
-    // ORPHANED USER RECOVERY - NEW CODE STARTS HERE
-    // ========================================
     if (signUpError) {
       let errorTitle = "Could not create account";
       let errorDescription = signUpError.message;
-
-      if (
-        signUpError.message.includes("User already registered") ||
-        signUpError.message.includes("already been taken") ||
-        signUpError.message.includes("already exists") ||
-        signUpError.message.includes("duplicate key") ||
-        signUpError.message.includes("unique constraint")
-      ) {
-        console.log("Email already exists in auth, checking if orphaned...");
-
-        // Check if this is an orphaned account (auth.users exists but public.users doesn't)
-        try {
-          const { data: existingUser } = await supabase
-            .from("users")
-            .select("id")
-            .eq("email", targetEmail)
-            .maybeSingle();
-
-          if (!existingUser) {
-            // ORPHANED ACCOUNT DETECTED!
-            // Auth record exists but no public.users record
-            console.log("Orphaned account detected for:", targetEmail);
-
-            // Use the fix function that already exists in your database
-            const { data: fixResult, error: fixError } = await supabase.rpc("fix_specific_orphaned_user", {
-              _email: targetEmail,
-              _name: name.trim(),
-              _address: address.trim(),
-            });
-
-            if (!fixError && fixResult && fixResult.length > 0 && fixResult[0].created_record) {
-              // Successfully fixed! Now sign them in
-              console.log("Orphaned account fixed, sending magic link...");
-
-              const { error: magicLinkError } = await supabase.auth.signInWithOtp({
-                email: targetEmail,
-                options: { emailRedirectTo: redirectUrl },
-              });
-
-              if (!magicLinkError) {
-                toast({
-                  title: "Account Recovered! ✅",
-                  description: "We found your account and fixed it. Check your email for a magic link to sign in.",
-                  duration: 8000,
-                });
-                setLoading(false);
-                return;
-              }
-            }
-
-            // If fix failed, show helpful error
-            errorTitle = "Account Issue Detected";
-            errorDescription =
-              "There's an issue with your account. Please try signing in with Google or contact support.";
-          } else {
-            // User actually exists in both tables - direct them to sign in
-            errorTitle = "Email already registered";
-            errorDescription = "This email is already registered. Please sign in instead.";
-
-            setTimeout(() => {
-              const signInUrl = communityName ? `/signin?community=${toSlug(communityName)}` : "/signin";
-              navigate(signInUrl);
-            }, 2000);
-          }
-        } catch (checkError) {
-          console.error("Error checking for orphaned account:", checkError);
-          errorTitle = "Email already registered";
-          errorDescription = "This email is already registered. Please sign in instead or contact support.";
-        }
+      
+      if (signUpError.message.includes("User already registered") || 
+          signUpError.message.includes("already been taken") ||
+          signUpError.message.includes("already exists") ||
+          signUpError.message.includes("duplicate key") ||
+          signUpError.message.includes("unique constraint")) {
+        errorTitle = "Email already registered";
+        errorDescription = "This email is already registered. Please sign in instead or contact support if you think this is an error.";
+        
+        setTimeout(() => {
+          const signInUrl = communityName 
+            ? `/signin?community=${toSlug(communityName)}` 
+            : "/signin";
+          navigate(signInUrl);
+        }, 2000);
+        
       } else if (signUpError.message.includes("invalid email")) {
         errorTitle = "Invalid email";
         errorDescription = "Please enter a valid email address.";
@@ -485,42 +415,36 @@ const Auth = () => {
         errorTitle = "Password issue";
         errorDescription = "There was an issue with the password. Please try again.";
       }
-
-      toast({
-        title: errorTitle,
-        description: errorDescription,
-        variant: "destructive",
+      
+      toast({ 
+        title: errorTitle, 
+        description: errorDescription, 
+        variant: "destructive" 
       });
-      setLoading(false);
       return;
     }
-    // ========================================
-    // ORPHANED USER RECOVERY - NEW CODE ENDS HERE
-    // ========================================
 
     const userId = authData.user?.id;
     if (!userId) {
       toast({ title: "Signup failed", description: "Could not create user account", variant: "destructive" });
-      setLoading(false);
       return;
     }
 
     try {
-      await supabase.functions.invoke("send-admin-notification", {
+      await supabase.functions.invoke('send-admin-notification', {
         body: {
           userEmail: targetEmail,
           userName: name.trim(),
           userAddress: address.trim(),
-          community: communityName || "Direct Signup",
-          signupSource: communityName ? `community:${communityName}` : "direct", // Use exact community from URL
-        },
+          community: communityName || 'Direct Signup',
+          signupSource: communityName ? `community:${communityName}` : 'direct'  // Use exact community from URL
+        }
       });
     } catch (adminNotificationError) {
       // Don't fail the signup process if admin notification fails
     }
-
+    
     setShowMagicLinkModal(true);
-    setLoading(false);
   };
 
   const canonical = typeof window !== "undefined" ? window.location.href : undefined;
@@ -530,22 +454,14 @@ const Auth = () => {
   ) : (
     <main className="min-h-screen bg-background">
       <SEO
-        title={
-          communityName
-            ? `Join ${communityName.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}`
-            : "Join Boca Bridges"
-        }
+        title={communityName ? `Join ${communityName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}` : "Join Boca Bridges"}
         description="Join the invite only test family - automatically verified access to exclusive vendor info."
         canonical={canonical}
       />
-
+      
       <section className="container max-w-xl py-4 sm:py-6 px-4 sm:px-6">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h1 className="text-3xl font-semibold">
-            {communityName
-              ? `Join ${communityName.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}`
-              : "Join Boca Bridges"}
-          </h1>
+          <h1 className="text-3xl font-semibold">{communityName ? `Join ${communityName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}` : "Join Boca Bridges"}</h1>
           <Button
             variant="ghost"
             size="sm"
@@ -559,7 +475,7 @@ const Auth = () => {
         <Card>
           <CardContent className="space-y-4 pt-6">
             <form onSubmit={onSubmit} className="space-y-4">
-              <GoogleSignInButton
+              <GoogleSignInButton 
                 onClick={handleGoogleSignUp}
                 loading={loading}
                 label="Sign up with Google"
@@ -567,12 +483,7 @@ const Auth = () => {
               />
 
               <div className="space-y-2">
-                <Label htmlFor="name">
-                  Name{" "}
-                  <span className="text-foreground" aria-hidden>
-                    *
-                  </span>
-                </Label>
+                <Label htmlFor="name">Name <span className="text-foreground" aria-hidden>*</span></Label>
                 <Input
                   id="name"
                   value={name}
@@ -584,12 +495,7 @@ const Auth = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">
-                  Email{" "}
-                  <span className="text-foreground" aria-hidden>
-                    *
-                  </span>
-                </Label>
+                <Label htmlFor="email">Email <span className="text-foreground" aria-hidden>*</span></Label>
                 <Input
                   id="email"
                   type="email"
@@ -603,12 +509,7 @@ const Auth = () => {
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="address">
-                    Full Address{" "}
-                    <span className="text-foreground" aria-hidden>
-                      *
-                    </span>
-                  </Label>
+                  <Label htmlFor="address">Full Address <span className="text-foreground" aria-hidden>*</span></Label>
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -634,12 +535,7 @@ const Auth = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="resident">
-                  Are you a resident?{" "}
-                  <span className="text-foreground" aria-hidden>
-                    *
-                  </span>
-                </Label>
+                <Label htmlFor="resident">Are you a resident? <span className="text-foreground" aria-hidden>*</span></Label>
                 <Select required value={resident} onValueChange={(v) => setResident(v as "yes" | "no")}>
                   <SelectTrigger id="resident" className={errors.resident ? "border-destructive" : undefined}>
                     <SelectValue placeholder="Select yes or no" />
@@ -651,30 +547,16 @@ const Auth = () => {
                 </Select>
               </div>
 
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full flex items-center justify-center gap-2"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    I'm VIP - Let Me In!
-                  </>
-                )}
+              <Button type="submit" size="lg" className="w-full flex items-center justify-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                I'm VIP - Let Me In!
               </Button>
 
               <p className="text-xs text-muted-foreground text-center">* Required fields</p>
 
               <div className="pt-2 text-center">
-                <Link
-                  to={communityName ? `/signin?community=${toSlug(communityName)}` : "/signin"}
+                <Link 
+                  to={communityName ? `/signin?community=${toSlug(communityName)}` : "/signin"} 
                   className="underline underline-offset-4 text-sm text-muted-foreground hover:text-foreground"
                 >
                   Already have an account? Sign In
@@ -693,20 +575,16 @@ const Auth = () => {
         </Card>
 
         <div className="mt-4 text-center text-sm text-muted-foreground">
-          Enter your details, and once approved by your community admin, you'll get full access to your neighborhood's
-          trusted providers.
+          Enter your details, and once approved by your community admin, you'll get full access to your neighborhood's trusted providers.
         </div>
       </section>
 
-      <Dialog
-        open={showMagicLinkModal}
-        onOpenChange={(open) => {
-          setShowMagicLinkModal(open);
-          if (!open) {
-            setJustSignedUp(false);
-          }
-        }}
-      >
+      <Dialog open={showMagicLinkModal} onOpenChange={(open) => {
+        setShowMagicLinkModal(open);
+        if (!open) {
+          setJustSignedUp(false);
+        }
+      }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg">
@@ -717,7 +595,7 @@ const Auth = () => {
               We've sent a magic link to <strong>{email}</strong>
             </DialogDescription>
           </DialogHeader>
-
+          
           <div className="space-y-4 py-4">
             <div className="flex items-start gap-3 p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
               <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
@@ -730,23 +608,20 @@ const Auth = () => {
                 </p>
               </div>
             </div>
-
+            
             <div className="flex flex-col gap-2 pt-2">
-              <Button
-                onClick={() => {
-                  setShowMagicLinkModal(false);
-                  setJustSignedUp(false);
-                }}
-                className="w-full"
-              >
+              <Button onClick={() => {
+                setShowMagicLinkModal(false);
+                setJustSignedUp(false);
+              }} className="w-full">
                 Got It!
               </Button>
-              <Button
-                variant="outline"
+              <Button 
+                variant="outline" 
                 onClick={() => {
                   setShowMagicLinkModal(false);
                   setJustSignedUp(false);
-                  onSubmit(new Event("submit") as any);
+                  onSubmit(new Event('submit') as any);
                 }}
                 className="w-full"
               >
@@ -767,18 +642,16 @@ const Auth = () => {
               Welcome to Your Community! 🎉
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base space-y-2">
-              <p className="font-semibold">
-                You've been successfully onboarded{detectedCommunity && ` to ${detectedCommunity}`}!
-              </p>
+              <p className="font-semibold">You've been successfully onboarded{detectedCommunity && ` to ${detectedCommunity}`}!</p>
               <p className="text-muted-foreground">
                 Explore local vendors recommended by your neighbors and start discovering trusted services in your area.
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogAction
+          <AlertDialogAction 
             onClick={() => {
               setShowSuccessModal(false);
-              const cleanDestination = `/communities/${toSlug(detectedCommunity)}`.split("#")[0];
+              const cleanDestination = `/communities/${toSlug(detectedCommunity)}`.split('#')[0];
               navigate(cleanDestination, { replace: true });
             }}
             className="w-full bg-green-600 hover:bg-green-700 text-white"
@@ -788,8 +661,8 @@ const Auth = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <WelcomeBackModal
-        open={showWelcomeBackModal}
+      <WelcomeBackModal 
+        open={showWelcomeBackModal} 
         onOpenChange={setShowWelcomeBackModal}
         email={email}
         communityName={communityName}

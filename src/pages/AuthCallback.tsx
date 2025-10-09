@@ -77,28 +77,23 @@ const AuthCallback = () => {
         const isGoogleUser = session.user.app_metadata?.provider === "google";
         const intent = searchParams.get("intent"); // 'signup' or 'signin'
 
-        // ========================================
-        // ORPHANED USER FIX - CHANGED CODE STARTS HERE
-        // ========================================
         // If no user record exists and this is Google OAuth
         if (!existingUser && isGoogleUser) {
           if (intent === "signin") {
             // User tried to SIGN IN but has no account
-            // FIX: Don't sign them out - guide them to complete profile instead
-            console.log(
-              "Sign-in attempted by non-registered user, redirecting to complete profile:",
-              session.user.email,
-            );
+            console.log("Sign-in attempted by non-registered user:", session.user.email);
+
+            await supabase.auth.signOut();
 
             toast({
-              title: "Complete Your Profile",
-              description: "Let's finish setting up your account! Please add your address to continue.",
-              variant: "default",
-              duration: 6000,
+              title: "No account found",
+              description: "You don't have an account yet. Please sign up first.",
+              variant: "destructive",
+              duration: 5000,
             });
 
-            const community = contextParam || "boca-bridges";
-            navigate(`/complete-profile?community=${community}&from=signin`, { replace: true });
+            const signupUrl = contextParam ? `/auth?community=${contextParam}` : "/auth";
+            navigate(signupUrl, { replace: true });
             return;
           }
 
@@ -111,27 +106,22 @@ const AuthCallback = () => {
             return;
           }
 
-          // Fallback: no intent specified
-          // Treat this as a signup attempt and guide to complete profile
-          console.log(
-            "Google OAuth attempted by non-registered user (no intent), redirecting to complete profile:",
-            session.user.email,
-          );
+          // Fallback: no intent specified, treat as unauthorized sign-in attempt
+          console.log("Google OAuth attempted by non-registered user (no intent):", session.user.email);
+
+          await supabase.auth.signOut();
 
           toast({
-            title: "Welcome!",
-            description: "Please complete your profile to get started.",
-            variant: "default",
+            title: "Account not found",
+            description: "No account exists for " + session.user.email + ". Please sign up first.",
+            variant: "destructive",
             duration: 5000,
           });
 
-          const community = contextParam || "boca-bridges";
-          navigate(`/complete-profile?community=${community}`, { replace: true });
+          const signupUrl = contextParam ? `/auth?community=${contextParam}` : "/auth";
+          navigate(signupUrl, { replace: true });
           return;
         }
-        // ========================================
-        // ORPHANED USER FIX - CHANGED CODE ENDS HERE
-        // ========================================
 
         // If no user record for magic link (shouldn't happen but safety check)
         if (!existingUser && !isGoogleUser) {
