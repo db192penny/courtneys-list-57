@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,14 +7,12 @@ import { BridgesHeader } from "@/components/bridges/BridgesHeader";
 import { VendorRatingCard, VendorRatingData } from "@/components/bridges/VendorRatingCard";
 import { ProgressBar } from "@/components/survey/ProgressBar";
 import { useSurveyRating } from "@/hooks/useSurveyRating";
-import { extractStreetName } from "@/utils/address";
 
 type PageType = "email" | "rating" | "thankyou" | "error" | "completed";
 
 export default function RateVendors() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
-  const navigate = useNavigate();
   
   const { loading, error, surveyResponse, pendingVendors, updateEmail, submitRating, skipVendor } = useSurveyRating(token);
   
@@ -155,21 +152,11 @@ export default function RateVendors() {
 
   if (currentPage === "rating" && surveyResponse && pendingVendors.length > 0) {
     const currentVendor = pendingVendors[currentVendorIndex];
-    const streetName = extractStreetName(surveyResponse.respondent_contact);
+    const streetName = "Lewis River Rd";
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
-        <div className="max-w-2xl mx-auto pt-6">
-          <button
-            onClick={() => navigate(-1)}
-            className="mb-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </button>
-
-          <BridgesHeader />
-
+        <div className="max-w-2xl mx-auto pt-12">
           <ProgressBar
             current={currentVendorIndex + 1}
             total={totalVendors}
@@ -178,6 +165,7 @@ export default function RateVendors() {
 
           <div className="bg-card rounded-lg shadow-lg p-6 md:p-8">
             <VendorRatingCard
+              key={currentVendor.id}
               vendorName={currentVendor.vendor_name}
               category={currentVendor.category}
               currentIndex={currentVendorIndex + 1}
