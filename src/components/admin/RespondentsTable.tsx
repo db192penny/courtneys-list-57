@@ -51,9 +51,6 @@ export function RespondentsTable() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [selectedRespondent, setSelectedRespondent] = useState<any>(null);
   const [showReviewsModal, setShowReviewsModal] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [resetDialogOpen, setResetDialogOpen] = useState(false);
-  const [actionTarget, setActionTarget] = useState<any>(null);
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -70,47 +67,84 @@ export function RespondentsTable() {
     toast({ title: "Link copied!", description: `Link for ${name}` });
   };
 
-  const handleReset = async (respondent: any) => {
+  const handleReset = async (sessionToken: string, respondentName: string) => {
+    const confirmed = window.confirm(
+      `Reset all ratings for ${respondentName}? They can re-submit their ratings.`
+    );
+    if (!confirmed) return;
+
     try {
-      const { data: response, error: fetchError } = await supabase
-        .from("survey_responses" as any)
-        .select("id")
-        .eq("session_token", respondent.sessionToken)
-        .maybeSingle();
+      // Step 1: Get survey_response_id
+      const { data: session, error: sessionError } = await supabase
+        .from('survey_responses' as any)
+        .select('id')
+        .eq('session_token', sessionToken)
+        .single();
 
-      if (fetchError) throw fetchError;
-      if (!response) throw new Error("Response not found");
+      if (sessionError || !session) {
+        throw new Error('Could not find survey response');
+      }
 
-      await supabase
-        .from("survey_vendor_ratings" as any)
+      // Step 2: Delete ratings using the ID
+      const { error: deleteError } = await supabase
+        .from('survey_vendor_ratings' as any)
         .delete()
-        .eq("survey_response_id", response.id);
+        .eq('survey_response_id', session.id);
 
-      await supabase
-        .from("survey_pending_vendors" as any)
+      if (deleteError) throw deleteError;
+
+      // Step 3: Reset vendors using the ID  
+      const { error: updateError } = await supabase
+        .from('survey_pending_vendors' as any)
         .update({ rated: false, rated_at: null })
-        .eq("survey_response_id", response.id);
+        .eq('survey_response_id', session.id);
 
-      toast({ title: "Data reset", description: `${respondent.name} can now re-submit ratings` });
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Data reset",
+        description: `${respondentName} can now re-submit ratings`,
+      });
+      
       refetch();
     } catch (error) {
-      console.error("Reset error:", error);
-      toast({ title: "Reset failed", variant: "destructive" });
+      console.error('Reset error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reset data. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleDelete = async (respondent: any) => {
-    try {
-      await supabase
-        .from("survey_responses" as any)
-        .delete()
-        .eq("session_token", respondent.sessionToken);
+  const handleDelete = async (sessionToken: string, respondentName: string) => {
+    const confirmed = window.confirm(
+      `Permanently delete ${respondentName} and all their data? This cannot be undone.`
+    );
+    if (!confirmed) return;
 
-      toast({ title: "Deleted", description: `${respondent.name} removed from system` });
+    try {
+      // Delete by session_token (cascade handles related records)
+      const { error } = await supabase
+        .from('survey_responses' as any)
+        .delete()
+        .eq('session_token', sessionToken);
+
+      if (error) throw error;
+
+      toast({
+        title: "Deleted",
+        description: `${respondentName} removed from system`,
+      });
+      
       refetch();
     } catch (error) {
-      console.error("Delete error:", error);
-      toast({ title: "Delete failed", variant: "destructive" });
+      console.error('Delete error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -249,10 +283,7 @@ export function RespondentsTable() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => {
-                              setActionTarget(respondent);
-                              setResetDialogOpen(true);
-                            }}
+                            onClick={() => handleReset(respondent.sessionToken, respondent.name)}
                             disabled={respondent.completedVendors === 0}
                           >
                             <RefreshCw className="h-4 w-4" />
@@ -260,10 +291,7 @@ export function RespondentsTable() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => {
-                              setActionTarget(respondent);
-                              setDeleteDialogOpen(true);
-                            }}
+                            onClick={() => handleDelete(respondent.sessionToken, respondent.name)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -291,19 +319,13 @@ export function RespondentsTable() {
                               <Copy className="h-4 w-4 mr-2" /> Copy Link
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => {
-                                setActionTarget(respondent);
-                                setResetDialogOpen(true);
-                              }}
+                              onClick={() => handleReset(respondent.sessionToken, respondent.name)}
                               disabled={respondent.completedVendors === 0}
                             >
                               <RefreshCw className="h-4 w-4 mr-2" /> Reset Data
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => {
-                                setActionTarget(respondent);
-                                setDeleteDialogOpen(true);
-                              }}
+                              onClick={() => handleDelete(respondent.sessionToken, respondent.name)}
                             >
                               <Trash2 className="h-4 w-4 mr-2" /> Delete
                             </DropdownMenuItem>
@@ -330,50 +352,6 @@ export function RespondentsTable() {
         />
       )}
 
-      <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Reset all ratings?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will delete all ratings for {actionTarget?.name}. They can re-submit their reviews using the same link.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                handleReset(actionTarget);
-                setResetDialogOpen(false);
-              }}
-            >
-              Reset
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Permanently delete this person?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete {actionTarget?.name} and all their data. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                handleDelete(actionTarget);
-                setDeleteDialogOpen(false);
-              }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }

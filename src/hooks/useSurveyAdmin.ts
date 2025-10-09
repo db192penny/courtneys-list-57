@@ -152,15 +152,17 @@ export function useSurveyRatings(sessionToken: string | null) {
     queryFn: async () => {
       if (!sessionToken) return [];
 
+      // Step 1: Get survey_response_id
       const { data: response, error: respError } = await supabase
         .from("survey_responses" as any)
         .select("id")
         .eq("session_token", sessionToken)
-        .maybeSingle();
+        .single();
 
       if (respError) throw respError;
       if (!response) return [];
 
+      // Step 2: Get ratings using the ID
       const { data: ratings, error: ratError } = await supabase
         .from("survey_vendor_ratings" as any)
         .select("*")

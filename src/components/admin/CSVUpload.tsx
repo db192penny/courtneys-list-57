@@ -121,7 +121,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
       for (const person of selected) {
         const token = `survey_${person.name.toLowerCase().replace(/\s+/g, '_')}_2024`;
         
-        // Insert survey response
+        // Step 1: Insert survey response
         const { data: response, error: respError } = await supabase
           .from("survey_responses" as any)
           .insert({
@@ -137,12 +137,12 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             },
           })
           .select()
-          .maybeSingle();
+          .single();
 
         if (respError) throw respError;
         if (!response) throw new Error("Failed to create response");
 
-        // Insert pending vendors
+        // Step 2: Insert pending vendors using the response ID
         const vendorInserts = person.vendors.map(v => ({
           survey_response_id: response.id,
           vendor_name: v.name,
