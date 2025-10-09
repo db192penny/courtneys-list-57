@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import ReviewPreview from "@/components/ReviewPreview";
 import { ChevronDown } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface VendorRatingCardProps {
   vendorName: string;
@@ -42,6 +43,7 @@ export function VendorRatingCard({
   onSubmit,
   onSkip
 }: VendorRatingCardProps) {
+  const { toast } = useToast();
   const [rating, setRating] = useState(0);
   const [comments, setComments] = useState("");
   const [vendorContact, setVendorContact] = useState("");
@@ -52,6 +54,17 @@ export function VendorRatingCard({
   const [costAmount, setCostAmount] = useState("");
   const [costPeriod, setCostPeriod] = useState("");
   const [costNotes, setCostNotes] = useState("");
+
+  const getRatingPrompt = (rating: number): string => {
+    switch(rating) {
+      case 5: return "💬 Tell neighbors why they'll love this vendor!";
+      case 4: return "💬 What made this service good but not perfect?";
+      case 3: return "💬 Help others understand your mixed experience";
+      case 2: return "💬 What went wrong? Your neighbors need to know";
+      case 1: return "💬 Warn your neighbors - what happened?";
+      default: return "💬 Share your experience";
+    }
+  };
 
   const formatPhoneNumber = (value: string) => {
     const numbers = value.replace(/\D/g, "");
@@ -64,10 +77,26 @@ export function VendorRatingCard({
     setVendorContact(formatPhoneNumber(e.target.value));
   };
 
-  const isValid = rating > 0 && comments.length >= 20;
-
   const handleSubmit = () => {
-    if (!isValid) return;
+    // Check rating
+    if (!rating || rating < 1 || rating > 5) {
+      toast({
+        title: "Rating required",
+        description: "Please select a rating from 1 to 5 stars",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Check comments - friendly message
+    if (!comments || comments.trim().length === 0) {
+      toast({
+        title: "Comments help neighbors",
+        description: "Please leave some words - good or bad - as comments are what really helps neighbors!",
+        variant: "destructive"
+      });
+      return;
+    }
     
     onSubmit({
       rating,
@@ -106,21 +135,20 @@ export function VendorRatingCard({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="comments" className="text-base font-medium flex items-center gap-2">
-          <span>💬</span> Your Review <span className="text-destructive">*</span>
-        </Label>
-        <Textarea
-          id="comments"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          placeholder="Share your experience to help neighbors make informed decisions..."
-          className="min-h-[120px]"
-        />
-        <div className="text-xs text-muted-foreground text-right">
-          {comments.length}/20 characters minimum
+      {rating > 0 && (
+        <div className="space-y-2">
+          <Label htmlFor="comments" className="text-base font-medium text-foreground">
+            {getRatingPrompt(rating)}
+          </Label>
+          <Textarea
+            id="comments"
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+            placeholder="Share your experience..."
+            className="min-h-[120px]"
+          />
         </div>
-      </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor="phone" className="text-base font-medium flex items-center gap-2">
@@ -233,7 +261,7 @@ export function VendorRatingCard({
         <Button
           size="lg"
           onClick={handleSubmit}
-          disabled={!isValid}
+          disabled={rating === 0}
           className="flex-1 h-14 text-lg"
         >
           Save & Continue →
