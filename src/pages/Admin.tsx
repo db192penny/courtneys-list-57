@@ -322,6 +322,9 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
                 <h2 className="font-medium">Admin Tools</h2>
                 <div className="flex gap-2">
                   <Button asChild variant="outline" size="sm">
+                    <Link to="/admin/survey-ratings">Survey Ratings</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
                     <Link to="/admin/vendors/seed">Seed Vendor</Link>
                   </Button>
                   <Button asChild variant="outline" size="sm">

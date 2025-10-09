@@ -238,7 +238,7 @@ function AppContent() {
         <Route path="/logo-mockup" element={<LogoMockup />} />
         <Route path="/homepage" element={<Index />} />
         <Route path="/bridges/rate-vendors" element={<RateVendors />} />
-        <Route path="/admin/survey-ratings" element={<SurveyRatingsAdmin />} />
+        <Route path="/admin/survey-ratings" element={<AdminProtectedRoute><SurveyRatingsAdmin /></AdminProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
