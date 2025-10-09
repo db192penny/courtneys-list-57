@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserData } from "@/hooks/useUserData";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+
 import { SurveyStatsCard } from "@/components/admin/SurveyStatsCard";
 import { RespondentsTable } from "@/components/admin/RespondentsTable";
 import { CSVUpload } from "@/components/admin/CSVUpload";
@@ -27,33 +27,6 @@ export default function SurveyRatingsAdmin() {
       navigate('/');
       return;
     }
-    
-    // Check admin access via hook
-    const checkAdmin = async () => {
-      const { data: session } = await supabase.auth.getSession();
-      const userEmail = session?.session?.user?.email;
-      
-      if (!userEmail) {
-        navigate('/');
-        return;
-      }
-      
-      const adminEmails = [
-        'courtney@courtneys-list.com',
-        'your-email@example.com'
-      ];
-      
-      if (!adminEmails.includes(userEmail)) {
-        toast({
-          title: "Admin access required",
-          description: "You don't have permission to access this page",
-          variant: "destructive"
-        });
-        navigate('/');
-      }
-    };
-    
-    checkAdmin();
   }, [userData, userLoading, navigate, toast]);
 
   if (userLoading) {
