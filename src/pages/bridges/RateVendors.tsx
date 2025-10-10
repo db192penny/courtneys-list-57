@@ -216,16 +216,16 @@ export default function RateVendors() {
         <BridgesHeader />
         
         <div className="bg-card rounded-lg shadow-lg p-8 space-y-6">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              Thanks for Helping Build The Bridges Directory! 🏡
-            </h2>
-          </div>
-
           {surveyResponse && (
             <>
               <div className="text-center text-xl font-medium text-foreground">
                 Hi {surveyResponse.respondent_name.split(" ")[0]}!
+              </div>
+
+              <div className="text-center space-y-3">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+                  Thanks for Helping Build The Bridges Directory! 🏡
+                </h2>
               </div>
 
               <div className="space-y-2">
