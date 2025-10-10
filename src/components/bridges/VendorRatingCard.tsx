@@ -90,7 +90,6 @@ export function VendorRatingCard({
       toast({
         title: "Comments help neighbors",
         description: "Please leave some words - good or bad - as comments are what really helps neighbors!",
-        variant: "destructive"
       });
       return;
     }
