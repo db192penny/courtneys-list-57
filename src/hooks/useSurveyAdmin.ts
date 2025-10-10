@@ -47,7 +47,7 @@ export function useSurveyStats() {
       const { data: sessions, error: sessError } = await supabase
         .from("preview_sessions" as any)
         .select("id")
-        .eq("source", "admin_csv_upload");
+        .eq("source", "survey_oct_2024");
 
       if (sessError) throw sessError;
 
@@ -101,7 +101,7 @@ export function useSurveyRespondents() {
       const { data: sessions, error: sessError } = await supabase
         .from("preview_sessions" as any)
         .select("*")
-        .eq("source", "admin_csv_upload")
+        .eq("source", "survey_oct_2024")
         .order("created_at", { ascending: false });
 
       if (sessError) throw sessError;
@@ -161,7 +161,7 @@ export function useSurveyRatings(sessionToken: string | null) {
         .from("preview_sessions" as any)
         .select("id")
         .eq("session_token", sessionToken)
-        .eq("source", "admin_csv_upload")
+        .eq("source", "survey_oct_2024")
         .single();
 
       if (sessError) {
