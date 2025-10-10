@@ -168,6 +168,13 @@ export function VendorRatingCard({
         </Label>
       </div>
 
+      <ReviewPreview
+        rating={rating}
+        showName={showName}
+        userName={userName}
+        streetName={streetName}
+      />
+
       <div className="space-y-2">
         <Label htmlFor="phone" className="text-base font-medium flex items-center gap-2">
           <span>📞</span> Vendor's Phone Number
@@ -179,13 +186,6 @@ export function VendorRatingCard({
           placeholder="555-123-4567"
         />
       </div>
-
-      <ReviewPreview
-        rating={rating}
-        showName={showName}
-        userName={userName}
-        streetName={streetName}
-      />
 
       <Collapsible open={isPricingOpen} onOpenChange={setIsPricingOpen}>
         <CollapsibleTrigger asChild>
