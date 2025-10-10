@@ -57,18 +57,27 @@ export function useSurveyRating(token: string | null) {
         .from("survey_pending_vendors")
         .select("*")
         .eq("survey_response_id", response.id)
-        .eq("rated", false)
         .order("created_at", { ascending: true });
 
       if (vendorsError) {
         throw vendorsError;
       }
 
-      if (!vendors || vendors.length === 0) {
+      // Filter for unrated vendors with robust filtering
+      const unratedVendors = (vendors || [])
+        .filter(v => !v.rated)
+        .map(v => ({
+          id: v.id,
+          vendor_name: v.vendor_name,
+          category: v.category,
+          rated: v.rated || false
+        }));
+
+      if (unratedVendors.length === 0) {
         setError("already_completed");
       }
 
-      setPendingVendors(vendors || []);
+      setPendingVendors(unratedVendors);
       setLoading(false);
     } catch (err) {
       console.error("Error loading survey data:", err);
