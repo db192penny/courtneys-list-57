@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 import ReviewPreview from "@/components/ReviewPreview";
 import { useToast } from "@/hooks/use-toast";
 import CostInputs, { CostEntry } from "@/components/vendors/CostInputs";
@@ -48,6 +50,7 @@ export function VendorRatingCard({
   const [useForHome, setUseForHome] = useState(true);
   const [showName, setShowName] = useState(true);
   const [costEntries, setCostEntries] = useState<CostEntry[]>([]);
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
 
   const getRatingPrompt = (rating: number): string => {
     switch(rating) {
@@ -184,17 +187,30 @@ export function VendorRatingCard({
         streetName={streetName}
       />
 
-      <div className="space-y-3 p-4 bg-muted/20 rounded-lg border">
-        <div className="flex items-center gap-2">
-          <span>💰</span>
-          <Label className="text-base font-medium">Pricing Details (Optional)</Label>
-        </div>
-        <CostInputs
-          category={category}
-          value={costEntries}
-          onChange={setCostEntries}
-        />
-      </div>
+      <Collapsible open={isPricingOpen} onOpenChange={setIsPricingOpen}>
+        <CollapsibleTrigger asChild>
+          <button className="w-full p-4 bg-muted/20 rounded-lg border hover:bg-muted/30 transition-colors">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span>💰</span>
+                <Label className="text-base font-medium cursor-pointer">Pricing Details (Optional)</Label>
+              </div>
+              <ChevronDown 
+                className={`h-5 w-5 text-muted-foreground transition-transform ${isPricingOpen ? 'rotate-180' : ''}`}
+              />
+            </div>
+          </button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-2">
+          <div className="p-4 bg-muted/20 rounded-lg border space-y-3">
+            <CostInputs
+              category={category}
+              value={costEntries}
+              onChange={setCostEntries}
+            />
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       <div className="flex gap-3 pt-4">
         {currentIndex > 1 && (
