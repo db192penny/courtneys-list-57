@@ -109,7 +109,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             });
           }
 
-          const token = `survey_${row.Name.toLowerCase().replace(/\s+/g, '_')}_2024`;
+          const token = `survey_${row.Name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
           const isDuplicate = existingSet.has(token);
 
           parsed.push({
@@ -147,7 +147,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
 
     try {
       for (const person of selected) {
-        const token = `survey_${person.name.toLowerCase().replace(/\s+/g, '_')}_2024`;
+        const token = `survey_${person.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
         
         console.log("Inserting person:", {
           name: person.name,
@@ -221,8 +221,13 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
       
       toast({
         title: "Import successful!",
-        description: `Imported ${selected.length} respondents`,
+        description: `Imported ${selected.length} respondents. Refreshing...`,
       });
+      
+      // Auto-refresh page to show new data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error("Import error:", error);
       toast({
