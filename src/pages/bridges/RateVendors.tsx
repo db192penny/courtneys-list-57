@@ -55,11 +55,12 @@ export default function RateVendors() {
 
     const success = await submitRating(vendor.id, data);
     if (success) {
-      if (currentVendorIndex >= pendingVendors.length - 1) {
+      // Don't increment - pendingVendors will be shorter after rating
+      // Always show the first unrated vendor (index 0)
+      if (pendingVendors.length <= 1) {
         setCurrentPage("thankyou");
-      } else {
-        setCurrentVendorIndex(prev => prev + 1);
       }
+      // Don't change index - stay at 0
     }
   };
 
@@ -69,11 +70,11 @@ export default function RateVendors() {
 
     const success = await skipVendor(vendor.id);
     if (success) {
-      if (currentVendorIndex >= pendingVendors.length - 1) {
+      // Don't increment - pendingVendors will be shorter after skipping
+      if (pendingVendors.length <= 1) {
         setCurrentPage("thankyou");
-      } else {
-        setCurrentVendorIndex(prev => prev + 1);
       }
+      // Don't change index
     }
   };
 
@@ -202,7 +203,7 @@ export default function RateVendors() {
               key={currentVendor.id}
               vendorName={currentVendor.vendor_name}
               category={currentVendor.category}
-              currentIndex={currentVendorIndex + 1}
+              currentIndex={totalVendors - pendingVendors.length + 1}
               totalVendors={totalVendors}
               userName={surveyResponse.respondent_name}
               streetName={streetName}
