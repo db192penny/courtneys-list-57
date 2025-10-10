@@ -80,40 +80,31 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
           ];
           
           categories.forEach(category => {
-            const value = row[category]?.trim();
-            if (!value || value === "No selection") return;
-            
-            // Handle "Other: [vendor]" format
-            if (value.startsWith("Other: ")) {
-              const vendorName = value.replace("Other: ", "").trim();
-              if (vendorName) {
-                vendors.push({ name: vendorName, category });
+            let vendorValue = row[category];
+            if (vendorValue && vendorValue.trim()) {
+              // Remove "Other: " prefix if present
+              if (vendorValue.startsWith("Other:")) {
+                vendorValue = vendorValue.substring(6).trim();
               }
-            } else {
-              vendors.push({ name: value, category });
+              // Skip "No selection" entries
+              if (vendorValue.toLowerCase() !== "no selection" && vendorValue !== "") {
+                vendors.push({ name: vendorValue, category });
+              }
             }
           });
 
-          // Parse additional vendors if present (pipe-separated format)
-          if (row["Additional Vendors Summary"]) {
-            const additional = row["Additional Vendors Summary"].split("|");
-            additional.forEach((vendor: string) => {
-              const trimmed = vendor.trim();
-              if (!trimmed || trimmed === "No selection") return;
-              
-              // Try format: "Name (Category)"
-              const match = trimmed.match(/(.+?)\s*\((.+?)\)/);
-              if (match) {
-                vendors.push({ name: match[1].trim(), category: match[2].trim() });
-              } else if (trimmed.startsWith("Other: ")) {
-                // Handle "Other: [vendor]" in additional vendors
-                const vendorName = trimmed.replace("Other: ", "").trim();
-                if (vendorName) {
-                  vendors.push({ name: vendorName, category: "Other" });
+          // Parse additional vendors if present
+          if (row["Additional Vendors Summary"] && row["Additional Vendors Summary"].trim()) {
+            // Split by pipe |
+            const additionalVendors = row["Additional Vendors Summary"].split("|");
+            additionalVendors.forEach((entry: string) => {
+              const colonIndex = entry.indexOf(":");
+              if (colonIndex > -1) {
+                const category = entry.substring(0, colonIndex).trim();
+                const vendorName = entry.substring(colonIndex + 1).trim();
+                if (vendorName && category) {
+                  vendors.push({ name: vendorName, category });
                 }
-              } else {
-                // Just a vendor name without category
-                vendors.push({ name: trimmed, category: "Other" });
               }
             });
           }
