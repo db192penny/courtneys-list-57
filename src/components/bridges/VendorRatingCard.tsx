@@ -130,7 +130,7 @@ export function VendorRatingCard({
 
       {rating > 0 && (
         <div className="space-y-2">
-          <Label htmlFor="comments" className="text-base font-medium bg-muted/20 p-4 rounded-lg border">
+          <Label htmlFor="comments" className="text-base font-normal bg-background p-4 rounded-lg border border-border shadow-sm">
             {getRatingPrompt(rating)}
           </Label>
           <Textarea
