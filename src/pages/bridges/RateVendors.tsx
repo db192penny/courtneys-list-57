@@ -168,8 +168,8 @@ export default function RateVendors() {
 
             <div className="bg-secondary/20 rounded-lg p-6 space-y-3">
               <div className="text-lg font-medium flex items-center gap-2">
-                <span>📧</span>
-                <span>Check your email for your $10 Starbucks card within 24 hours</span>
+                <span>☕</span>
+                <span>As a thank you, I'm sending you a $10 Starbucks card - Coffee on me! Please check your email in the next 24 hours if kids give me a chance to breathe :)</span>
               </div>
             </div>
 
