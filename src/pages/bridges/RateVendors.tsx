@@ -77,6 +77,12 @@ export default function RateVendors() {
     }
   };
 
+  const handleBack = () => {
+    if (currentVendorIndex > 0) {
+      setCurrentVendorIndex(prev => prev - 1);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background flex items-center justify-center">
@@ -202,6 +208,7 @@ export default function RateVendors() {
               streetName={streetName}
               onSubmit={handleRatingSubmit}
               onSkip={handleSkip}
+              onBack={handleBack}
             />
           </div>
         </div>

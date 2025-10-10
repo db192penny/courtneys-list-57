@@ -342,9 +342,9 @@ export default function CostInputs({
       {/* Comments field for all categories */}
       {(category && category.toLowerCase() !== "general contractor") && (
         <div className="grid gap-2">
-          <Label>Comments (Optional)</Label>
+          <Label>Additional Cost Details</Label>
           <Textarea
-            placeholder="Share additional details about pricing for neighbors..."
+            placeholder="Share any helpful pricing details for neighbors..."
             value={entries[0]?.notes ?? ""}
             onChange={(e) => {
               // Only update the first entry with notes to prevent duplication

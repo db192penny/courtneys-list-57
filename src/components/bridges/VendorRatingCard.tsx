@@ -5,10 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import ReviewPreview from "@/components/ReviewPreview";
-import { ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import CostInputs, { CostEntry } from "@/components/vendors/CostInputs";
 
 interface VendorRatingCardProps {
   vendorName: string;
@@ -19,6 +18,7 @@ interface VendorRatingCardProps {
   streetName: string;
   onSubmit: (data: VendorRatingData) => void;
   onSkip: () => void;
+  onBack: () => void;
 }
 
 export interface VendorRatingData {
@@ -27,10 +27,7 @@ export interface VendorRatingData {
   vendorContact: string;
   useForHome: boolean;
   showName: boolean;
-  costKind: string;
-  costAmount: number | null;
-  costPeriod: string;
-  costNotes: string;
+  costEntries: CostEntry[];
 }
 
 export function VendorRatingCard({
@@ -41,19 +38,16 @@ export function VendorRatingCard({
   userName,
   streetName,
   onSubmit,
-  onSkip
+  onSkip,
+  onBack
 }: VendorRatingCardProps) {
   const { toast } = useToast();
   const [rating, setRating] = useState(0);
   const [comments, setComments] = useState("");
   const [vendorContact, setVendorContact] = useState("");
-  const [useForHome, setUseForHome] = useState(false);
+  const [useForHome, setUseForHome] = useState(true);
   const [showName, setShowName] = useState(true);
-  const [costOpen, setCostOpen] = useState(false);
-  const [costKind, setCostKind] = useState("");
-  const [costAmount, setCostAmount] = useState("");
-  const [costPeriod, setCostPeriod] = useState("");
-  const [costNotes, setCostNotes] = useState("");
+  const [costEntries, setCostEntries] = useState<CostEntry[]>([]);
 
   const getRatingPrompt = (rating: number): string => {
     switch(rating) {
@@ -104,10 +98,7 @@ export function VendorRatingCard({
       vendorContact,
       useForHome,
       showName,
-      costKind,
-      costAmount: costAmount ? parseFloat(costAmount) : null,
-      costPeriod,
-      costNotes
+      costEntries
     });
   };
 
@@ -128,7 +119,7 @@ export function VendorRatingCard({
 
       <div className="space-y-2">
         <Label className="text-base font-medium flex items-center gap-2">
-          <span>⭐</span> Your Rating <span className="text-destructive">*</span>
+          <span>⭐</span> Your Rating
         </Label>
         <div className="flex justify-center py-2">
           <StarRating value={rating} onChange={setRating} size="lg" />
@@ -137,7 +128,7 @@ export function VendorRatingCard({
 
       {rating > 0 && (
         <div className="space-y-2">
-          <Label htmlFor="comments" className="text-base font-medium text-foreground">
+          <Label htmlFor="comments" className="text-base font-medium text-foreground bg-muted/30 p-3 rounded-md border">
             {getRatingPrompt(rating)}
           </Label>
           <Textarea
@@ -149,20 +140,6 @@ export function VendorRatingCard({
           />
         </div>
       )}
-
-      <div className="space-y-2">
-        <Label htmlFor="phone" className="text-base font-medium flex items-center gap-2">
-          <span>📞</span> Vendor's Phone Number
-        </Label>
-        <Input
-          id="phone"
-          value={vendorContact}
-          onChange={handlePhoneChange}
-          placeholder="(555) 123-4567"
-          className="h-14 text-base"
-          maxLength={12}
-        />
-      </div>
 
       <div className="flex items-center space-x-2">
         <Checkbox
@@ -186,6 +163,18 @@ export function VendorRatingCard({
         </Label>
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="phone" className="text-base font-medium flex items-center gap-2">
+          <span>📞</span> Vendor's Phone Number
+        </Label>
+        <Input
+          id="phone"
+          value={vendorContact}
+          onChange={handlePhoneChange}
+          placeholder="555-123-4567"
+        />
+      </div>
+
       <ReviewPreview
         rating={rating}
         showName={showName}
@@ -193,63 +182,29 @@ export function VendorRatingCard({
         streetName={streetName}
       />
 
-      <Collapsible open={costOpen} onOpenChange={setCostOpen}>
-        <CollapsibleTrigger asChild>
-          <Button variant="outline" className="w-full justify-between" type="button">
-            <span className="flex items-center gap-2">
-              <span>💰</span> Add pricing details (optional)
-            </span>
-            <ChevronDown className={`h-4 w-4 transition-transform ${costOpen ? "rotate-180" : ""}`} />
+      <div className="space-y-3 p-4 bg-muted/20 rounded-lg border">
+        <div className="flex items-center gap-2">
+          <span>💰</span>
+          <Label className="text-base font-medium">Pricing Details (Optional)</Label>
+        </div>
+        <CostInputs
+          category={category}
+          value={costEntries}
+          onChange={setCostEntries}
+        />
+      </div>
+
+      <div className="flex gap-3 pt-4">
+        {currentIndex > 1 && (
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={onBack}
+            className="h-14 text-lg"
+          >
+            ← Back
           </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-4 mt-4">
-          <div className="space-y-2">
-            <Label htmlFor="cost-type">Cost Type</Label>
-            <select
-              id="cost-type"
-              value={costKind}
-              onChange={(e) => setCostKind(e.target.value)}
-              className="flex h-14 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <option value="">Select type...</option>
-              <option value="monthly_plan">Monthly Plan</option>
-              <option value="yearly_plan">Yearly Plan</option>
-              <option value="service_call">Service Call</option>
-              <option value="hourly">Hourly</option>
-              <option value="one_time">One-Time</option>
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cost-amount">Amount</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-              <Input
-                id="cost-amount"
-                type="number"
-                value={costAmount}
-                onChange={(e) => setCostAmount(e.target.value)}
-                placeholder="0.00"
-                className="h-14 text-base pl-8"
-                step="0.01"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cost-notes">Notes</Label>
-            <Textarea
-              id="cost-notes"
-              value={costNotes}
-              onChange={(e) => setCostNotes(e.target.value)}
-              placeholder="e.g., Includes weekly service + chemicals"
-              className="min-h-[80px]"
-            />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-
-      <div className="flex gap-4 pt-4">
+        )}
         <Button
           variant="outline"
           size="lg"
