@@ -127,13 +127,20 @@ export default function CommunityVendorTable({
   const { data, isLoading, error, refetch, isFetching } = useQuery<CommunityVendorRow[]>({
     queryKey: ["community-stats", communityName, category, sortBy],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("list_vendor_stats", {
+      const params: any = {
         _hoa_name: communityName,
         _category: category === "all" ? null : category,
         _sort_by: sortBy,
         _limit: 100,
         _offset: 0,
-      });
+      };
+      
+      // Only exclude hidden vendors for The Bridges
+      if (communityName === "The Bridges") {
+        params._exclude_hidden = true;
+      }
+      
+      const { data, error } = await supabase.rpc("list_vendor_stats", params);
       if (error) throw error;
       return (data || []) as any[];
     },
