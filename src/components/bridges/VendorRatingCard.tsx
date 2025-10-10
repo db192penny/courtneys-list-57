@@ -139,7 +139,7 @@ export function VendorRatingCard({
           
           <div className="space-y-2">
             <Label htmlFor="comments" className="text-base font-medium">
-              Comments * (required to help neighbors)
+              Comments
             </Label>
             <Textarea
               id="comments"
