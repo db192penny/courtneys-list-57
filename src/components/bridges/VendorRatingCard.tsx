@@ -221,7 +221,7 @@ export function VendorRatingCard({
       </Collapsible>
 
       <div className="flex flex-col gap-3 pt-4">
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           {currentIndex > 1 && (
             <Button
               variant="outline"
