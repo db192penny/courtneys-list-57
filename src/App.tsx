@@ -153,8 +153,9 @@ function AuthWatcher() {
 function ConditionalHeader() {
   const location = useLocation();
   const isPreviewRoute = location.pathname.startsWith('/community-preview/');
+  const isSurveyRoute = location.pathname === '/bridges/rate-vendors';
   
-  return isPreviewRoute ? null : <Header />;
+  return (isPreviewRoute || isSurveyRoute) ? null : <Header />;
 }
 
 function ActivityTimeoutManager() {
