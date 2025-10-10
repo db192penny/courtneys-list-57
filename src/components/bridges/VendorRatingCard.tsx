@@ -54,12 +54,12 @@ export function VendorRatingCard({
 
   const getRatingPrompt = (rating: number): string => {
     switch(rating) {
-      case 5: return "💬 Tell neighbors why they'll love this vendor!";
-      case 4: return "💬 What made this service good but not perfect?";
-      case 3: return "💬 Help others understand your mixed experience";
-      case 2: return "💬 What went wrong? Your neighbors need to know";
-      case 1: return "💬 Warn your neighbors - what happened?";
-      default: return "💬 Share your experience";
+      case 5: return "Tell neighbors why they'll love this vendor!";
+      case 4: return "What made this service good but not perfect?";
+      case 3: return "Help others understand your mixed experience";
+      case 2: return "What went wrong? Your neighbors need to know";
+      case 1: return "Warn your neighbors - what happened?";
+      default: return "Share your experience";
     }
   };
 
@@ -129,17 +129,26 @@ export function VendorRatingCard({
       </div>
 
       {rating > 0 && (
-        <div className="space-y-2">
-          <Label htmlFor="comments" className="text-base font-normal bg-background p-4 rounded-lg border border-border shadow-sm">
-            {getRatingPrompt(rating)}
-          </Label>
-          <Textarea
-            id="comments"
-            value={comments}
-            onChange={(e) => setComments(e.target.value)}
-            placeholder="Share your experience - the more details, the better for everyone in the community..."
-            className="min-h-[120px]"
-          />
+        <div className="space-y-3">
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <div className="flex items-start gap-2">
+              <span className="text-lg">💬</span>
+              <span className="text-blue-600 font-medium">{getRatingPrompt(rating)}</span>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="comments" className="text-base font-medium">
+              Comments * (required to help neighbors)
+            </Label>
+            <Textarea
+              id="comments"
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              placeholder="Share your experience to help neighbors make informed decisions"
+              className="min-h-[120px]"
+            />
+          </div>
         </div>
       )}
 
