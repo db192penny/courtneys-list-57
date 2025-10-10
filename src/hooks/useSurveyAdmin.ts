@@ -44,37 +44,38 @@ export function useSurveyStats() {
   return useQuery<SurveyStats>({
     queryKey: ["survey-stats"],
     queryFn: async () => {
-      const { data: responses, error: respError } = await supabase
-        .from("survey_responses" as any)
-        .select("id");
+      const { data: sessions, error: sessError } = await supabase
+        .from("preview_sessions" as any)
+        .select("id")
+        .eq("source", "survey_oct_2024");
 
-      if (respError) throw respError;
+      if (sessError) throw sessError;
 
-      const { data: vendors, error: vendError } = await supabase
-        .from("survey_pending_vendors" as any)
-        .select("id, rated, survey_response_id");
+      const { data: ratings, error: ratError } = await supabase
+        .from("survey_pending_ratings" as any)
+        .select("id, rated, session_id");
 
-      if (vendError) throw vendError;
+      if (ratError) throw ratError;
 
-      const totalPeople = responses?.length || 0;
-      const totalVendors = vendors?.length || 0;
-      const vendorsRated = vendors?.filter((v: any) => v.rated).length || 0;
+      const totalPeople = sessions?.length || 0;
+      const totalVendors = ratings?.length || 0;
+      const vendorsRated = ratings?.filter((v: any) => v.rated).length || 0;
 
       // Calculate completion status for each person
       const personStatus = new Map<string, { hasRated: boolean; hasUnrated: boolean }>();
       
-      vendors?.forEach((v: any) => {
-        const status = personStatus.get(v.survey_response_id) || { hasRated: false, hasUnrated: false };
+      ratings?.forEach((v: any) => {
+        const status = personStatus.get(v.session_id) || { hasRated: false, hasUnrated: false };
         if (v.rated) status.hasRated = true;
         else status.hasUnrated = true;
-        personStatus.set(v.survey_response_id, status);
+        personStatus.set(v.session_id, status);
       });
 
       let completedPeople = 0;
       let inProgressPeople = 0;
       let notStartedPeople = 0;
 
-      responses?.forEach((r: any) => {
+      sessions?.forEach((r: any) => {
         const status = personStatus.get(r.id);
         if (!status || !status.hasRated) notStartedPeople++;
         else if (status.hasUnrated) inProgressPeople++;
@@ -97,29 +98,30 @@ export function useSurveyRespondents() {
   return useQuery<Respondent[]>({
     queryKey: ["survey-respondents"],
     queryFn: async () => {
-      const { data: responses, error: respError } = await supabase
-        .from("survey_responses" as any)
+      const { data: sessions, error: sessError } = await supabase
+        .from("preview_sessions" as any)
         .select("*")
+        .eq("source", "survey_oct_2024")
         .order("created_at", { ascending: false });
 
-      if (respError) throw respError;
+      if (sessError) throw sessError;
 
-      const { data: vendors, error: vendError } = await supabase
-        .from("survey_pending_vendors" as any)
-        .select("survey_response_id, rated");
+      const { data: ratings, error: ratError } = await supabase
+        .from("survey_pending_ratings" as any)
+        .select("session_id, rated");
 
-      if (vendError) throw vendError;
+      if (ratError) throw ratError;
 
-      const vendorsByResponse = new Map<string, { total: number; completed: number }>();
-      vendors?.forEach((v: any) => {
-        const stats = vendorsByResponse.get(v.survey_response_id) || { total: 0, completed: 0 };
+      const ratingsBySession = new Map<string, { total: number; completed: number }>();
+      ratings?.forEach((r: any) => {
+        const stats = ratingsBySession.get(r.session_id) || { total: 0, completed: 0 };
         stats.total++;
-        if (v.rated) stats.completed++;
-        vendorsByResponse.set(v.survey_response_id, stats);
+        if (r.rated) stats.completed++;
+        ratingsBySession.set(r.session_id, stats);
       });
 
-      return responses?.map((r: any) => {
-        const vendorStats = vendorsByResponse.get(r.id) || { total: 0, completed: 0 };
+      return sessions?.map((s: any) => {
+        const vendorStats = ratingsBySession.get(s.id) || { total: 0, completed: 0 };
         let status: 'complete' | 'in_progress' | 'not_started' = 'not_started';
         
         if (vendorStats.completed === vendorStats.total && vendorStats.total > 0) {
@@ -129,17 +131,17 @@ export function useSurveyRespondents() {
         }
 
         return {
-          id: r.id,
-          sessionToken: r.session_token,
-          name: r.respondent_name,
-          contact: r.respondent_contact,
-          contactMethod: r.respondent_contact_method,
-          email: r.respondent_email,
+          id: s.id,
+          sessionToken: s.session_token,
+          name: s.name,
+          contact: s.email || 'No email provided',
+          contactMethod: s.metadata?.contact_method || 'Unknown',
+          email: s.email,
           totalVendors: vendorStats.total,
           completedVendors: vendorStats.completed,
           status,
-          createdAt: r.created_at,
-          metadata: r.metadata,
+          createdAt: s.created_at,
+          metadata: s.metadata,
         };
       }) || [];
     },
@@ -152,32 +154,31 @@ export function useSurveyRatings(sessionToken: string | null) {
     queryFn: async () => {
       if (!sessionToken) return [];
 
-      // Step 1: Get survey_response_id with proper error handling
-      const { data: responseData, error: respError } = await supabase
-        .from("survey_responses" as any)
+      // Step 1: Get session_id from preview_sessions
+      const { data: sessionData, error: sessError } = await supabase
+        .from("preview_sessions" as any)
         .select("id")
         .eq("session_token", sessionToken)
+        .eq("source", "survey_oct_2024")
         .single();
 
-      // Check for errors BEFORE accessing .id
-      if (respError) {
-        console.error('Response fetch error:', respError);
-        throw respError;
+      if (sessError) {
+        console.error('Session fetch error:', sessError);
+        throw sessError;
       }
       
-      if (!responseData) {
-        console.warn('No response found for token:', sessionToken);
+      if (!sessionData) {
+        console.warn('No session found for token:', sessionToken);
         return [];
       }
 
-      // NOW safe to use responseData.id with type assertion
-      const surveyResponseId = (responseData as any).id as string;
+      const sessionId = (sessionData as any).id as string;
 
-      // Step 2: Get ratings using the ID
+      // Step 2: Get all pending ratings for this session
       const { data: ratings, error: ratError } = await supabase
-        .from("survey_vendor_ratings" as any)
+        .from("survey_pending_ratings" as any)
         .select("*")
-        .eq("survey_response_id", surveyResponseId)
+        .eq("session_id", sessionId)
         .order("created_at", { ascending: true });
 
       if (ratError) {
@@ -189,15 +190,15 @@ export function useSurveyRatings(sessionToken: string | null) {
         id: r.id,
         vendorName: r.vendor_name,
         category: r.category,
-        rating: r.rating,
-        comments: r.comments,
-        vendorContact: r.vendor_contact,
-        showNameInReview: r.show_name_in_review,
-        useForHome: r.use_for_home,
-        costKind: r.cost_kind,
-        costAmount: r.cost_amount,
-        costPeriod: r.cost_period,
-        costNotes: r.cost_notes,
+        rating: r.rating || 0,
+        comments: r.comments || '',
+        vendorContact: null,
+        showNameInReview: true,
+        useForHome: false,
+        costKind: null,
+        costAmount: null,
+        costPeriod: null,
+        costNotes: null,
         createdAt: r.created_at,
       })) || [];
     },
