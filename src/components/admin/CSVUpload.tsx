@@ -162,13 +162,13 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
           .insert({
             session_token: token,
             name: person.name,
-            email: person.contactMethod === "Email" ? person.contact : null,
+            email: person.contactMethod?.toLowerCase() === "email" ? person.contact : null,
             address: "The Bridges, Delray Beach, FL",
             normalized_address: "the bridges delray beach fl",
             community: "The Bridges",
             source: "admin_csv_upload",
             metadata: {
-              phone: person.contactMethod === "Phone" ? person.contact : null,
+              phone: person.contactMethod?.toLowerCase() === "phone" ? person.contact : null,
               contact_method: person.contactMethod,
               from_survey: true,
               upload_batch: batchId,
