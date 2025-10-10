@@ -244,7 +244,7 @@ export default function RateVendors() {
 
               <div className="bg-secondary/20 rounded-lg p-4 space-y-3">
                 <p className="text-lg text-foreground text-center">
-                  You mentioned <span className="font-bold">{totalVendors}</span> service provider{totalVendors !== 1 ? "s" : ""}—let's quickly rate them!
+                  You mentioned <span className="font-bold">{totalVendors}</span> service provider{totalVendors !== 1 ? "s" : ""}—would be amazing and super helpful if you rate them.
                 </p>
                 {pendingVendors && pendingVendors.length > 0 && (
                   <div className="text-sm text-muted-foreground text-center">
@@ -256,6 +256,15 @@ export default function RateVendors() {
                     ))}
                   </div>
                 )}
+              </div>
+
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 text-center space-y-2">
+                <p className="text-lg font-medium text-foreground flex items-center justify-center gap-2">
+                  You do this and coffee on me! ☕
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  $10 Starbucks gift card
+                </p>
               </div>
 
               <Button
