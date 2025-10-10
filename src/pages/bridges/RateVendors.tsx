@@ -22,10 +22,16 @@ export default function RateVendors() {
   const [currentVendorIndex, setCurrentVendorIndex] = useState(0);
   const [emailInput, setEmailInput] = useState("");
   const [totalVendors, setTotalVendors] = useState(0);
+  const [initialVendorCount, setInitialVendorCount] = useState(0);
 
   useEffect(() => {
     if (!loading && surveyResponse && pendingVendors) {
-      setTotalVendors(pendingVendors.length);
+      // Capture initial count only once
+      if (initialVendorCount === 0 && pendingVendors.length > 0) {
+        setInitialVendorCount(pendingVendors.length);
+        setTotalVendors(pendingVendors.length);
+      }
+      
       setEmailInput(surveyResponse.respondent_email || "");
       
       if (error === "already_completed") {
@@ -38,7 +44,7 @@ export default function RateVendors() {
     if (error && error !== "already_completed") {
       setCurrentPage("error");
     }
-  }, [loading, error, surveyResponse, pendingVendors]);
+  }, [loading, error, surveyResponse, pendingVendors, initialVendorCount]);
 
   const handleEmailSubmit = async () => {
     if (!emailInput || !emailInput.includes("@")) return;
@@ -150,7 +156,7 @@ export default function RateVendors() {
                 Thank You {surveyResponse.respondent_name.split(" ")[0]}!
               </h2>
               <p className="text-lg text-muted-foreground">
-                Your {totalVendors} rating{totalVendors !== 1 ? "s have" : " has"} been saved and will help Boca Bridges neighbors find trusted service providers!
+                Your {initialVendorCount} rating{initialVendorCount !== 1 ? "s have" : " has"} been saved and will help Boca Bridges neighbors find trusted service providers!
               </p>
               
               <Button
@@ -193,8 +199,8 @@ export default function RateVendors() {
       <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
         <div className="max-w-2xl mx-auto pt-12">
           <ProgressBar
-            current={currentVendorIndex + 1}
-            total={totalVendors}
+            current={initialVendorCount - pendingVendors.length + 1}
+            total={initialVendorCount}
             className="mb-8"
           />
 
@@ -203,8 +209,8 @@ export default function RateVendors() {
               key={currentVendor.id}
               vendorName={currentVendor.vendor_name}
               category={currentVendor.category}
-              currentIndex={totalVendors - pendingVendors.length + 1}
-              totalVendors={totalVendors}
+              currentIndex={initialVendorCount - pendingVendors.length + 1}
+              totalVendors={initialVendorCount}
               userName={surveyResponse.respondent_name}
               streetName={streetName}
               onSubmit={handleRatingSubmit}
