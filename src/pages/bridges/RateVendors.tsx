@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,11 +7,13 @@ import { BridgesHeader } from "@/components/bridges/BridgesHeader";
 import { VendorRatingCard, VendorRatingData } from "@/components/bridges/VendorRatingCard";
 import { ProgressBar } from "@/components/survey/ProgressBar";
 import { useSurveyRating } from "@/hooks/useSurveyRating";
+import { ArrowLeft } from "lucide-react";
 
 type PageType = "email" | "rating" | "thankyou" | "error" | "completed";
 
 export default function RateVendors() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const token = searchParams.get("token");
   
   const { loading, error, surveyResponse, pendingVendors, updateEmail, submitRating, skipVendor } = useSurveyRating(token);
@@ -92,6 +94,14 @@ export default function RateVendors() {
             <div className="text-6xl mb-4">❌</div>
             <h2 className="text-2xl font-bold text-foreground">Invalid Link</h2>
             <p className="text-muted-foreground">{error || "Please check your email for the correct link."}</p>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/')}
+              className="mt-4"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
           </div>
         </div>
       </div>
@@ -106,7 +116,15 @@ export default function RateVendors() {
           <div className="bg-card rounded-lg shadow-lg p-8 text-center space-y-4">
             <div className="text-6xl mb-4">✅</div>
             <h2 className="text-2xl font-bold text-foreground">Already Completed</h2>
-            <p className="text-muted-foreground">You've already rated all vendors. Thank you!</p>
+            <p className="text-muted-foreground">You've already rated all service providers. Thank you!</p>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/')}
+              className="mt-4"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
           </div>
         </div>
       </div>
@@ -127,6 +145,16 @@ export default function RateVendors() {
               <p className="text-lg text-muted-foreground">
                 Your {totalVendors} rating{totalVendors !== 1 ? "s have" : " has"} been saved and will help Boca Bridges neighbors find trusted service providers!
               </p>
+              
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => navigate('/')}
+                className="mt-4"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Home
+              </Button>
             </div>
 
             <div className="bg-secondary/20 rounded-lg p-6 space-y-3">
@@ -192,20 +220,17 @@ export default function RateVendors() {
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
               Thanks for Helping Build The Bridges Directory! 🏡
             </h2>
-            <p className="text-lg text-muted-foreground">
-              We'll send your $10 Starbucks card to this email
-            </p>
           </div>
 
           {surveyResponse && (
             <>
               <div className="text-center text-xl font-medium text-foreground">
-                Hi {surveyResponse.respondent_name}!
+                Hi {surveyResponse.respondent_name.split(" ")[0]}!
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-base font-medium">
-                  Your Email (for gift card delivery)
+                  Your Email
                 </Label>
                 <Input
                   id="email"
@@ -217,10 +242,20 @@ export default function RateVendors() {
                 />
               </div>
 
-              <div className="bg-secondary/20 rounded-lg p-4 text-center">
-                <p className="text-lg text-foreground">
-                  You mentioned <span className="font-bold">{totalVendors}</span> vendor{totalVendors !== 1 ? "s" : ""}. Let's rate them!
+              <div className="bg-secondary/20 rounded-lg p-4 space-y-3">
+                <p className="text-lg text-foreground text-center">
+                  You mentioned <span className="font-bold">{totalVendors}</span> service provider{totalVendors !== 1 ? "s" : ""}—let's quickly rate them!
                 </p>
+                {pendingVendors && pendingVendors.length > 0 && (
+                  <div className="text-sm text-muted-foreground text-center">
+                    {pendingVendors.map((v, i) => (
+                      <span key={v.id}>
+                        <span className="font-medium">{v.vendor_name}</span>
+                        {i < pendingVendors.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <Button
