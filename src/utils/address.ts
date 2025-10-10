@@ -13,12 +13,19 @@ export const extractStreetName = (fullAddress: string) => {
 export const capitalizeStreetName = (streetName: string) => {
   if (!streetName || !streetName.trim()) return '';
   
+  // Words that should stay lowercase (except if they're the first word)
+  const smallWords = new Set(['a', 'an', 'the', 'and', 'but', 'or', 'for', 'nor', 'on', 'at', 'to', 'from', 'by', 'of', 'in']);
+  
   return streetName
     .toLowerCase()
     .split(' ')
-    .map(word => {
-      // Capitalize first letter of each word
-      return word.charAt(0).toUpperCase() + word.slice(1);
+    .map((word, index) => {
+      // Always capitalize first word, or if it's not a small word
+      if (index === 0 || !smallWords.has(word)) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      // Keep small words lowercase
+      return word;
     })
     .join(' ');
 };
