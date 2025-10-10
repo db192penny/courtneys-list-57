@@ -199,7 +199,7 @@ export default function RateVendors() {
 
   if (currentPage === "rating" && surveyResponse && pendingVendors.length > 0) {
     const currentVendor = pendingVendors[currentVendorIndex];
-    const streetName = "Lewis River Rd";
+    const streetName = "Lewis River Rd (just an example)";
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
