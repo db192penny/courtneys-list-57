@@ -60,7 +60,13 @@ export default function RateVendors() {
 
     const success = await submitRating(vendor.id, data);
     if (success) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Delay scroll to ensure new content renders first, then instant scroll to top
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }, 100);
+      
       // Don't increment - pendingVendors will be shorter after rating
       // Always show the first unrated vendor (index 0)
       if (pendingVendors.length <= 1) {
@@ -76,7 +82,13 @@ export default function RateVendors() {
 
     const success = await skipVendor(vendor.id);
     if (success) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Delay scroll to ensure new content renders first, then instant scroll to top
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }, 100);
+      
       // Don't increment - pendingVendors will be shorter after skipping
       if (pendingVendors.length <= 1) {
         setCurrentPage("thankyou");
@@ -88,7 +100,12 @@ export default function RateVendors() {
   const handleBack = () => {
     if (currentVendorIndex > 0) {
       setCurrentVendorIndex(prev => prev - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Delay scroll to ensure new content renders first, then instant scroll to top
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }, 100);
     }
   };
 
