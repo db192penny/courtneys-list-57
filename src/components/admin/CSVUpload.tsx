@@ -52,13 +52,15 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
         
         const parsed: ParsedRespondent[] = [];
         
-        // Check existing respondents by session_token
+        // Check existing respondents by NAME (not token)
         const { data: existing } = await supabase
           .from("preview_sessions" as any)
-          .select("session_token");
+          .select("name, session_token")
+          .in('source', ['survey_oct_2024', 'admin_csv_upload']);
 
-        const existingSet = new Set(
-          existing?.map((r: any) => r.session_token) || []
+        // Check by NAME not token
+        const existingNames = new Set(
+          existing?.map((r: any) => r.name.toLowerCase().trim()) || []
         );
 
         results.data.forEach((row: any) => {
@@ -109,8 +111,11 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             });
           }
 
+          // Keep unique token but check name for duplicates
           const token = `survey_${row.Name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
-          const isDuplicate = existingSet.has(token);
+          const isDuplicate = existingNames.has(row.Name.toLowerCase().trim());
+          
+          console.log(`${row.Name}: ${isDuplicate ? 'DUPLICATE ⚠️' : 'NEW ✅'}`);
 
           parsed.push({
             name: row.Name,
