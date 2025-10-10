@@ -157,7 +157,8 @@ export default function CommunityVendorTable({
       const uniqueCategories = [...new Set(data?.map((v: any) => v.category) || [])];
       return uniqueCategories.sort();
     },
-    enabled: !!communityName,
+    enabled: !!communityName && 
+      (communityName === "The Bridges" || communityName === "the-bridges"),
   });
 
   // Fetch community photo for the review source icon
@@ -272,7 +273,11 @@ export default function CommunityVendorTable({
               <HorizontalCategoryPills
                 selectedCategory={category}
                 onCategoryChange={handleCategoryChange}
-                categories={(communityName === "The Bridges" && availableCategories ? availableCategories : CATEGORIES) as string[]}
+                categories={(
+                  (communityName === "The Bridges" || communityName === "the-bridges") && 
+                  availableCategories?.length > 0 ? 
+                  availableCategories : CATEGORIES
+                ) as string[]}
               />
             </div>
             
