@@ -140,6 +140,26 @@ export default function CommunityVendorTable({
     enabled: !!communityName,
   });
 
+  // Fetch available categories for The Bridges
+  const { data: availableCategories } = useQuery<string[]>({
+    queryKey: ["available-categories", communityName],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("list_vendor_stats", {
+        _hoa_name: communityName,
+        _category: null,
+        _sort_by: "hoa_rating",
+        _limit: 1000,
+        _offset: 0,
+      });
+      if (error) throw error;
+      
+      // Get unique categories from the results
+      const uniqueCategories = [...new Set(data?.map((v: any) => v.category) || [])];
+      return uniqueCategories.sort();
+    },
+    enabled: !!communityName,
+  });
+
   // Fetch community photo for the review source icon
   const { data: communityAssets } = useQuery({
     queryKey: ["community-assets", communityName],
@@ -252,7 +272,7 @@ export default function CommunityVendorTable({
               <HorizontalCategoryPills
                 selectedCategory={category}
                 onCategoryChange={handleCategoryChange}
-                categories={[...CATEGORIES]}
+                categories={(communityName === "The Bridges" && availableCategories ? availableCategories : CATEGORIES) as string[]}
               />
             </div>
             
