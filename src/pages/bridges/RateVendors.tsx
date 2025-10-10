@@ -162,7 +162,7 @@ export default function RateVendors() {
                 Thank You {surveyResponse.respondent_name.split(" ")[0]}!
               </h2>
               <p className="text-lg text-muted-foreground">
-                Your {initialVendorCount} rating{initialVendorCount !== 1 ? "s have" : " has"} been saved and will help Boca Bridges neighbors find trusted service providers!
+                Your {initialVendorCount} rating{initialVendorCount !== 1 ? "s have" : " has"} been saved and will help The Bridges neighbors find trusted service providers!
               </p>
             </div>
 
@@ -178,7 +178,7 @@ export default function RateVendors() {
               <ul className="space-y-2 text-muted-foreground">
                 <li>• The Bridges Directory launches next week</li>
                 <li>• Your reviews will go live</li>
-                <li>• We'll email you when it launches!</li>
+                <li>• I'll email you when it launches!</li>
               </ul>
             </div>
           </div>
