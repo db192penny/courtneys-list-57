@@ -19,7 +19,7 @@ export interface Respondent {
   email: string | null;
   totalVendors: number;
   completedVendors: number;
-  status: 'complete' | 'in_progress' | 'not_started';
+  status: "complete" | "in_progress" | "not_started";
   createdAt: string;
   metadata: any;
 }
@@ -74,9 +74,7 @@ export function useSurveyStats() {
       const totalVendors = pendingRatings?.length || 0;
 
       // Map session_token to survey_response_id
-      const sessionToResponseId = new Map(
-        surveyResponses?.map((r: any) => [r.session_token, r.id]) || []
-      );
+      const sessionToResponseId = new Map(surveyResponses?.map((r: any) => [r.session_token, r.id]) || []);
 
       // Count actual ratings per session
       const actualRatingsPerSession = new Map<string, number>();
@@ -90,7 +88,7 @@ export function useSurveyStats() {
 
       // Calculate completion status for each person
       const personStatus = new Map<string, { hasRated: boolean; hasUnrated: boolean; actualRatingCount: number }>();
-      
+
       pendingRatings?.forEach((v: any) => {
         const status = personStatus.get(v.session_id) || { hasRated: false, hasUnrated: false, actualRatingCount: 0 };
         if (v.rated) status.hasRated = true;
@@ -113,10 +111,10 @@ export function useSurveyStats() {
       sessions?.forEach((session: any) => {
         const status = personStatus.get(session.id);
         const hasActualRatings = status && status.actualRatingCount > 0;
-        
+
         if (!status || (!status.hasRated && !hasActualRatings)) {
           notStartedPeople++;
-        } else if (status.hasUnrated || (status.actualRatingCount < totalVendors / totalPeople)) {
+        } else if (status.hasUnrated || status.actualRatingCount < totalVendors / totalPeople) {
           inProgressPeople++;
         } else {
           completedPeople++;
@@ -173,9 +171,7 @@ export function useSurveyRespondents() {
       if (actualError) throw actualError;
 
       // Map session_token to survey_response_id
-      const sessionToResponseId = new Map(
-        surveyResponses?.map((r: any) => [r.session_token, r.id]) || []
-      );
+      const sessionToResponseId = new Map(surveyResponses?.map((r: any) => [r.session_token, r.id]) || []);
 
       // Count pending ratings by session
       const ratingsBySession = new Map<string, { total: number; completed: number }>();
@@ -196,40 +192,42 @@ export function useSurveyRespondents() {
         }
       });
 
-      return sessions?.map((s: any) => {
-        const pendingStats = ratingsBySession.get(s.id) || { total: 0, completed: 0 };
-        const actualRatingCount = actualRatingsPerSession.get(s.id) || 0;
-        
-        // Use the HIGHER of the two counts
-        const completedVendors = Math.max(pendingStats.completed, actualRatingCount);
-        const totalVendors = pendingStats.total;
-        
-        let status: 'complete' | 'in_progress' | 'not_started' = 'not_started';
-        
-        if (completedVendors > 0) {
-          if (completedVendors === totalVendors && totalVendors > 0) {
-            status = 'complete';
-          } else {
-            status = 'in_progress';
+      return (
+        sessions?.map((s: any) => {
+          const pendingStats = ratingsBySession.get(s.id) || { total: 0, completed: 0 };
+          const actualRatingCount = actualRatingsPerSession.get(s.id) || 0;
+
+          // Use the HIGHER of the two counts
+          const completedVendors = Math.max(pendingStats.completed, actualRatingCount);
+          const totalVendors = pendingStats.total;
+
+          let status: "complete" | "in_progress" | "not_started" = "not_started";
+
+          if (completedVendors > 0) {
+            if (completedVendors === totalVendors && totalVendors > 0) {
+              status = "complete";
+            } else {
+              status = "in_progress";
+            }
           }
-        }
 
-        const contact = s.email || s.metadata?.phone || 'No contact provided';
+          const contact = s.email || s.metadata?.phone || "No contact provided";
 
-        return {
-          id: s.id,
-          sessionToken: s.session_token,
-          name: s.name,
-          contact: contact,
-          contactMethod: s.metadata?.contact_method || 'Unknown',
-          email: s.email,
-          totalVendors: totalVendors,
-          completedVendors: completedVendors,
-          status,
-          createdAt: s.created_at,
-          metadata: s.metadata,
-        };
-      }) || [];
+          return {
+            id: s.id,
+            sessionToken: s.session_token,
+            name: s.name,
+            contact: contact,
+            contactMethod: s.metadata?.contact_method || "Unknown",
+            email: s.email,
+            totalVendors: totalVendors,
+            completedVendors: completedVendors,
+            status,
+            createdAt: s.created_at,
+            metadata: s.metadata,
+          };
+        }) || []
+      );
     },
   });
 }
@@ -240,53 +238,56 @@ export function useSurveyRatings(sessionToken: string | null) {
     queryFn: async () => {
       if (!sessionToken) return [];
 
-      // Step 1: Get session_id from preview_sessions
-      const { data: sessionData, error: sessError } = await supabase
-        .from("preview_sessions" as any)
+      // Get survey_response by matching session_token
+      const { data: responseData, error: respError } = await supabase
+        .from("survey_responses" as any)
         .select("id")
         .eq("session_token", sessionToken)
-        .eq("source", "survey_oct_2024")
         .single();
 
-      if (sessError) {
-        console.error('Session fetch error:', sessError);
-        throw sessError;
-      }
-      
-      if (!sessionData) {
-        console.warn('No session found for token:', sessionToken);
+      if (respError) {
+        console.error("Survey response fetch error:", respError);
+        // If no survey_response, return empty array
         return [];
       }
 
-      const sessionId = (sessionData as any).id as string;
+      if (!responseData) {
+        console.warn("No survey response found for token:", sessionToken);
+        return [];
+      }
 
-      // Step 2: Get all pending ratings for this session
+      const responseId = (responseData as any).id as string;
+
+      // Get ACTUAL ratings from survey_vendor_ratings
       const { data: ratings, error: ratError } = await supabase
-        .from("survey_pending_ratings" as any)
+        .from("survey_vendor_ratings" as any)
         .select("*")
-        .eq("session_id", sessionId)
+        .eq("survey_response_id", responseId)
         .order("created_at", { ascending: true });
 
       if (ratError) {
-        console.error('Ratings fetch error:', ratError);
+        console.error("Ratings fetch error:", ratError);
         throw ratError;
       }
 
-      return ratings?.map((r: any) => ({
-        id: r.id,
-        vendorName: r.vendor_name,
-        category: r.category,
-        rating: r.rating || 0,
-        comments: r.comments || '',
-        vendorContact: null,
-        showNameInReview: true,
-        useForHome: false,
-        costKind: null,
-        costAmount: null,
-        costPeriod: null,
-        costNotes: null,
-        createdAt: r.created_at,
-      })) || [];
+      // Map with ACTUAL data from the ratings table
+      return (
+        ratings?.map((r: any) => ({
+          id: r.id,
+          vendorName: r.vendor_name,
+          category: r.category,
+          rating: r.rating || 0,
+          comments: r.comments || "",
+          vendorContact: r.vendor_contact || null,
+          showNameInReview: r.show_name_in_review ?? true,
+          useForHome: r.use_for_home ?? false,
+          costKind: r.cost_kind || null,
+          costAmount: r.cost_amount || null,
+          costPeriod: r.cost_period || null,
+          costNotes: r.cost_notes || null,
+          createdAt: r.created_at,
+        })) || []
+      );
     },
     enabled: !!sessionToken,
   });
