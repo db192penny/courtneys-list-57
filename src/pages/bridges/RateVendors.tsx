@@ -164,16 +164,6 @@ export default function RateVendors() {
               <p className="text-lg text-muted-foreground">
                 Your {initialVendorCount} rating{initialVendorCount !== 1 ? "s have" : " has"} been saved and will help Boca Bridges neighbors find trusted service providers!
               </p>
-              
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => navigate('/')}
-                className="mt-4"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
-              </Button>
             </div>
 
             <div className="bg-secondary/20 rounded-lg p-6 space-y-3">
