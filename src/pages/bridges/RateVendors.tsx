@@ -3,7 +3,6 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BridgesHeader } from "@/components/bridges/BridgesHeader";
 import { VendorRatingCard, VendorRatingData } from "@/components/bridges/VendorRatingCard";
 import { ProgressBar } from "@/components/survey/ProgressBar";
 import { useSurveyRating } from "@/hooks/useSurveyRating";
@@ -105,7 +104,6 @@ export default function RateVendors() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
         <div className="max-w-2xl mx-auto pt-12">
-          <BridgesHeader />
           <div className="bg-card rounded-lg shadow-lg p-8 text-center space-y-4">
             <div className="text-6xl mb-4">❌</div>
             <h2 className="text-2xl font-bold text-foreground">Invalid Link</h2>
@@ -128,7 +126,6 @@ export default function RateVendors() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
         <div className="max-w-2xl mx-auto pt-12">
-          <BridgesHeader />
           <div className="bg-card rounded-lg shadow-lg p-8 text-center space-y-4">
             <div className="text-6xl mb-4">✅</div>
             <h2 className="text-2xl font-bold text-foreground">Already Completed</h2>
@@ -151,9 +148,15 @@ export default function RateVendors() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
         <div className="max-w-2xl mx-auto pt-12">
-          <BridgesHeader />
           <div className="bg-card rounded-lg shadow-lg p-8 space-y-6">
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-6">
+              <div className="flex justify-center mb-4">
+                <img 
+                  src="/courtney-list-header-logo.png" 
+                  alt="The Bridges" 
+                  className="w-24 h-24 rounded-full object-cover"
+                />
+              </div>
               <div className="text-6xl">🎉</div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
                 Thank You {surveyResponse.respondent_name.split(" ")[0]}!
@@ -230,19 +233,25 @@ export default function RateVendors() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
       <div className="max-w-2xl mx-auto pt-12">
-        <BridgesHeader />
-        
-        <div className="bg-card rounded-lg shadow-lg p-8 space-y-6">
+        <div className="bg-card rounded-lg shadow-lg p-8 space-y-8">
           {surveyResponse && (
             <>
-              <div className="text-center text-xl font-medium text-foreground">
-                Hi {surveyResponse.respondent_name.split(" ")[0]}!
-              </div>
+              <div className="text-center space-y-6">
+                <div className="flex justify-center">
+                  <img 
+                    src="/courtney-list-header-logo.png" 
+                    alt="The Bridges" 
+                    className="w-24 h-24 rounded-full object-cover"
+                  />
+                </div>
+                
+                <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+                  Hi {surveyResponse.respondent_name.split(" ")[0]}!
+                </h1>
 
-              <div className="text-center space-y-3">
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+                <p className="text-xl md:text-2xl text-foreground">
                   Thanks for Helping Build The Bridges Directory! 🏡
-                </h2>
+                </p>
               </div>
 
               <div className="space-y-2">
