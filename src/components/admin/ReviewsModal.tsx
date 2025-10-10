@@ -77,6 +77,11 @@ export function ReviewsModal({
           <DialogTitle className="text-2xl flex items-center gap-2">
             📝 {respondentName}'s Reviews
           </DialogTitle>
+          {ratings?.[0]?.respondentEmail && (
+            <p className="text-sm text-muted-foreground mt-1">
+              📧 {ratings[0].respondentEmail}
+            </p>
+          )}
           <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between pt-2">
             <Badge variant={completedVendors === totalVendors ? "default" : "secondary"} className="w-fit">
               {completedVendors === totalVendors ? "✅" : "⏳"} {completedVendors} of {totalVendors} vendors rated

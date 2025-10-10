@@ -38,6 +38,8 @@ export interface VendorRating {
   costPeriod: string | null;
   costNotes: string | null;
   createdAt: string;
+  respondentEmail?: string;
+  respondentName?: string;
 }
 
 export function useSurveyStats() {
