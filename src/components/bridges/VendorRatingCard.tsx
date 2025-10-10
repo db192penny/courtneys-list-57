@@ -103,7 +103,7 @@ export function VendorRatingCard({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="text-center border-b border-border pb-4">
         <div className="text-sm text-muted-foreground font-medium mb-2">
           VENDOR {currentIndex} OF {totalVendors}
@@ -128,7 +128,7 @@ export function VendorRatingCard({
 
       {rating > 0 && (
         <div className="space-y-2">
-          <Label htmlFor="comments" className="text-base font-medium text-foreground bg-muted/30 p-3 rounded-md border">
+          <Label htmlFor="comments" className="text-base font-medium bg-muted/20 p-4 rounded-lg border">
             {getRatingPrompt(rating)}
           </Label>
           <Textarea
@@ -141,25 +141,27 @@ export function VendorRatingCard({
         </div>
       )}
 
-      <div className="flex items-center space-x-2">
+      <div className="flex items-start gap-3">
         <Checkbox
           id="use-for-home"
           checked={useForHome}
           onCheckedChange={(checked) => setUseForHome(checked as boolean)}
+          className="mt-0.5"
         />
-        <Label htmlFor="use-for-home" className="text-base cursor-pointer">
-          <span className="mr-2">✓</span>I currently use this vendor for my home
+        <Label htmlFor="use-for-home" className="text-base cursor-pointer select-none font-normal">
+          I currently use this vendor for my home
         </Label>
       </div>
 
-      <div className="flex items-center space-x-2">
+      <div className="flex items-start gap-3">
         <Checkbox
           id="show-name"
           checked={showName}
           onCheckedChange={(checked) => setShowName(checked as boolean)}
+          className="mt-0.5"
         />
-        <Label htmlFor="show-name" className="text-base cursor-pointer">
-          <span className="mr-2">✓</span>Show my name in review
+        <Label htmlFor="show-name" className="text-base cursor-pointer select-none font-normal">
+          Show my name in review
         </Label>
       </div>
 
