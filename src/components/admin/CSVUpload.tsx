@@ -43,6 +43,13 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
     Papa.parse(selectedFile, {
       header: true,
       complete: async (results) => {
+        console.log("=== CSV DEBUG ===");
+        console.log("Total rows:", results.data.length);
+        console.log("First row raw data:", results.data[0]);
+        console.log("Column names found:", Object.keys(results.data[0] || {}));
+        console.log("Sample Contact value:", (results.data[0] as any)?.["Contact"]);
+        console.log("Sample Contact Method:", (results.data[0] as any)?.["Contact Method"]);
+        
         const parsed: ParsedRespondent[] = [];
         
         // Check existing respondents by session_token
@@ -57,6 +64,13 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
         results.data.forEach((row: any) => {
           if (!row.Name || !row.Contact) return;
 
+          console.log(`Processing ${row.Name}:`, {
+            contact: row.Contact,
+            contactMethod: row["Contact Method"],
+            poolService: row["Pool Service"],
+            additionalVendors: row["Additional Vendors Summary"]
+          });
+
           const vendors: Array<{ name: string; category: string }> = [];
           
           // Extract vendors from category columns
@@ -66,18 +80,40 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
           ];
           
           categories.forEach(category => {
-            if (row[category] && row[category].trim()) {
-              vendors.push({ name: row[category].trim(), category });
+            const value = row[category]?.trim();
+            if (!value || value === "No selection") return;
+            
+            // Handle "Other: [vendor]" format
+            if (value.startsWith("Other: ")) {
+              const vendorName = value.replace("Other: ", "").trim();
+              if (vendorName) {
+                vendors.push({ name: vendorName, category });
+              }
+            } else {
+              vendors.push({ name: value, category });
             }
           });
 
-          // Parse additional vendors if present
+          // Parse additional vendors if present (pipe-separated format)
           if (row["Additional Vendors Summary"]) {
-            const additional = row["Additional Vendors Summary"].split(";");
+            const additional = row["Additional Vendors Summary"].split("|");
             additional.forEach((vendor: string) => {
-              const match = vendor.match(/(.+?)\s*\((.+?)\)/);
+              const trimmed = vendor.trim();
+              if (!trimmed || trimmed === "No selection") return;
+              
+              // Try format: "Name (Category)"
+              const match = trimmed.match(/(.+?)\s*\((.+?)\)/);
               if (match) {
                 vendors.push({ name: match[1].trim(), category: match[2].trim() });
+              } else if (trimmed.startsWith("Other: ")) {
+                // Handle "Other: [vendor]" in additional vendors
+                const vendorName = trimmed.replace("Other: ", "").trim();
+                if (vendorName) {
+                  vendors.push({ name: vendorName, category: "Other" });
+                }
+              } else {
+                // Just a vendor name without category
+                vendors.push({ name: trimmed, category: "Other" });
               }
             });
           }
@@ -121,6 +157,13 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
     try {
       for (const person of selected) {
         const token = `survey_${person.name.toLowerCase().replace(/\s+/g, '_')}_2024`;
+        
+        console.log("Inserting person:", {
+          name: person.name,
+          contact: person.contact,
+          contactMethod: person.contactMethod,
+          vendorCount: person.vendors.length
+        });
         
         // Step 1: Insert preview session with proper error handling
         const { data: responseData, error: respError } = await supabase
