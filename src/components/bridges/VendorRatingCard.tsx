@@ -221,26 +221,24 @@ export function VendorRatingCard({
       </Collapsible>
 
       <div className="flex flex-col gap-3 pt-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          {currentIndex > 1 && (
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={onBack}
-              className="flex-1 h-14 text-lg"
-            >
-              ← Back
-            </Button>
-          )}
+        <Button
+          size="lg"
+          onClick={handleSubmit}
+          disabled={rating === 0}
+          className="w-full h-14 text-lg"
+        >
+          Save & Continue →
+        </Button>
+        {currentIndex > 1 && (
           <Button
+            variant="outline"
             size="default"
-            onClick={handleSubmit}
-            disabled={rating === 0}
-            className="h-12 text-base"
+            onClick={onBack}
+            className="w-full h-12 text-base"
           >
-            Save & Continue →
+            ← Back
           </Button>
-        </div>
+        )}
         <button
           onClick={onSkip}
           className="text-sm text-muted-foreground hover:text-foreground underline transition-colors"
