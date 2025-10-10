@@ -241,7 +241,7 @@ export function useSurveyRatings(sessionToken: string | null) {
       // Get survey_response by matching session_token
       const { data: responseData, error: respError } = await supabase
         .from("survey_responses" as any)
-        .select("id")
+        .select("id, respondent_email, respondent_name")
         .eq("session_token", sessionToken)
         .single();
 
@@ -257,6 +257,8 @@ export function useSurveyRatings(sessionToken: string | null) {
       }
 
       const responseId = (responseData as any).id as string;
+      const respondentEmail = (responseData as any).respondent_email as string;
+      const respondentName = (responseData as any).respondent_name as string;
 
       // Get ACTUAL ratings from survey_vendor_ratings
       const { data: ratings, error: ratError } = await supabase
@@ -272,7 +274,7 @@ export function useSurveyRatings(sessionToken: string | null) {
 
       // Map with ACTUAL data from the ratings table
       return (
-        ratings?.map((r: any) => ({
+        ratings?.map((r: any, index: number) => ({
           id: r.id,
           vendorName: r.vendor_name,
           category: r.category,
@@ -286,6 +288,10 @@ export function useSurveyRatings(sessionToken: string | null) {
           costPeriod: r.cost_period || null,
           costNotes: r.cost_notes || null,
           createdAt: r.created_at,
+          ...(index === 0 ? { 
+            respondentEmail: respondentEmail || 'No email provided',
+            respondentName: respondentName 
+          } : {})
         })) || []
       );
     },
