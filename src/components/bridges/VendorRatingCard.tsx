@@ -222,24 +222,24 @@ export function VendorRatingCard({
 
       <div className="flex flex-col gap-3 pt-4">
         <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            size="lg"
-            onClick={handleSubmit}
-            disabled={rating === 0}
-            className="flex-1 h-14 text-lg"
-          >
-            Save & Continue →
-          </Button>
           {currentIndex > 1 && (
             <Button
               variant="outline"
               size="lg"
               onClick={onBack}
-              className="h-14 text-lg"
+              className="flex-1 h-14 text-lg"
             >
               ← Back
             </Button>
           )}
+          <Button
+            size="default"
+            onClick={handleSubmit}
+            disabled={rating === 0}
+            className="h-12 text-base"
+          >
+            Save & Continue →
+          </Button>
         </div>
         <button
           onClick={onSkip}
