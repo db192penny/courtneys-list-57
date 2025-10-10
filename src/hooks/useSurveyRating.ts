@@ -129,10 +129,10 @@ export function useSurveyRating(token: string | null) {
           comments: ratingData.comments,
           use_for_home: ratingData.useForHome,
           show_name_in_review: ratingData.showName,
-          cost_kind: ratingData.costKind || null,
-          cost_amount: ratingData.costAmount,
-          cost_period: ratingData.costPeriod || null,
-          cost_notes: ratingData.costNotes || null,
+          cost_kind: ratingData.costEntries?.[0]?.kind || null,
+          cost_amount: ratingData.costEntries?.[0]?.amount || null,
+          cost_period: ratingData.costEntries?.[0]?.period || null,
+          cost_notes: ratingData.costEntries?.[0]?.notes || null,
         });
 
       if (insertError) throw insertError;
