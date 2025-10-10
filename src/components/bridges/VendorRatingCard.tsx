@@ -135,7 +135,7 @@ export function VendorRatingCard({
             id="comments"
             value={comments}
             onChange={(e) => setComments(e.target.value)}
-            placeholder="Share your experience..."
+            placeholder="Share your experience - the more details, the better for everyone in the community..."
             className="min-h-[120px]"
           />
         </div>
