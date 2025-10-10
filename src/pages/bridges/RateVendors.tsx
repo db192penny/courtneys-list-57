@@ -152,7 +152,7 @@ export default function RateVendors() {
             <div className="text-center space-y-6">
               <div className="flex justify-center mb-4">
                 <img 
-                  src="/courtney-list-header-logo.png" 
+                  src="/bridges-logo.jpg" 
                   alt="The Bridges" 
                   className="w-24 h-24 rounded-full object-cover"
                 />
@@ -229,7 +229,7 @@ export default function RateVendors() {
               <div className="text-center space-y-6">
                 <div className="flex justify-center">
                   <img 
-                    src="/courtney-list-header-logo.png" 
+                    src="/bridges-logo.jpg" 
                     alt="The Bridges" 
                     className="w-24 h-24 rounded-full object-cover"
                   />
