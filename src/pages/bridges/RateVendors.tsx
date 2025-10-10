@@ -97,17 +97,6 @@ export default function RateVendors() {
     }
   };
 
-  const handleBack = () => {
-    if (currentVendorIndex > 0) {
-      setCurrentVendorIndex(prev => prev - 1);
-      // Delay scroll to ensure new content renders first, then instant scroll to top
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'auto' });
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-      }, 100);
-    }
-  };
 
   if (loading) {
     return (
@@ -228,7 +217,6 @@ export default function RateVendors() {
               streetName={streetName}
               onSubmit={handleRatingSubmit}
               onSkip={handleSkip}
-              onBack={handleBack}
             />
           </div>
         </div>

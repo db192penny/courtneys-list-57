@@ -20,7 +20,6 @@ interface VendorRatingCardProps {
   streetName: string;
   onSubmit: (data: VendorRatingData) => void;
   onSkip: () => void;
-  onBack: () => void;
 }
 
 export interface VendorRatingData {
@@ -40,8 +39,7 @@ export function VendorRatingCard({
   userName,
   streetName,
   onSubmit,
-  onSkip,
-  onBack
+  onSkip
 }: VendorRatingCardProps) {
   const { toast } = useToast();
   const [rating, setRating] = useState(0);
@@ -229,16 +227,6 @@ export function VendorRatingCard({
         >
           Save & Continue →
         </Button>
-        {currentIndex > 1 && (
-          <Button
-            variant="outline"
-            size="default"
-            onClick={onBack}
-            className="w-full h-12 text-base"
-          >
-            ← Back
-          </Button>
-        )}
         <button
           onClick={onSkip}
           className="text-sm text-muted-foreground hover:text-foreground underline transition-colors"
