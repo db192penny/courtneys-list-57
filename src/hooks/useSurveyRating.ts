@@ -177,22 +177,9 @@ export function useSurveyRating(token: string | null) {
   };
 
   const skipVendor = async (vendorId: string) => {
-    if (!surveyResponse) return false;
-    
-    try {
-      const { error } = await (supabase as any)
-        .from("survey_pending_ratings")
-        .update({ rated: true, rated_at: new Date().toISOString() })
-        .eq("id", vendorId);
-
-      if (error) throw error;
-
-      setPendingVendors(prev => prev.filter(v => v.id !== vendorId));
-      return true;
-    } catch (err) {
-      console.error("Error skipping vendor:", err);
-      return false;
-    }
+    // Just remove from pending list without marking as rated
+    setPendingVendors(prev => prev.filter(v => v.id !== vendorId));
+    return true;
   };
 
   return {
