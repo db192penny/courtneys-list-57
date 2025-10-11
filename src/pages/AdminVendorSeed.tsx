@@ -282,7 +282,10 @@ const AdminVendorSeed = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Boca Bridges">Boca Bridges</SelectItem>
-                  {adminCommunity && adminCommunity !== "Boca Bridges" && (
+                  <SelectItem value="The Bridges">The Bridges</SelectItem>
+                  {adminCommunity && 
+                   adminCommunity !== "Boca Bridges" && 
+                   adminCommunity !== "The Bridges" && (
                     <SelectItem value={adminCommunity}>{adminCommunity}</SelectItem>
                   )}
                 </SelectContent>
