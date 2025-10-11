@@ -244,29 +244,23 @@ export function useSurveyRatings(sessionToken: string | null) {
         .from("survey_ratings")
         .select("*")
         .eq("session_token", sessionToken)
-        .order("created_at", { ascending: true });
+        .order("created_at");
 
-      return (
-        ratings?.map((r: any, index: number) => ({
-          id: r.id,
-          vendorName: r.vendor_name,
-          category: r.vendor_category,
-          rating: r.rating || 0,
-          comments: r.comments || "",
-          vendorContact: r.vendor_phone || null,
-          showNameInReview: r.show_name ?? true,
-          useForHome: r.current_vendor ?? false,
-          costKind: null,
-          costAmount: r.cost_amount || null,
-          costPeriod: r.cost_period || null,
-          costNotes: r.cost_notes || null,
-          createdAt: r.created_at,
-          ...(index === 0 ? { 
-            respondentEmail: 'No email provided',
-            respondentName: r.respondent_name 
-          } : {})
-        })) || []
-      );
+      return ratings?.map((r: any) => ({
+        id: r.id,
+        vendorName: r.vendor_name,
+        category: r.vendor_category,
+        rating: r.rating,
+        comments: r.comments,
+        showNameInReview: r.show_name,
+        useForHome: r.current_vendor,
+        vendorContact: r.vendor_phone,
+        costKind: null,
+        costAmount: r.cost_amount,
+        costPeriod: r.cost_period,
+        costNotes: r.cost_notes,
+        createdAt: r.created_at
+      })) || [];
     },
     enabled: !!sessionToken,
   });

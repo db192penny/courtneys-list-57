@@ -116,11 +116,11 @@ export function useSurveyRating(token: string | null) {
   const submitRating = async (vendorId: string, ratingData: any) => {
     if (!surveyResponse) return false;
 
-    try {
-      const vendor = pendingVendors.find(v => v.id === vendorId);
-      if (!vendor) return false;
+    const vendor = pendingVendors.find(v => v.id === vendorId);
+    if (!vendor) return false;
 
-      // Insert rating to survey_ratings
+    try {
+      // Simple insert to survey_ratings table
       const { error } = await (supabase as any)
         .from("survey_ratings")
         .insert({
@@ -134,23 +134,26 @@ export function useSurveyRating(token: string | null) {
           show_name: ratingData.showName,
           current_vendor: ratingData.useForHome,
           vendor_phone: ratingData.vendorContact,
-          cost_amount: ratingData.costEntries?.[0]?.amount,
-          cost_period: ratingData.costEntries?.[0]?.period,
-          cost_notes: ratingData.costEntries?.[0]?.notes
+          cost_amount: ratingData.costEntries?.[0]?.amount || null,
+          cost_period: ratingData.costEntries?.[0]?.period || null,
+          cost_notes: ratingData.costEntries?.[0]?.notes || null
         });
 
       if (error) throw error;
 
       // Mark as rated in survey_pending_ratings
-      const { error: updateError } = await (supabase as any)
+      await (supabase as any)
         .from("survey_pending_ratings")
         .update({ rated: true, rated_at: new Date().toISOString() })
         .eq("id", vendorId);
 
-      if (updateError) throw updateError;
-
-      // Update local state
+      // Remove from pending list
       setPendingVendors(prev => prev.filter(v => v.id !== vendorId));
+      
+      toast({
+        title: "Rating saved!",
+        description: "Thank you for rating " + vendor.vendor_name,
+      });
       
       return true;
     } catch (err) {
