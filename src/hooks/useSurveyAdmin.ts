@@ -49,7 +49,7 @@ export function useSurveyStats() {
       const { data: sessions, error: sessError } = await supabase
         .from("preview_sessions" as any)
         .select("id, session_token")
-        .eq("source", "survey_oct_2024");
+        .in("source", ["survey_oct_2024", "admin_csv_upload"]);
 
       if (sessError) throw sessError;
 
@@ -147,7 +147,7 @@ export function useSurveyRespondents() {
       const { data: sessions, error: sessError } = await supabase
         .from("preview_sessions" as any)
         .select("*")
-        .eq("source", "survey_oct_2024")
+        .in("source", ["survey_oct_2024", "admin_csv_upload"])
         .order("created_at", { ascending: false });
 
       if (sessError) throw sessError;
