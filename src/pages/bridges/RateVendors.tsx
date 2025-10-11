@@ -134,16 +134,17 @@ export default function RateVendors() {
         <div className="max-w-2xl mx-auto pt-12">
           <div className="bg-card rounded-lg shadow-lg p-8 text-center space-y-4">
             <div className="text-6xl mb-4">✅</div>
-            <h2 className="text-2xl font-bold text-foreground">Already Completed</h2>
-            <p className="text-muted-foreground">You've already rated all service providers. Thank you!</p>
-            <Button
-              variant="outline"
-              onClick={() => navigate('/')}
-              className="mt-4"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
-            </Button>
+            <h2 className="text-2xl font-bold text-foreground">All Done!</h2>
+            <p className="text-muted-foreground">
+              You've already rated your vendors.<br />
+              Thank you for your participation!
+            </p>
+            <p className="text-sm text-muted-foreground pt-2">
+              Questions? Text Lindsay at{" "}
+              <a href="sms:917-968-8887" className="text-primary hover:underline font-medium">
+                917-968-8887
+              </a>
+            </p>
           </div>
         </div>
       </div>
