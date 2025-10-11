@@ -27,6 +27,7 @@ export const CATEGORIES = [
   "Patio Screening",
   "Pest Control",
   "Roofing",
+  "Stone Fabricators",
   "Pet Grooming",
   "Plumbing",
   "Pool",

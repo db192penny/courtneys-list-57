@@ -116,6 +116,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
 
+  // Stone Fabricators: Per square foot + Project fee
+  if (c === "stone fabricators") {
+    return [
+      { cost_kind: "installation", amount: null, unit: "sq ft", notes: null },
+      { cost_kind: "project_fee", amount: null, unit: "project", notes: null },
+    ];
+  }
+
   // House Manager: Monthly fee
   if (c === "house manager") {
     return [

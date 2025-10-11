@@ -15,6 +15,7 @@ export const categoryEmojiMap: Record<string, string> = {
   'House Cleaning': '🧹',
   'Handyman': '🔨',
   'Roofing': '🏗️',
+  'Stone Fabricators': '🪨',
   'General Contractor': '👷',
   'Car Service': '🚗',
   'Car Wash and Detail': '✨',
