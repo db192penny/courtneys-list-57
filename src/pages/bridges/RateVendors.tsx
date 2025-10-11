@@ -165,27 +165,11 @@ export default function RateVendors() {
               </div>
               <div className="text-6xl">🎉</div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                Thank You {surveyResponse.respondent_name.split(" ")[0]}!
+                You're Awesome!
               </h2>
               <p className="text-lg text-muted-foreground">
-                Your {initialVendorCount} rating{initialVendorCount !== 1 ? "s have" : " has"} been saved and will help The Bridges neighbors find trusted service providers!
+                Thanks {surveyResponse.respondent_name.split(" ")[0]}! Coffee on me fo helping to get this started! Please check your email for a $10 Starbucks gift card in the next day or two. ❤️ Lindsay
               </p>
-            </div>
-
-            <div className="bg-secondary/20 rounded-lg p-6 space-y-3">
-              <div className="text-lg font-medium flex items-center gap-2">
-                <span>☕</span>
-                <span>Coffee on me. Please check your email for a $10 Starbucks gift card. You rock.</span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="font-semibold text-lg">What's Next:</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• The Bridges Directory launches next week</li>
-                <li>• Your reviews will go live</li>
-                <li>• I'll email you when it launches!</li>
-              </ul>
             </div>
           </div>
         </div>
