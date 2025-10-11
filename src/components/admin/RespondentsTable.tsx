@@ -38,12 +38,14 @@ import { useSurveyRespondents } from "@/hooks/useSurveyAdmin";
 import { ReviewsModal } from "./ReviewsModal";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Eye, Copy, Mail, RefreshCw, Trash2, Loader2, MoreVertical } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Search, Eye, Copy, Mail, RotateCcw, Trash2, Loader2, MoreVertical } from "lucide-react";
 
 type StatusFilter = "all" | "complete" | "in_progress" | "not_started";
 
 export function RespondentsTable() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { data: respondents, isLoading, refetch } = useSurveyRespondents();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -109,7 +111,8 @@ export function RespondentsTable() {
         description: `${respondentName} can now re-submit ratings`,
       });
       
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['survey-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['survey-respondents'] });
     } catch (error) {
       console.error('Reset error:', error);
       toast({
@@ -151,7 +154,8 @@ export function RespondentsTable() {
         description: `${respondentName} removed from system`,
       });
       
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['survey-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['survey-respondents'] });
     } catch (error) {
       console.error('Delete error:', error);
       toast({
@@ -300,7 +304,7 @@ export function RespondentsTable() {
                             onClick={() => handleReset(respondent.sessionToken, respondent.name)}
                             disabled={respondent.completedVendors === 0}
                           >
-                            <RefreshCw className="h-4 w-4" />
+                            <RotateCcw className="h-4 w-4" />
                           </Button>
                           <Button
                             size="sm"
@@ -336,7 +340,7 @@ export function RespondentsTable() {
                               onClick={() => handleReset(respondent.sessionToken, respondent.name)}
                               disabled={respondent.completedVendors === 0}
                             >
-                              <RefreshCw className="h-4 w-4 mr-2" /> Reset Data
+                              <RotateCcw className="h-4 w-4 mr-2" /> Reset Data
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleDelete(respondent.sessionToken, respondent.name)}
