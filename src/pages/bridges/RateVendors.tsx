@@ -58,7 +58,7 @@ export default function RateVendors() {
     const vendor = pendingVendors[currentVendorIndex];
     if (!vendor) return;
 
-    const success = await submitRating(vendor.id, data);
+    const success = await submitRating(vendor.id, data, emailInput);
     if (success) {
       // Delay scroll to ensure new content renders first, then instant scroll to top
       setTimeout(() => {

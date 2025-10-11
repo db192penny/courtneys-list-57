@@ -113,13 +113,15 @@ export function useSurveyRating(token: string | null) {
     }
   };
 
-  const submitRating = async (vendorId: string, ratingData: any) => {
+  const submitRating = async (vendorId: string, ratingData: any, email?: string) => {
     if (!surveyResponse) return false;
 
     const vendor = pendingVendors.find(v => v.id === vendorId);
     if (!vendor) return false;
 
     try {
+      const costEntry = ratingData.costEntries?.length > 0 ? ratingData.costEntries[0] : null;
+
       // Simple insert to survey_ratings table
       const { error } = await (supabase as any)
         .from("survey_ratings")
@@ -127,6 +129,7 @@ export function useSurveyRating(token: string | null) {
           session_token: token,
           session_id: surveyResponse.id,
           respondent_name: surveyResponse.respondent_name,
+          respondent_email: email || surveyResponse.respondent_email,
           vendor_name: vendor.vendor_name,
           vendor_category: vendor.category,
           rating: ratingData.rating,
@@ -134,9 +137,15 @@ export function useSurveyRating(token: string | null) {
           show_name: ratingData.showName,
           current_vendor: ratingData.useForHome,
           vendor_phone: ratingData.vendorContact,
-          cost_amount: ratingData.costEntries?.[0]?.amount || null,
-          cost_period: ratingData.costEntries?.[0]?.period || null,
-          cost_notes: ratingData.costEntries?.[0]?.notes || null
+          // Capture all cost fields
+          cost_kind: costEntry?.cost_kind || null,
+          cost_amount: costEntry?.amount || null,
+          cost_period: costEntry?.period || null,
+          cost_unit: costEntry?.unit || null,
+          cost_quantity: costEntry?.quantity || null,
+          cost_notes: costEntry?.notes || null,
+          // Store complete cost data as JSON backup
+          cost_entries: ratingData.costEntries || null
         });
 
       if (error) throw error;
