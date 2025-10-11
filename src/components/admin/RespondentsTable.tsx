@@ -78,12 +78,19 @@ export function RespondentsTable() {
     try {
       console.log('[handleReset] Starting reset for token:', sessionToken);
       
+      // Admin check (RLS requires admin for updates)
+      const { data: isAdmin } = await supabase.rpc('is_admin');
+      if (!isAdmin) {
+        console.warn('[handleReset] Not admin - aborting reset');
+        toast({ title: 'Permission denied', description: 'Admin required to reset data', variant: 'destructive' });
+        return;
+      }
+      
       // Step 1: Get session_id from preview_sessions
       const { data: sessionData, error: sessionError } = await supabase
         .from('preview_sessions' as any)
         .select('id')
         .eq('session_token', sessionToken)
-        .eq('source', 'survey_oct_2024')
         .maybeSingle();
 
       console.log('[handleReset] Session lookup result:', { sessionData, sessionError });
