@@ -168,7 +168,7 @@ export default function RateVendors() {
                 You're Awesome!
               </h2>
               <p className="text-lg text-muted-foreground">
-                Thanks {surveyResponse.respondent_name.split(" ")[0]}! Coffee on me fo helping to get this started! Please check your email for a $10 Starbucks gift card in the next day or two. ❤️ Lindsay
+                Thanks so much {surveyResponse.respondent_name.split(" ")[0]}! Will send you a little gift over email shortly as a thank you for helping get this off the ground! ❤️ Lindsay
               </p>
             </div>
           </div>
