@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +45,27 @@ export default function RateVendors() {
       setCurrentPage("error");
     }
   }, [loading, error, surveyResponse, pendingVendors, initialVendorCount]);
+
+  // Custom metadata for link previews
+  const helmetContent = (
+    <Helmet>
+      <title>⭐ The Bridges Service Providers</title>
+      <meta name="description" content="Help your neighbors find trusted service vendors" />
+      
+      {/* Facebook/WhatsApp Preview */}
+      <meta property="og:title" content="⭐ The Bridges Service Providers" />
+      <meta property="og:description" content="Help your neighbors find trusted service vendors" />
+      <meta property="og:type" content="website" />
+      <meta property="og:image" content="https://courtneys-list.com/bridges-logo.jpg" />
+      <meta property="og:site_name" content="The Bridges Directory" />
+      
+      {/* Twitter/Other Platforms */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="⭐ The Bridges Service Providers" />
+      <meta name="twitter:description" content="Help your neighbors find trusted service vendors" />
+      <meta name="twitter:image" content="https://courtneys-list.com/bridges-logo.jpg" />
+    </Helmet>
+  );
 
   const handleEmailSubmit = async () => {
     if (!emailInput || !emailInput.includes("@")) return;
@@ -100,15 +122,20 @@ export default function RateVendors() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background flex items-center justify-center">
-        <div className="text-lg text-muted-foreground">Loading...</div>
-      </div>
+      <>
+        {helmetContent}
+        <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background flex items-center justify-center">
+          <div className="text-lg text-muted-foreground">Loading...</div>
+        </div>
+      </>
     );
   }
 
   if (currentPage === "error") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
+      <>
+        {helmetContent}
+        <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
         <div className="max-w-2xl mx-auto pt-12">
           <div className="bg-card rounded-lg shadow-lg p-8 text-center space-y-4">
             <div className="text-6xl mb-4">❌</div>
@@ -125,12 +152,15 @@ export default function RateVendors() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   if (currentPage === "completed") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
+      <>
+        {helmetContent}
+        <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
         <div className="max-w-2xl mx-auto pt-12">
           <div className="bg-card rounded-lg shadow-lg p-8 text-center space-y-4">
             <div className="text-6xl mb-4">✅</div>
@@ -148,12 +178,15 @@ export default function RateVendors() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   if (currentPage === "thankyou" && surveyResponse) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
+      <>
+        {helmetContent}
+        <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
         <div className="max-w-2xl mx-auto pt-12">
           <div className="bg-card rounded-lg shadow-lg p-8 space-y-6">
             <div className="text-center space-y-6">
@@ -175,6 +208,7 @@ export default function RateVendors() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
@@ -183,7 +217,9 @@ export default function RateVendors() {
     const streetName = "Lewis River Rd (just an example)";
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
+      <>
+        {helmetContent}
+        <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
         <div className="max-w-2xl mx-auto pt-12">
           <ProgressBar
             current={initialVendorCount - pendingVendors.length + 1}
@@ -206,12 +242,15 @@ export default function RateVendors() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   // Email verification page (default)
   return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
+    <>
+      {helmetContent}
+      <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background p-6">
       <div className="max-w-2xl mx-auto pt-12">
         <div className="bg-card rounded-lg shadow-lg p-8 space-y-8">
           {surveyResponse && (
@@ -286,5 +325,6 @@ export default function RateVendors() {
         </div>
       </div>
     </div>
+    </>
   );
 }
