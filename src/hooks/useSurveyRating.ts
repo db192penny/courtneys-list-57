@@ -7,7 +7,6 @@ interface SurveyResponse {
   respondent_name: string;
   respondent_email: string | null;
   respondent_contact: string;
-  isOldSystem?: boolean; // Track which table system is being used
 }
 
 interface PendingVendor {
@@ -38,91 +37,36 @@ export function useSurveyRating(token: string | null) {
     try {
       setLoading(true);
       
-      // Try BOTH table systems for backward compatibility
-      let response = null;
-      let responseId = null;
-      let isOldSystem = false;
-
-      // First try new system (survey_responses)
-      const { data: newResponse } = await (supabase as any)
-        .from("survey_responses")
+      // Load from preview_sessions
+      const { data: sessionData } = await (supabase as any)
+        .from("preview_sessions")
         .select("*")
         .eq("session_token", token)
         .maybeSingle();
-
-      if (newResponse) {
-        response = {
-          id: newResponse.id,
-          respondent_name: newResponse.respondent_name,
-          respondent_email: newResponse.respondent_email,
-          respondent_contact: newResponse.respondent_contact,
-          isOldSystem: false
-        };
-        responseId = newResponse.id;
-      } else {
-        // Fall back to old system (preview_sessions)
-        const { data: oldResponse } = await (supabase as any)
-          .from("preview_sessions")
-          .select("*")
-          .eq("session_token", token)
-          .maybeSingle();
-        
-        if (oldResponse) {
-          response = {
-            id: oldResponse.id,
-            respondent_name: oldResponse.name,
-            respondent_email: oldResponse.email,
-            respondent_contact: oldResponse.metadata?.phone || oldResponse.email,
-            isOldSystem: true
-          };
-          responseId = oldResponse.id;
-          isOldSystem = true;
-        }
-      }
-
-      if (!response) {
+      
+      if (!sessionData) {
         setError("Invalid link. Please check your email.");
         setLoading(false);
         return;
       }
 
+      const response = {
+        id: sessionData.id,
+        respondent_name: sessionData.name,
+        respondent_email: sessionData.email,
+        respondent_contact: sessionData.metadata?.phone || sessionData.email
+      };
+
       setSurveyResponse(response);
 
-      // Fetch pending vendors from BOTH tables
-      let vendors = [];
+      // Fetch pending vendors from survey_pending_ratings
+      const { data: vendors } = await (supabase as any)
+        .from("survey_pending_ratings")
+        .select("*")
+        .eq("session_id", sessionData.id)
+        .order("created_at", { ascending: true });
 
-      if (!isOldSystem) {
-        // Try new table first
-        const { data: newVendors } = await (supabase as any)
-          .from("survey_pending_vendors")
-          .select("*")
-          .eq("survey_response_id", responseId)
-          .order("created_at", { ascending: true });
-
-        if (newVendors && newVendors.length > 0) {
-          vendors = newVendors;
-        }
-      } else {
-        // Use old table
-        const { data: oldVendors } = await (supabase as any)
-          .from("survey_pending_ratings")
-          .select("*")
-          .eq("session_id", responseId)
-          .order("created_at", { ascending: true });
-        
-        if (oldVendors) {
-          // Map old format to new format
-          vendors = oldVendors.map(v => ({
-            id: v.id,
-            vendor_name: v.vendor_name,
-            category: v.category,
-            rated: v.rated || false,
-            survey_response_id: responseId
-          }));
-        }
-      }
-
-      // Filter for unrated vendors with robust filtering
+      // Filter for unrated vendors
       const unratedVendors = (vendors || [])
         .filter(v => !v.rated)
         .map(v => ({
@@ -149,10 +93,9 @@ export function useSurveyRating(token: string | null) {
     if (!surveyResponse) return false;
 
     try {
-      const tableName = surveyResponse.isOldSystem ? "preview_sessions" : "survey_responses";
       const { error } = await (supabase as any)
-        .from(tableName)
-        .update({ [surveyResponse.isOldSystem ? "email" : "respondent_email"]: email })
+        .from("preview_sessions")
+        .update({ email })
         .eq("id", surveyResponse.id);
 
       if (error) throw error;
@@ -177,30 +120,23 @@ export function useSurveyRating(token: string | null) {
       const vendor = pendingVendors.find(v => v.id === vendorId);
       if (!vendor) return false;
 
-      // Insert rating
+      // Insert rating to preview_reviews
       const { error: insertError } = await (supabase as any)
-        .from("survey_vendor_ratings")
+        .from("preview_reviews")
         .insert({
-          survey_response_id: surveyResponse.id,
-          category: vendor.category,
-          vendor_name: vendor.vendor_name,
-          vendor_contact: ratingData.vendorContact || null,
+          session_id: surveyResponse.id,
+          vendor_id: null, // We don't have a vendor_id yet, just vendor_name
           rating: ratingData.rating,
           comments: ratingData.comments,
-          use_for_home: ratingData.useForHome,
-          show_name_in_review: ratingData.showName,
-          cost_kind: ratingData.costEntries?.[0]?.cost_kind || null,
-          cost_amount: ratingData.costEntries?.[0]?.amount || null,
-          cost_period: ratingData.costEntries?.[0]?.period || null,
-          cost_notes: ratingData.costEntries?.[0]?.notes || null,
+          anonymous: !ratingData.showName,
+          recommended: ratingData.useForHome
         });
 
       if (insertError) throw insertError;
 
-      // Mark as rated in the appropriate table
-      const tableName = surveyResponse.isOldSystem ? "survey_pending_ratings" : "survey_pending_vendors";
+      // Mark as rated in survey_pending_ratings
       const { error: updateError } = await (supabase as any)
-        .from(tableName)
+        .from("survey_pending_ratings")
         .update({ rated: true, rated_at: new Date().toISOString() })
         .eq("id", vendorId);
 
@@ -225,9 +161,8 @@ export function useSurveyRating(token: string | null) {
     if (!surveyResponse) return false;
     
     try {
-      const tableName = surveyResponse.isOldSystem ? "survey_pending_ratings" : "survey_pending_vendors";
       const { error } = await (supabase as any)
-        .from(tableName)
+        .from("survey_pending_ratings")
         .update({ rated: true, rated_at: new Date().toISOString() })
         .eq("id", vendorId);
 
