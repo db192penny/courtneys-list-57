@@ -36,7 +36,7 @@ export default function RateVendors() {
       
       if (error === "already_completed") {
         setCurrentPage("completed");
-      } else if (pendingVendors.length === 0) {
+      } else if (!loading && pendingVendors.length === 0 && currentPage === "rating") {
         setCurrentPage("thankyou");
       }
     }
