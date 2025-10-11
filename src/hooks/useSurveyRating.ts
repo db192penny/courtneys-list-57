@@ -77,7 +77,16 @@ export function useSurveyRating(token: string | null) {
         }));
 
       if (unratedVendors.length === 0) {
-        setError("already_completed");
+        // Only show ALL DONE if the user actually submitted at least one rating
+        const { data: submittedRatings } = await (supabase as any)
+          .from("survey_ratings")
+          .select("id")
+          .eq("session_id", sessionData.id)
+          .limit(1);
+
+        if (submittedRatings && submittedRatings.length > 0) {
+          setError("already_completed");
+        }
       }
 
       setPendingVendors(unratedVendors);
