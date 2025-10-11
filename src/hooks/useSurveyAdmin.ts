@@ -54,56 +54,33 @@ export function useSurveyStats() {
 
       if (sessError) throw sessError;
 
+      // Get total vendors from survey_pending_ratings
       const { data: pendingRatings, error: ratError } = await supabase
         .from("survey_pending_ratings" as any)
-        .select("id, rated, session_id");
+        .select("session_id");
 
       if (ratError) throw ratError;
 
-      // Get survey responses and actual ratings
-      const { data: surveyResponses, error: respError } = await supabase
-        .from("survey_responses" as any)
-        .select("id, session_token");
-
-      if (respError) throw respError;
-
-      const { data: actualRatings, error: actualError } = await supabase
-        .from("survey_vendor_ratings" as any)
-        .select("id, survey_response_id");
+      // Get ACTUAL ratings from survey_ratings (source of truth)
+      const { data: actualRatings, error: actualError } = await (supabase as any)
+        .from("survey_ratings")
+        .select("session_id");
 
       if (actualError) throw actualError;
 
       const totalPeople = sessions?.length || 0;
       const totalVendors = pendingRatings?.length || 0;
 
-      // Map session_token to survey_response_id
-      const sessionToResponseId = new Map(surveyResponses?.map((r: any) => [r.session_token, r.id]) || []);
+      // Count total vendors per session
+      const totalVendorsBySession = new Map<string, number>();
+      pendingRatings?.forEach((r: any) => {
+        totalVendorsBySession.set(r.session_id, (totalVendorsBySession.get(r.session_id) || 0) + 1);
+      });
 
-      // Count actual ratings per session
+      // Count actual completed ratings per session
       const actualRatingsPerSession = new Map<string, number>();
-      sessions?.forEach((session: any) => {
-        const responseId = sessionToResponseId.get(session.session_token);
-        if (responseId) {
-          const count = actualRatings?.filter((r: any) => r.survey_response_id === responseId).length || 0;
-          actualRatingsPerSession.set(session.id, count);
-        }
-      });
-
-      // Calculate completion status for each person
-      const personStatus = new Map<string, { hasRated: boolean; hasUnrated: boolean; actualRatingCount: number }>();
-
-      pendingRatings?.forEach((v: any) => {
-        const status = personStatus.get(v.session_id) || { hasRated: false, hasUnrated: false, actualRatingCount: 0 };
-        if (v.rated) status.hasRated = true;
-        else status.hasUnrated = true;
-        personStatus.set(v.session_id, status);
-      });
-
-      // Add actual rating counts
-      sessions?.forEach((session: any) => {
-        const status = personStatus.get(session.id) || { hasRated: false, hasUnrated: false, actualRatingCount: 0 };
-        status.actualRatingCount = actualRatingsPerSession.get(session.id) || 0;
-        personStatus.set(session.id, status);
+      actualRatings?.forEach((r: any) => {
+        actualRatingsPerSession.set(r.session_id, (actualRatingsPerSession.get(r.session_id) || 0) + 1);
       });
 
       let completedPeople = 0;
@@ -112,21 +89,18 @@ export function useSurveyStats() {
       let vendorsRated = 0;
 
       sessions?.forEach((session: any) => {
-        const status = personStatus.get(session.id);
-        const hasActualRatings = status && status.actualRatingCount > 0;
+        const totalForSession = totalVendorsBySession.get(session.id) || 0;
+        const completedForSession = actualRatingsPerSession.get(session.id) || 0;
 
-        if (!status || (!status.hasRated && !hasActualRatings)) {
+        if (completedForSession === 0) {
           notStartedPeople++;
-        } else if (status.hasUnrated || status.actualRatingCount < totalVendors / totalPeople) {
+        } else if (completedForSession < totalForSession) {
           inProgressPeople++;
         } else {
           completedPeople++;
         }
 
-        // Count total vendors rated (use actual ratings)
-        if (status) {
-          vendorsRated += status.actualRatingCount;
-        }
+        vendorsRated += completedForSession;
       });
 
       return {
@@ -153,56 +127,36 @@ export function useSurveyRespondents() {
 
       if (sessError) throw sessError;
 
+      // Get total vendors per session from survey_pending_ratings
       const { data: pendingRatings, error: ratError } = await supabase
         .from("survey_pending_ratings" as any)
-        .select("session_id, rated");
+        .select("session_id");
 
       if (ratError) throw ratError;
 
-      // Get survey responses
-      const { data: surveyResponses, error: respError } = await supabase
-        .from("survey_responses" as any)
-        .select("id, session_token");
-
-      if (respError) throw respError;
-
-      // Get actual ratings
-      const { data: actualRatings, error: actualError } = await supabase
-        .from("survey_vendor_ratings" as any)
-        .select("id, survey_response_id");
+      // Get ACTUAL ratings from survey_ratings (source of truth)
+      const { data: actualRatings, error: actualError } = await (supabase as any)
+        .from("survey_ratings")
+        .select("session_id");
 
       if (actualError) throw actualError;
 
-      // Map session_token to survey_response_id
-      const sessionToResponseId = new Map(surveyResponses?.map((r: any) => [r.session_token, r.id]) || []);
-
-      // Count pending ratings by session
-      const ratingsBySession = new Map<string, { total: number; completed: number }>();
+      // Count total vendors per session
+      const totalVendorsBySession = new Map<string, number>();
       pendingRatings?.forEach((r: any) => {
-        const stats = ratingsBySession.get(r.session_id) || { total: 0, completed: 0 };
-        stats.total++;
-        if (r.rated) stats.completed++;
-        ratingsBySession.set(r.session_id, stats);
+        totalVendorsBySession.set(r.session_id, (totalVendorsBySession.get(r.session_id) || 0) + 1);
       });
 
-      // Count actual ratings per session
-      const actualRatingsPerSession = new Map<string, number>();
-      sessions?.forEach((session: any) => {
-        const responseId = sessionToResponseId.get(session.session_token);
-        if (responseId) {
-          const count = actualRatings?.filter((r: any) => r.survey_response_id === responseId).length || 0;
-          actualRatingsPerSession.set(session.id, count);
-        }
+      // Count actual completed ratings per session
+      const completedRatingsBySession = new Map<string, number>();
+      actualRatings?.forEach((r: any) => {
+        completedRatingsBySession.set(r.session_id, (completedRatingsBySession.get(r.session_id) || 0) + 1);
       });
 
       return (
         sessions?.map((s: any) => {
-          const pendingStats = ratingsBySession.get(s.id) || { total: 0, completed: 0 };
-          const actualRatingCount = actualRatingsPerSession.get(s.id) || 0;
-
-          // Use the HIGHER of the two counts
-          const completedVendors = Math.max(pendingStats.completed, actualRatingCount);
-          const totalVendors = pendingStats.total;
+          const totalVendors = totalVendorsBySession.get(s.id) || 0;
+          const completedVendors = completedRatingsBySession.get(s.id) || 0;
 
           let status: "complete" | "in_progress" | "not_started" = "not_started";
 
