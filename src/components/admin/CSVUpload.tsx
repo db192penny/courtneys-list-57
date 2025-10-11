@@ -123,7 +123,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             contact: row.Contact,
             vendors,
             isDuplicate,
-            selected: true, // Allow selecting both new and duplicates
+            selected: false, // Default to unchecked
           });
         });
 
@@ -136,6 +136,30 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
   const toggleSelection = (index: number) => {
     setParsedData(prev => 
       prev.map((item, i) => i === index ? { ...item, selected: !item.selected } : item)
+    );
+  };
+
+  const selectAllNew = () => {
+    setParsedData(prev => 
+      prev.map(item => item.isDuplicate ? item : { ...item, selected: true })
+    );
+  };
+
+  const deselectAllNew = () => {
+    setParsedData(prev => 
+      prev.map(item => item.isDuplicate ? item : { ...item, selected: false })
+    );
+  };
+
+  const selectAllDuplicates = () => {
+    setParsedData(prev => 
+      prev.map(item => !item.isDuplicate ? item : { ...item, selected: true })
+    );
+  };
+
+  const deselectAllDuplicates = () => {
+    setParsedData(prev => 
+      prev.map(item => !item.isDuplicate ? item : { ...item, selected: false })
     );
   };
 
@@ -279,8 +303,10 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
     toast({ title: "All links copied!" });
   };
 
-  const newCount = parsedData.filter(p => !p.isDuplicate && p.selected).length;
-  const updateCount = parsedData.filter(p => p.isDuplicate && p.selected).length;
+  const newEntries = parsedData.filter(p => !p.isDuplicate);
+  const duplicateEntries = parsedData.filter(p => p.isDuplicate);
+  const newCount = newEntries.filter(p => p.selected).length;
+  const updateCount = duplicateEntries.filter(p => p.selected).length;
   const totalVendors = parsedData
     .filter(p => p.selected)
     .reduce((sum, p) => sum + p.vendors.length, 0);
@@ -322,39 +348,122 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
         <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>
-              Preview - {newCount} New, {updateCount} Updates Found
+              Preview Import
             </DialogTitle>
           </DialogHeader>
           
-          <div className="flex-1 overflow-y-auto space-y-2">
-            {parsedData.map((person, idx) => (
-              <div
-                key={idx}
-                className={`flex items-start gap-3 p-3 rounded-lg border ${
-                  person.isDuplicate ? 'bg-muted/50' : 'bg-background'
-                }`}
-              >
-                <Checkbox
-                  checked={person.selected}
-                  onCheckedChange={() => toggleSelection(idx)}
-                />
-                <div className="flex-1">
-                  <div className="font-medium">{person.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {person.contactMethod}: {person.contact}
+          <div className="flex-1 overflow-y-auto space-y-4">
+            {/* New Entries Section */}
+            {newEntries.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-3 py-2 bg-muted/50 rounded-lg">
+                  <div className="font-semibold">
+                    New Entries ({newEntries.length})
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">
+                      {newCount} of {newEntries.length} selected
+                    </span>
                   </div>
-                  <div className="text-sm text-muted-foreground font-medium">
-                    {person.isDuplicate 
-                      ? `Will add ${person.vendors.length} vendor${person.vendors.length !== 1 ? 's' : ''} to existing`
-                      : `${person.vendors.length} vendor${person.vendors.length !== 1 ? 's' : ''}`
-                    }
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={selectAllNew}
+                      disabled={newCount === newEntries.length}
+                    >
+                      Select All New
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={deselectAllNew}
+                      disabled={newCount === 0}
+                    >
+                      Deselect All New
+                    </Button>
                   </div>
                 </div>
-                <Badge variant={person.isDuplicate ? "secondary" : "default"}>
-                  {person.isDuplicate ? "🔄 UPDATE" : "✅ NEW"}
-                </Badge>
+                {newEntries.map((person, idx) => {
+                  const originalIdx = parsedData.indexOf(person);
+                  return (
+                    <div
+                      key={originalIdx}
+                      className="flex items-start gap-3 p-3 rounded-lg border bg-background"
+                    >
+                      <Checkbox
+                        checked={person.selected}
+                        onCheckedChange={() => toggleSelection(originalIdx)}
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium">{person.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {person.contactMethod}: {person.contact}
+                        </div>
+                        <div className="text-sm text-muted-foreground font-medium">
+                          {person.vendors.length} vendor{person.vendors.length !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+                      <Badge variant="default">✅ NEW</Badge>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            )}
+
+            {/* Duplicates Section */}
+            {duplicateEntries.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-3 py-2 bg-muted/50 rounded-lg">
+                  <div className="font-semibold">
+                    Duplicates ({duplicateEntries.length})
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">
+                      {updateCount} of {duplicateEntries.length} selected
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={selectAllDuplicates}
+                      disabled={updateCount === duplicateEntries.length}
+                    >
+                      Select All Duplicates
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={deselectAllDuplicates}
+                      disabled={updateCount === 0}
+                    >
+                      Deselect All Duplicates
+                    </Button>
+                  </div>
+                </div>
+                {duplicateEntries.map((person, idx) => {
+                  const originalIdx = parsedData.indexOf(person);
+                  return (
+                    <div
+                      key={originalIdx}
+                      className="flex items-start gap-3 p-3 rounded-lg border bg-muted/50"
+                    >
+                      <Checkbox
+                        checked={person.selected}
+                        onCheckedChange={() => toggleSelection(originalIdx)}
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium">{person.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {person.contactMethod}: {person.contact}
+                        </div>
+                        <div className="text-sm text-muted-foreground font-medium">
+                          Will add {person.vendors.length} vendor{person.vendors.length !== 1 ? 's' : ''} to existing
+                        </div>
+                      </div>
+                      <Badge variant="secondary">🔄 UPDATE</Badge>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <DialogFooter className="flex-col sm:flex-row gap-2">
