@@ -7,6 +7,7 @@ interface SurveyResponse {
   respondent_name: string;
   respondent_email: string | null;
   respondent_contact: string;
+  isOldSystem?: boolean; // Track which table system is being used
 }
 
 interface PendingVendor {
@@ -37,14 +38,49 @@ export function useSurveyRating(token: string | null) {
     try {
       setLoading(true);
       
-      // Fetch survey response
-      const { data: response, error: responseError } = await (supabase as any)
+      // Try BOTH table systems for backward compatibility
+      let response = null;
+      let responseId = null;
+      let isOldSystem = false;
+
+      // First try new system (survey_responses)
+      const { data: newResponse } = await (supabase as any)
         .from("survey_responses")
         .select("*")
         .eq("session_token", token)
         .maybeSingle();
 
-      if (responseError || !response) {
+      if (newResponse) {
+        response = {
+          id: newResponse.id,
+          respondent_name: newResponse.respondent_name,
+          respondent_email: newResponse.respondent_email,
+          respondent_contact: newResponse.respondent_contact,
+          isOldSystem: false
+        };
+        responseId = newResponse.id;
+      } else {
+        // Fall back to old system (preview_sessions)
+        const { data: oldResponse } = await (supabase as any)
+          .from("preview_sessions")
+          .select("*")
+          .eq("session_token", token)
+          .maybeSingle();
+        
+        if (oldResponse) {
+          response = {
+            id: oldResponse.id,
+            respondent_name: oldResponse.name,
+            respondent_email: oldResponse.email,
+            respondent_contact: oldResponse.metadata?.phone || oldResponse.email,
+            isOldSystem: true
+          };
+          responseId = oldResponse.id;
+          isOldSystem = true;
+        }
+      }
+
+      if (!response) {
         setError("Invalid link. Please check your email.");
         setLoading(false);
         return;
@@ -52,15 +88,38 @@ export function useSurveyRating(token: string | null) {
 
       setSurveyResponse(response);
 
-      // Fetch pending vendors
-      const { data: vendors, error: vendorsError } = await (supabase as any)
-        .from("survey_pending_vendors")
-        .select("*")
-        .eq("survey_response_id", response.id)
-        .order("created_at", { ascending: true });
+      // Fetch pending vendors from BOTH tables
+      let vendors = [];
 
-      if (vendorsError) {
-        throw vendorsError;
+      if (!isOldSystem) {
+        // Try new table first
+        const { data: newVendors } = await (supabase as any)
+          .from("survey_pending_vendors")
+          .select("*")
+          .eq("survey_response_id", responseId)
+          .order("created_at", { ascending: true });
+
+        if (newVendors && newVendors.length > 0) {
+          vendors = newVendors;
+        }
+      } else {
+        // Use old table
+        const { data: oldVendors } = await (supabase as any)
+          .from("survey_pending_ratings")
+          .select("*")
+          .eq("session_id", responseId)
+          .order("created_at", { ascending: true });
+        
+        if (oldVendors) {
+          // Map old format to new format
+          vendors = oldVendors.map(v => ({
+            id: v.id,
+            vendor_name: v.vendor_name,
+            category: v.category,
+            rated: v.rated || false,
+            survey_response_id: responseId
+          }));
+        }
       }
 
       // Filter for unrated vendors with robust filtering
@@ -90,9 +149,10 @@ export function useSurveyRating(token: string | null) {
     if (!surveyResponse) return false;
 
     try {
+      const tableName = surveyResponse.isOldSystem ? "preview_sessions" : "survey_responses";
       const { error } = await (supabase as any)
-        .from("survey_responses")
-        .update({ respondent_email: email })
+        .from(tableName)
+        .update({ [surveyResponse.isOldSystem ? "email" : "respondent_email"]: email })
         .eq("id", surveyResponse.id);
 
       if (error) throw error;
@@ -137,9 +197,10 @@ export function useSurveyRating(token: string | null) {
 
       if (insertError) throw insertError;
 
-      // Mark as rated
+      // Mark as rated in the appropriate table
+      const tableName = surveyResponse.isOldSystem ? "survey_pending_ratings" : "survey_pending_vendors";
       const { error: updateError } = await (supabase as any)
-        .from("survey_pending_vendors")
+        .from(tableName)
         .update({ rated: true, rated_at: new Date().toISOString() })
         .eq("id", vendorId);
 
@@ -161,9 +222,12 @@ export function useSurveyRating(token: string | null) {
   };
 
   const skipVendor = async (vendorId: string) => {
+    if (!surveyResponse) return false;
+    
     try {
+      const tableName = surveyResponse.isOldSystem ? "survey_pending_ratings" : "survey_pending_vendors";
       const { error } = await (supabase as any)
-        .from("survey_pending_vendors")
+        .from(tableName)
         .update({ rated: true, rated_at: new Date().toISOString() })
         .eq("id", vendorId);
 
