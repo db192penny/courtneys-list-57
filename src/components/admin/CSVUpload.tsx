@@ -123,7 +123,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             contact: row.Contact,
             vendors,
             isDuplicate,
-            selected: !isDuplicate,
+            selected: true, // Allow selecting both new and duplicates
           });
         });
 
@@ -152,49 +152,69 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
 
     try {
       for (const person of selected) {
-        const token = `survey_${person.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
-        
-        console.log("Inserting person:", {
+        let sessionId: string;
+        let token: string;
+
+        console.log("Processing person:", {
           name: person.name,
-          contact: person.contact,
-          contactMethod: person.contactMethod,
+          isDuplicate: person.isDuplicate,
           vendorCount: person.vendors.length
         });
-        
-        // Step 1: Insert preview session with proper error handling
-        const { data: responseData, error: respError } = await supabase
-          .from("preview_sessions" as any)
-          .insert({
-            session_token: token,
-            name: person.name,
-            email: person.contactMethod?.toLowerCase() === "email" ? person.contact : null,
-            address: "The Bridges, Delray Beach, FL",
-            normalized_address: "the bridges delray beach fl",
-            community: "The Bridges",
-            source: "admin_csv_upload",
-            metadata: {
-              phone: person.contactMethod?.toLowerCase() === "phone" ? person.contact : null,
-              contact_method: person.contactMethod,
-              from_survey: true,
-              upload_batch: batchId,
-              upload_date: new Date().toISOString(),
-            },
-          })
-          .select()
-          .single();
 
-        // Check for errors BEFORE accessing .id
-        if (respError) {
-          console.error('Insert response error:', respError);
-          throw respError;
-        }
-        
-        if (!responseData) {
-          throw new Error("Failed to create response");
-        }
+        if (person.isDuplicate) {
+          // Find existing session by name
+          const { data: existingSession, error: findError } = await supabase
+            .from("preview_sessions" as any)
+            .select("id, session_token")
+            .eq("name", person.name)
+            .in('source', ['survey_oct_2024', 'admin_csv_upload'])
+            .single();
 
-        // NOW safe to use responseData.id with type assertion
-        const sessionId = (responseData as any).id as string;
+          if (findError || !existingSession) {
+            console.error('Could not find existing session for:', person.name);
+            throw new Error(`Could not find existing session for ${person.name}`);
+          }
+
+          sessionId = (existingSession as any).id;
+          token = (existingSession as any).session_token;
+          console.log(`UPDATE: Adding ${person.vendors.length} vendors to existing session for ${person.name}`);
+        } else {
+          // Create new session
+          token = `survey_${person.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
+          
+          const { data: responseData, error: respError } = await supabase
+            .from("preview_sessions" as any)
+            .insert({
+              session_token: token,
+              name: person.name,
+              email: person.contactMethod?.toLowerCase() === "email" ? person.contact : null,
+              address: "The Bridges, Delray Beach, FL",
+              normalized_address: "the bridges delray beach fl",
+              community: "The Bridges",
+              source: "admin_csv_upload",
+              metadata: {
+                phone: person.contactMethod?.toLowerCase() === "phone" ? person.contact : null,
+                contact_method: person.contactMethod,
+                from_survey: true,
+                upload_batch: batchId,
+                upload_date: new Date().toISOString(),
+              },
+            })
+            .select()
+            .single();
+
+          if (respError) {
+            console.error('Insert response error:', respError);
+            throw respError;
+          }
+          
+          if (!responseData) {
+            throw new Error("Failed to create response");
+          }
+
+          sessionId = (responseData as any).id as string;
+          console.log(`NEW: Created session for ${person.name}`);
+        }
 
         // Step 2: Insert pending ratings using the session ID
         const vendorInserts = person.vendors.map(v => ({
@@ -260,8 +280,9 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
   };
 
   const newCount = parsedData.filter(p => !p.isDuplicate && p.selected).length;
+  const updateCount = parsedData.filter(p => p.isDuplicate && p.selected).length;
   const totalVendors = parsedData
-    .filter(p => !p.isDuplicate && p.selected)
+    .filter(p => p.selected)
     .reduce((sum, p) => sum + p.vendors.length, 0);
 
   return (
@@ -300,7 +321,9 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
         <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>Preview - {newCount} New Respondents Found</DialogTitle>
+            <DialogTitle>
+              Preview - {newCount} New, {updateCount} Updates Found
+            </DialogTitle>
           </DialogHeader>
           
           <div className="flex-1 overflow-y-auto space-y-2">
@@ -314,16 +337,21 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
                 <Checkbox
                   checked={person.selected}
                   onCheckedChange={() => toggleSelection(idx)}
-                  disabled={person.isDuplicate}
                 />
                 <div className="flex-1">
                   <div className="font-medium">{person.name}</div>
                   <div className="text-sm text-muted-foreground">
-                    {person.contactMethod}: {person.contact} | {person.vendors.length} vendors
+                    {person.contactMethod}: {person.contact}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium">
+                    {person.isDuplicate 
+                      ? `Will add ${person.vendors.length} vendor${person.vendors.length !== 1 ? 's' : ''} to existing`
+                      : `${person.vendors.length} vendor${person.vendors.length !== 1 ? 's' : ''}`
+                    }
                   </div>
                 </div>
-                <Badge variant={person.isDuplicate ? "destructive" : "default"}>
-                  {person.isDuplicate ? "⚠️ DUPLICATE" : "✅ NEW"}
+                <Badge variant={person.isDuplicate ? "secondary" : "default"}>
+                  {person.isDuplicate ? "🔄 UPDATE" : "✅ NEW"}
                 </Badge>
               </div>
             ))}
@@ -331,13 +359,13 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
 
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <div className="flex-1 text-sm text-muted-foreground">
-              Summary: {newCount} new people ({totalVendors} vendors) | {parsedData.filter(p => p.isDuplicate).length} duplicates (will skip)
+              Summary: {newCount} new, {updateCount} updates ({totalVendors} total vendors)
             </div>
             <Button variant="outline" onClick={() => setShowPreview(false)}>
               Cancel
             </Button>
-            <Button onClick={handleImport} disabled={isUploading || newCount === 0}>
-              {isUploading ? "Importing..." : `Import ${newCount} New People`}
+            <Button onClick={handleImport} disabled={isUploading || (newCount + updateCount === 0)}>
+              {isUploading ? "Processing..." : `Import ${newCount + updateCount} Respondent${newCount + updateCount !== 1 ? 's' : ''}`}
             </Button>
           </DialogFooter>
         </DialogContent>
