@@ -127,14 +127,24 @@ export function RespondentsTable() {
     if (!confirmed) return;
 
     try {
-      // Delete by session_token (cascade should handle related records)
-      const { error } = await supabase
+      // Delete from BOTH table systems to ensure complete removal
+      
+      // Delete from old system (preview_sessions)
+      const { error: oldError } = await supabase
         .from('preview_sessions' as any)
         .delete()
-        .eq('session_token', sessionToken)
-        .eq('source', 'survey_oct_2024');
-
-      if (error) throw error;
+        .eq('session_token', sessionToken);
+      
+      // Delete from new system (survey_responses)
+      const { error: newError } = await supabase
+        .from('survey_responses' as any)
+        .delete()
+        .eq('session_token', sessionToken);
+      
+      // At least one should succeed
+      if (oldError && newError) {
+        throw oldError || newError;
+      }
 
       toast({
         title: "Deleted",
