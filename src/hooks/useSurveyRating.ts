@@ -120,19 +120,26 @@ export function useSurveyRating(token: string | null) {
       const vendor = pendingVendors.find(v => v.id === vendorId);
       if (!vendor) return false;
 
-      // Insert rating to preview_reviews
-      const { error: insertError } = await (supabase as any)
-        .from("preview_reviews")
+      // Insert rating to survey_ratings
+      const { error } = await (supabase as any)
+        .from("survey_ratings")
         .insert({
+          session_token: token,
           session_id: surveyResponse.id,
-          vendor_id: null, // We don't have a vendor_id yet, just vendor_name
+          respondent_name: surveyResponse.respondent_name,
+          vendor_name: vendor.vendor_name,
+          vendor_category: vendor.category,
           rating: ratingData.rating,
           comments: ratingData.comments,
-          anonymous: !ratingData.showName,
-          recommended: ratingData.useForHome
+          show_name: ratingData.showName,
+          current_vendor: ratingData.useForHome,
+          vendor_phone: ratingData.vendorContact,
+          cost_amount: ratingData.costEntries?.[0]?.amount,
+          cost_period: ratingData.costEntries?.[0]?.period,
+          cost_notes: ratingData.costEntries?.[0]?.notes
         });
 
-      if (insertError) throw insertError;
+      if (error) throw error;
 
       // Mark as rated in survey_pending_ratings
       const { error: updateError } = await (supabase as any)
