@@ -52,15 +52,15 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
         
         const parsed: ParsedRespondent[] = [];
         
-        // Check existing respondents by NAME (not token)
+        // Check existing respondents by NAME in survey_responses
         const { data: existing } = await supabase
-          .from("preview_sessions" as any)
-          .select("name, session_token")
+          .from("survey_responses" as any)
+          .select("respondent_name, session_token")
           .in('source', ['survey_oct_2024', 'admin_csv_upload']);
 
         // Check by NAME not token
         const existingNames = new Set(
-          existing?.map((r: any) => r.name.toLowerCase().trim()) || []
+          existing?.map((r: any) => r.respondent_name.toLowerCase().trim()) || []
         );
 
         results.data.forEach((row: any) => {
@@ -161,20 +161,18 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
           vendorCount: person.vendors.length
         });
         
-        // Step 1: Insert preview session with proper error handling
+        // Step 1: Create survey_responses record (for RateVendors page to find)
         const { data: responseData, error: respError } = await supabase
-          .from("preview_sessions" as any)
+          .from("survey_responses" as any)
           .insert({
             session_token: token,
-            name: person.name,
-            email: person.contactMethod?.toLowerCase() === "email" ? person.contact : null,
-            address: "The Bridges, Delray Beach, FL",
-            normalized_address: "the bridges delray beach fl",
-            community: "The Bridges",
+            respondent_name: person.name,
+            respondent_contact: person.contact,
+            respondent_contact_method: person.contactMethod,
+            respondent_email: person.contactMethod?.toLowerCase() === "email" ? person.contact : null,
             source: "admin_csv_upload",
             metadata: {
               phone: person.contactMethod?.toLowerCase() === "phone" ? person.contact : null,
-              contact_method: person.contactMethod,
               from_survey: true,
               upload_batch: batchId,
               upload_date: new Date().toISOString(),
@@ -185,20 +183,20 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
 
         // Check for errors BEFORE accessing .id
         if (respError) {
-          console.error('Insert response error:', respError);
+          console.error('Insert survey response error:', respError);
           throw respError;
         }
         
         if (!responseData) {
-          throw new Error("Failed to create response");
+          throw new Error("Failed to create survey response");
         }
 
-        // NOW safe to use responseData.id with type assertion
-        const sessionId = (responseData as any).id as string;
+        // NOW safe to use responseData.id
+        const surveyResponseId = (responseData as any).id as string;
 
-        // Step 2: Insert pending ratings using the session ID
+        // Step 2: Insert pending vendors using the survey_response_id
         const vendorInserts = person.vendors.map(v => ({
-          session_id: sessionId,
+          survey_response_id: surveyResponseId,
           vendor_name: v.name,
           category: v.category,
           rated: false,
@@ -206,11 +204,11 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
 
         if (vendorInserts.length > 0) {
           const { error: vendError } = await supabase
-            .from("survey_pending_ratings" as any)
+            .from("survey_pending_vendors" as any)
             .insert(vendorInserts);
 
           if (vendError) {
-            console.error('Insert vendors error:', vendError);
+            console.error('Insert pending vendors error:', vendError);
             throw vendError;
           }
         }

@@ -74,33 +74,32 @@ export function RespondentsTable() {
     if (!confirmed) return;
 
     try {
-      // Step 1: Get session_id from preview_sessions
-      const { data: sessionData, error: sessionError } = await supabase
-        .from('preview_sessions' as any)
+      // Step 1: Get survey_response_id from survey_responses
+      const { data: responseData, error: responseError } = await supabase
+        .from('survey_responses' as any)
         .select('id')
         .eq('session_token', sessionToken)
-        .eq('source', 'survey_oct_2024')
         .single();
 
-      if (sessionError) {
-        console.error('Session fetch error:', sessionError);
-        throw new Error('Could not find session');
+      if (responseError) {
+        console.error('Survey response fetch error:', responseError);
+        throw new Error('Could not find survey response');
       }
       
-      if (!sessionData) {
-        throw new Error('Session not found');
+      if (!responseData) {
+        throw new Error('Survey response not found');
       }
 
-      const sessionId = (sessionData as any).id as string;
+      const responseId = (responseData as any).id as string;
 
-      // Step 2: Reset all ratings for this session
+      // Step 2: Reset all pending vendors for this response
       const { error: updateError } = await supabase
-        .from('survey_pending_ratings' as any)
+        .from('survey_pending_vendors' as any)
         .update({ rated: false, rated_at: null })
-        .eq('session_id', sessionId);
+        .eq('survey_response_id', responseId);
 
       if (updateError) {
-        console.error('Update ratings error:', updateError);
+        console.error('Update vendors error:', updateError);
         throw updateError;
       }
 
@@ -127,12 +126,11 @@ export function RespondentsTable() {
     if (!confirmed) return;
 
     try {
-      // Delete by session_token (cascade should handle related records)
+      // Delete survey_response by session_token (cascade should handle related records)
       const { error } = await supabase
-        .from('preview_sessions' as any)
+        .from('survey_responses' as any)
         .delete()
-        .eq('session_token', sessionToken)
-        .eq('source', 'survey_oct_2024');
+        .eq('session_token', sessionToken);
 
       if (error) throw error;
 
