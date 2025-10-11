@@ -6,6 +6,7 @@ export const CATEGORIES = [
   "Catering",
   "Car Wash & Detail",
   "DJs",
+  "Dryer Vent Cleaning",
   "Carpet/Upholstery Cleaning",
   "Damage Assessment/Restoration",
   "Electrician",
