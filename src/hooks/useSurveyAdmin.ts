@@ -37,6 +37,9 @@ export interface VendorRating {
   costAmount: number | null;
   costPeriod: string | null;
   costNotes: string | null;
+  costUnit: string | null;
+  costQuantity: number | null;
+  costEntries: any[] | null;
   createdAt: string;
   respondentEmail?: string;
   respondentName?: string;
@@ -210,10 +213,13 @@ export function useSurveyRatings(sessionToken: string | null) {
         showNameInReview: r.show_name,
         useForHome: r.current_vendor,
         vendorContact: r.vendor_phone,
-        costKind: null,
+        costKind: r.cost_kind,
         costAmount: r.cost_amount,
         costPeriod: r.cost_period,
         costNotes: r.cost_notes,
+        costUnit: r.cost_unit,
+        costQuantity: r.cost_quantity,
+        costEntries: r.cost_entries,
         createdAt: r.created_at,
         respondentEmail: r.respondent_email,
         respondentName: r.respondent_name

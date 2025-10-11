@@ -36,20 +36,30 @@ export function ReviewsModal({
   const handleExportCSV = () => {
     if (!ratings || ratings.length === 0) return;
 
-    const csvHeaders = "vendor_name,category,rating,comments,cost,phone,display_name,current_vendor,submitted_at\n";
+    const csvHeaders = "vendor_name,category,rating,comments,cost_amount,cost_period,cost_kind,cost_unit,cost_quantity,cost_notes,phone,display_name,current_vendor,respondent_name,respondent_email,cost_entries_json,submitted_at\n";
     const csvRows = ratings.map(r => {
-      const cost = r.costAmount 
-        ? `$${r.costAmount}${r.costPeriod ? `/${r.costPeriod}` : ''}`
-        : 'Not provided';
+      const escapeCsv = (str: string | null | undefined) => {
+        if (!str) return 'Not provided';
+        return `"${String(str).replace(/"/g, '""')}"`;
+      };
+      
       return [
-        `"${r.vendorName}"`,
-        `"${r.category}"`,
+        escapeCsv(r.vendorName),
+        escapeCsv(r.category),
         r.rating,
-        `"${r.comments.replace(/"/g, '""')}"`,
-        `"${cost}"`,
-        r.vendorContact || 'Not provided',
+        escapeCsv(r.comments),
+        r.costAmount || 'Not provided',
+        escapeCsv(r.costPeriod),
+        escapeCsv(r.costKind),
+        escapeCsv(r.costUnit),
+        r.costQuantity || 'Not provided',
+        escapeCsv(r.costNotes),
+        escapeCsv(r.vendorContact),
         r.showNameInReview ? 'Yes' : 'No',
         r.useForHome ? 'Yes' : 'No',
+        escapeCsv(r.respondentName),
+        escapeCsv(r.respondentEmail),
+        escapeCsv(JSON.stringify(r.costEntries || [])),
         format(new Date(r.createdAt), 'yyyy-MM-dd HH:mm:ss'),
       ].join(',');
     }).join('\n');
