@@ -76,48 +76,57 @@ export function RespondentsTable() {
     if (!confirmed) return;
 
     try {
+      console.log('[handleReset] Starting reset for token:', sessionToken);
+      
       // Step 1: Get session_id from preview_sessions
       const { data: sessionData, error: sessionError } = await supabase
         .from('preview_sessions' as any)
         .select('id')
         .eq('session_token', sessionToken)
         .eq('source', 'survey_oct_2024')
-        .single();
+        .maybeSingle();
+
+      console.log('[handleReset] Session lookup result:', { sessionData, sessionError });
 
       if (sessionError) {
-        console.error('Session fetch error:', sessionError);
-        throw new Error('Could not find session');
+        console.error('[handleReset] Session fetch error:', sessionError);
+        throw new Error(`Could not find session: ${sessionError.message}`);
       }
       
       if (!sessionData) {
-        throw new Error('Session not found');
+        console.error('[handleReset] No session found for token:', sessionToken);
+        throw new Error('Session not found in database');
       }
 
       const sessionId = (sessionData as any).id as string;
+      console.log('[handleReset] Found session_id:', sessionId);
 
       // Step 2: Reset all ratings for this session
-      const { error: updateError } = await supabase
+      const { data: updateData, error: updateError, count } = await supabase
         .from('survey_pending_ratings' as any)
         .update({ rated: false, rated_at: null })
-        .eq('session_id', sessionId);
+        .eq('session_id', sessionId)
+        .select();
+
+      console.log('[handleReset] Update result:', { updateData, updateError, count });
 
       if (updateError) {
-        console.error('Update ratings error:', updateError);
-        throw updateError;
+        console.error('[handleReset] Update ratings error:', updateError);
+        throw new Error(`Failed to update ratings: ${updateError.message}`);
       }
 
       toast({
         title: "Data reset",
-        description: `${respondentName} can now re-submit ratings`,
+        description: `${respondentName} can now re-submit ratings (${count || 0} vendors reset)`,
       });
       
       queryClient.invalidateQueries({ queryKey: ['survey-stats'] });
       queryClient.invalidateQueries({ queryKey: ['survey-respondents'] });
-    } catch (error) {
-      console.error('Reset error:', error);
+    } catch (error: any) {
+      console.error('[handleReset] Complete error:', error);
       toast({
-        title: "Error",
-        description: "Failed to reset data. Please try again.",
+        title: "Reset Failed",
+        description: error.message || "Failed to reset data. Please try again.",
         variant: "destructive",
       });
     }
