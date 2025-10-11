@@ -40,6 +40,7 @@ export interface VendorRating {
   createdAt: string;
   respondentEmail?: string;
   respondentName?: string;
+  respondentPhone?: string;
 }
 
 export function useSurveyStats() {
@@ -259,7 +260,9 @@ export function useSurveyRatings(sessionToken: string | null) {
         costAmount: r.cost_amount,
         costPeriod: r.cost_period,
         costNotes: r.cost_notes,
-        createdAt: r.created_at
+        createdAt: r.created_at,
+        respondentEmail: r.respondent_email,
+        respondentName: r.respondent_name
       })) || [];
     },
     enabled: !!sessionToken,

@@ -77,10 +77,19 @@ export function ReviewsModal({
           <DialogTitle className="text-2xl flex items-center gap-2">
             📝 {respondentName}'s Reviews
           </DialogTitle>
-          {ratings?.[0]?.respondentEmail && (
-            <p className="text-sm text-muted-foreground mt-1">
-              📧 {ratings[0].respondentEmail}
-            </p>
+          {ratings && ratings.length > 0 && (
+            <div className="mt-2 p-4 bg-muted/50 rounded-lg space-y-2">
+              <div>
+                <span className="text-sm text-muted-foreground">Name: </span>
+                <span className="font-medium">{respondentName}</span>
+              </div>
+              {ratings[0].respondentEmail && (
+                <div>
+                  <span className="text-sm text-muted-foreground">Email: </span>
+                  <span className="font-medium">{ratings[0].respondentEmail}</span>
+                </div>
+              )}
+            </div>
           )}
           <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between pt-2">
             <Badge variant={completedVendors === totalVendors ? "default" : "secondary"} className="w-fit">
