@@ -301,9 +301,6 @@ export default function RateVendors() {
                     ))}
                   </div>
                 )}
-                <p className="text-sm text-muted-foreground text-center pt-2">
-                  💡 Share what you know - phone numbers and pricing are helpful but optional
-                </p>
               </div>
 
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 text-center space-y-2">
