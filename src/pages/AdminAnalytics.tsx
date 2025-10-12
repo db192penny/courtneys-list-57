@@ -1,25 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, Eye, MousePointer, RefreshCw, ArrowLeft } from 'lucide-react';
+import { RefreshCw, ArrowLeft } from 'lucide-react';
 import SEO from '@/components/SEO';
 import { UserActivityTable } from '@/components/admin/UserActivityTable';
 import { useNavigate } from 'react-router-dom';
-
-interface AnalyticsSummary {
-  total_sessions: number;
-  unique_users: number;
-  total_events: number;
-  top_pages: any[];
-  top_events: any[];
-  device_breakdown: any[];
-  community_breakdown: any[];
-}
 
 interface UserActivity {
   id: string;
@@ -93,31 +79,12 @@ export function AdminAnalytics() {
   const navigate = useNavigate();
   const [timeRange, setTimeRange] = useState('30');
   const [loading, setLoading] = useState(true);
-  const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [userActivities, setUserActivities] = useState<UserActivity[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   const fetchAnalytics = async () => {
     setLoading(true);
     try {
-      // Fetch summary data
-      const { data: summaryData, error: summaryError } = await supabase
-        .rpc('get_analytics_summary', { _days: parseInt(timeRange) });
-
-      if (summaryError) throw summaryError;
-      if (summaryData && summaryData.length > 0) {
-        const data = summaryData[0];
-        setSummary({
-          total_sessions: data.total_sessions,
-          unique_users: data.unique_users,
-          total_events: data.total_events,
-          top_pages: Array.isArray(data.top_pages) ? data.top_pages : [],
-          top_events: Array.isArray(data.top_events) ? data.top_events : [],
-          device_breakdown: Array.isArray(data.device_breakdown) ? data.device_breakdown : [],
-          community_breakdown: Array.isArray(data.community_breakdown) ? data.community_breakdown : []
-        });
-      }
-
       // Fetch user activity data with session info and activity counts
       // David Birnbaum's user ID and emails to exclude
       const adminUserId = '50c337c8-2c85-4aae-84da-26ee79f4c43b';
@@ -337,158 +304,14 @@ export function AdminAnalytics() {
           </div>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
-              <Eye className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summary?.total_sessions || 0}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Unique Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summary?.unique_users || 0}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Events</CardTitle>
-              <MousePointer className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summary?.total_events || 0}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Unique User Sessions</CardTitle>
-              <MousePointer className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{userActivities.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Deduplicated non-admin sessions
-              </p>
-            </CardContent>
-          </Card>
+        {/* User Activity Table */}
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold">Unique User Sessions (Last 2 Days)</h3>
+          <p className="text-sm text-muted-foreground">
+            Deduplicated non-admin user sessions with session actions and lifetime totals
+          </p>
         </div>
-
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Device Breakdown */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Device Types</CardTitle>
-                  <CardDescription>Sessions by device type</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={summary?.device_breakdown || []}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ device, count }) => `${device}: ${count}`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="count"
-                      >
-                        {(summary?.device_breakdown || []).map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Community Breakdown */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Community Activity</CardTitle>
-                  <CardDescription>Sessions by community</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={summary?.community_breakdown || []}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="community" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="sessions" fill="hsl(var(--primary))" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Top Pages */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Pages</CardTitle>
-                  <CardDescription>Most viewed pages</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={summary?.top_pages || []}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="page" angle={-45} textAnchor="end" height={100} />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="views" fill="hsl(var(--accent))" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Top Events */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Events</CardTitle>
-                  <CardDescription>Most frequent user actions</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={summary?.top_events || []}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="event" angle={-45} textAnchor="end" height={100} />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="count" fill="hsl(var(--secondary))" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-          </div>
-
-          {/* User Activity Table */}
-          <div className="mt-8">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold">Unique User Sessions (Last 2 Days)</h3>
-              <p className="text-sm text-muted-foreground">
-                Deduplicated non-admin user sessions with session actions and lifetime totals
-              </p>
-            </div>
-            <UserActivityTable activities={userActivities} />
-          </div>
-        </TabsContent>
-        </Tabs>
+        <UserActivityTable activities={userActivities} />
       </div>
     </div>
   );
