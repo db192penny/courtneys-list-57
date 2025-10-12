@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserBadge from "@/components/badges/UserBadge";
-import { Pencil, Save, X, Plus } from "lucide-react";
+import { Pencil, Save, X, Plus, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 type BadgeLevel = {
   id: string;
@@ -38,6 +39,7 @@ type PointReward = {
 const AdminBadges = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data: isAdmin, isLoading: isAdminLoading } = useIsAdmin();
   
   const [editingBadge, setEditingBadge] = useState<string | null>(null);
@@ -168,7 +170,16 @@ const AdminBadges = () => {
         canonical={canonical}
       />
       
-      <section className="container max-w-4xl py-10">
+      <section className="container max-w-4xl py-6 md:py-10">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/admin")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Admin
+        </Button>
         <h1 className="text-3xl font-semibold mb-6">Badge & Points Management</h1>
         
         <Tabs defaultValue="badges" className="w-full">

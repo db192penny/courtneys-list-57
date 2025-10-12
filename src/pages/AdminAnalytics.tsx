@@ -6,9 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, Eye, MousePointer, RefreshCw } from 'lucide-react';
+import { Users, Eye, MousePointer, RefreshCw, ArrowLeft } from 'lucide-react';
 import SEO from '@/components/SEO';
 import { UserActivityTable } from '@/components/admin/UserActivityTable';
+import { useNavigate } from 'react-router-dom';
 
 interface AnalyticsSummary {
   total_sessions: number;
@@ -89,6 +90,7 @@ function deduplicateUserSessions(sessions: UserActivity[]): UserActivity[] {
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'];
 
 export function AdminAnalytics() {
+  const navigate = useNavigate();
   const [timeRange, setTimeRange] = useState('30');
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
@@ -297,7 +299,16 @@ export function AdminAnalytics() {
         description="Analytics dashboard for tracking user behavior and engagement"
       />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 md:py-8">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/admin")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Admin
+        </Button>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold">Analytics Dashboard</h1>

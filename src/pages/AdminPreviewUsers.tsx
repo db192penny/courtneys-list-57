@@ -10,8 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SEO from "@/components/SEO";
-import { Eye, Calendar, MapPin, Star, DollarSign, Building } from "lucide-react";
+import { Eye, Calendar, MapPin, Star, DollarSign, Building, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 interface PreviewUser {
   id: string;
@@ -44,6 +45,7 @@ interface UserActivity {
 }
 
 export default function AdminPreviewUsers() {
+  const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState<PreviewUser | null>(null);
   const [communityFilter, setCommunityFilter] = useState<string>("all");
   const [searchFilter, setSearchFilter] = useState("");
@@ -241,11 +243,21 @@ export default function AdminPreviewUsers() {
   };
 
   return (
-    <main className="container py-8 space-y-8">
+    <main className="container py-6 md:py-8 space-y-8">
       <SEO
         title="Admin — Preview Users Activity"
         description="Track individual user activity from preview links"
       />
+
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate("/admin")}
+        className="mb-4"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back to Admin
+      </Button>
 
       <div className="space-y-6">
         <div>

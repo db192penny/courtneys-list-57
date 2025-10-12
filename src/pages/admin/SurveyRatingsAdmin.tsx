@@ -9,7 +9,7 @@ import { RespondentsTable } from "@/components/admin/RespondentsTable";
 import { CSVUpload } from "@/components/admin/CSVUpload";
 import { useSurveyRespondents } from "@/hooks/useSurveyAdmin";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 
 export default function SurveyRatingsAdmin() {
   const { data: userData, isLoading: userLoading } = useUserData();
@@ -48,7 +48,16 @@ export default function SurveyRatingsAdmin() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container max-w-7xl mx-auto py-8 px-4">
+      <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/admin")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Admin
+        </Button>
         <div className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold">Survey Ratings Admin</h1>

@@ -10,8 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Copy, Plus, Edit, BarChart3, ExternalLink } from "lucide-react";
+import { Copy, Plus, Edit, BarChart3, ExternalLink, ArrowLeft } from "lucide-react";
 import SEO from "@/components/SEO";
+import { useNavigate } from "react-router-dom";
 
 interface PreviewLink {
   id: string;
@@ -32,6 +33,7 @@ interface PreviewMetrics {
 }
 
 export default function AdminPreviewLinks() {
+  const navigate = useNavigate();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<PreviewLink | null>(null);
   const [newLink, setNewLink] = useState({
@@ -246,11 +248,21 @@ export default function AdminPreviewLinks() {
   };
 
   return (
-    <main className="container py-8 space-y-8">
+    <main className="container py-6 md:py-8 space-y-8">
       <SEO
         title="Admin — Preview Links Management"
         description="Manage Facebook community preview links and analytics"
       />
+
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate("/admin")}
+        className="mb-4"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back to Admin
+      </Button>
 
       <div className="flex items-center justify-between">
         <div>

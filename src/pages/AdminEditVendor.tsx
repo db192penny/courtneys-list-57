@@ -17,6 +17,7 @@ import useIsHoaAdmin from "@/hooks/useIsHoaAdmin";
 import { useUserData } from "@/hooks/useUserData";
 import ReviewPreview from "@/components/ReviewPreview";
 import VendorNameInput, { type VendorSelectedPayload } from "@/components/VendorNameInput";
+import { ArrowLeft } from "lucide-react";
 
 const AdminEditVendor = () => {
   const { toast } = useToast();
@@ -239,7 +240,16 @@ const AdminEditVendor = () => {
         description="Edit vendor details and information."
         canonical={canonical}
       />
-      <section className="container py-10 max-w-2xl">
+      <section className="container py-6 md:py-10 max-w-2xl">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/admin/vendors/manage")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Vendor Management
+        </Button>
         <header className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight">Edit Vendor</h1>
           <p className="text-muted-foreground mt-2">

@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useCanSeedVendors } from "@/hooks/useCanSeedVendors";
 import VendorNameInput, { type VendorSelectedPayload } from "@/components/VendorNameInput";
+import { ArrowLeft } from "lucide-react";
 
 const AdminVendorSeed = () => {
   const { toast } = useToast();
@@ -264,7 +265,16 @@ const AdminVendorSeed = () => {
         description="Admin tool to pre-populate vendors for community tables."
         canonical={canonical}
       />
-      <section className="container py-10 max-w-2xl">
+      <section className="container py-6 md:py-10 max-w-2xl">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/admin")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Admin
+        </Button>
         <header className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight">Seed Vendor</h1>
           <p className="text-muted-foreground mt-2">
