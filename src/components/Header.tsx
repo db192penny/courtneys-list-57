@@ -336,7 +336,7 @@ const Header = () => {
                     const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
                     navigate(`/auth?community=${communitySlug}`);
                   }}
-                  className="text-sm"
+                  className="text-sm bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white"
                 >
                   Sign Up
                 </Button>
@@ -395,6 +395,7 @@ const Header = () => {
                     const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
                     navigate(`/auth?community=${communitySlug}`);
                   }}
+                  className="bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white"
                 >
                   Sign Up
                 </Button>
