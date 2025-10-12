@@ -183,7 +183,7 @@ export function VendorRatingCard({
 
       <div className="space-y-2">
         <Label htmlFor="phone" className="text-base font-medium flex items-center gap-2">
-          <span>📞</span> Vendor's Phone Number
+          <span>📞</span> Vendor's Phone Number (Optional)
         </Label>
         <Input
           id="phone"
@@ -191,6 +191,9 @@ export function VendorRatingCard({
           onChange={handlePhoneChange}
           placeholder="555-123-4567"
         />
+        <p className="text-sm text-muted-foreground">
+          Help your neighbors contact them easily. Skip if you don't have it.
+        </p>
       </div>
 
       <Collapsible open={isPricingOpen} onOpenChange={setIsPricingOpen}>
