@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/table";
 import { Edit, Trash2, RotateCcw, Calendar, User } from "lucide-react";
 import { format } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { AdminCostCard } from "@/components/admin/AdminCostCard";
 
 interface CostEntry {
   id: string;
@@ -40,6 +42,8 @@ interface AdminCostTableProps {
 }
 
 export function AdminCostTable({ costs, onEdit, onDelete, onRestore, showDeleted }: AdminCostTableProps) {
+  const isMobile = useIsMobile();
+  
   const formatAmount = (amount: number, unit: string, period?: string) => {
     const formattedAmount = `$${amount.toLocaleString()}`;
     let unitDisplay = unit;
@@ -74,6 +78,23 @@ export function AdminCostTable({ costs, onEdit, onDelete, onRestore, showDeleted
     return (
       <div className="text-center py-8 text-muted-foreground">
         {showDeleted ? "No deleted cost entries found" : "No active cost entries found"}
+      </div>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <div className="space-y-3">
+        {costs.map((cost) => (
+          <AdminCostCard
+            key={cost.id}
+            cost={cost}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onRestore={onRestore}
+            showDeleted={showDeleted}
+          />
+        ))}
       </div>
     );
   }

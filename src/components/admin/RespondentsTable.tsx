@@ -40,6 +40,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Search, Eye, Copy, Mail, RotateCcw, Trash2, Loader2, MoreVertical } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { RespondentCard } from "./RespondentCard";
 
 type StatusFilter = "all" | "complete" | "in_progress" | "not_started";
 
@@ -47,6 +49,7 @@ export function RespondentsTable() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data: respondents, isLoading, refetch } = useSurveyRespondents();
+  const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortColumn, setSortColumn] = useState<string>("createdAt");
@@ -256,8 +259,31 @@ export function RespondentsTable() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
+          {isMobile ? (
+            <div className="space-y-3">
+              {!filteredData || filteredData.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  No respondents found
+                </div>
+              ) : (
+                filteredData.map((respondent) => (
+                  <RespondentCard
+                    key={respondent.id}
+                    respondent={respondent}
+                    onViewReviews={() => {
+                      setSelectedRespondent(respondent);
+                      setShowReviewsModal(true);
+                    }}
+                    onCopyLink={() => handleCopyLink(respondent.sessionToken, respondent.name)}
+                    onReset={() => handleReset(respondent.sessionToken, respondent.name)}
+                    onDelete={() => handleDelete(respondent.sessionToken, respondent.name)}
+                  />
+                ))
+              )}
+            </div>
+          ) : (
+            <div className="rounded-md border overflow-x-auto">
+              <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
@@ -372,6 +398,7 @@ export function RespondentsTable() {
               </TableBody>
             </Table>
           </div>
+          )}
         </CardContent>
       </Card>
 

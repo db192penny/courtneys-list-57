@@ -1,6 +1,8 @@
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Monitor, Smartphone } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { ActivityCard } from './ActivityCard';
 
 interface UserActivity {
   id: string;
@@ -24,6 +26,8 @@ interface UserActivityTableProps {
 }
 
 export function UserActivityTable({ activities }: UserActivityTableProps) {
+  const isMobile = useIsMobile();
+  
   const formatDuration = (seconds: number | null) => {
     if (!seconds) return 'N/A';
     const minutes = Math.floor(seconds / 60);
@@ -38,6 +42,16 @@ export function UserActivityTable({ activities }: UserActivityTableProps) {
       time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
   };
+
+  if (isMobile) {
+    return (
+      <div className="space-y-3">
+        {activities.map((activity) => (
+          <ActivityCard key={activity.id} activity={activity} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-md border">
