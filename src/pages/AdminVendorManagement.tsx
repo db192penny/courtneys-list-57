@@ -32,6 +32,7 @@ const AdminVendorManagement = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
+  const isMobile = useIsMobile();
 
   // State
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -162,8 +163,6 @@ const AdminVendorManagement = () => {
       </main>
     );
   }
-
-  const isMobile = useIsMobile();
 
   return (
     <main className="min-h-screen bg-background">
