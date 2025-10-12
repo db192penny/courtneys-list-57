@@ -9,9 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Search, UserCheck, UserX, Trash2, Eye } from "lucide-react";
+import { Search, UserCheck, UserX, Trash2, Eye, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { UserActivityDetailsModal } from "@/components/admin/UserActivityDetailsModal";
+import { UserCard } from "@/components/admin/UserCard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface User {
   id: string;
@@ -229,6 +231,8 @@ const AdminUsers = () => {
     return <Badge variant="secondary">Pending</Badge>;
   };
 
+  const isMobile = useIsMobile();
+
   return (
     <main className="min-h-screen bg-background">
       <SEO
@@ -286,7 +290,7 @@ const AdminUsers = () => {
           </CardContent>
         </Card>
 
-        {/* Users Table */}
+        {/* Users Table/Cards */}
         <Card>
           <CardHeader>
             <CardTitle>Users ({filteredUsers.length})</CardTitle>
@@ -295,112 +299,142 @@ const AdminUsers = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Signup Source</TableHead>
-                    <TableHead>Community</TableHead>
-                    <TableHead>Points</TableHead>
-                    <TableHead>Joined</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : isMobile ? (
+              // Mobile Card View
+              <div className="space-y-3">
+                {filteredUsers.length === 0 ? (
+                  <p className="text-center py-8 text-muted-foreground text-sm">
+                    No users found matching the current filters.
+                  </p>
+                ) : (
+                  filteredUsers.map((user) => (
+                    <UserCard
+                      key={user.id}
+                      user={user}
+                      onView={() => setSelectedUserForModal({
+                        id: user.id,
+                        name: user.name || "Unknown",
+                        email: user.email,
+                        address: user.address,
+                        hoaName: user.hoa_name,
+                        signupSource: user.signup_source,
+                        points: user.points
+                      })}
+                      onVerify={!user.is_orphaned && !user.is_verified ? () => handleUserAction(user.id, "verify") : undefined}
+                      onUnverify={!user.is_orphaned && user.is_verified ? () => handleUserAction(user.id, "unverify") : undefined}
+                      onDelete={() => handleUserAction(user.id, user.is_orphaned ? "cleanup" : "delete")}
+                      isLoading={!!loadingAction[user.id]}
+                    />
+                  ))
+                )}
+              </div>
+            ) : (
+              // Desktop Table View
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
-                        Loading users...
-                      </TableCell>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Signup Source</TableHead>
+                      <TableHead>Community</TableHead>
+                      <TableHead>Points</TableHead>
+                      <TableHead>Joined</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ) : filteredUsers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
-                        No users found matching the current filters.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.name || "—"}</TableCell>
-                        <TableCell>{getStatusBadge(user)}</TableCell>
-                        <TableCell>{getSignupSourceDisplay(user.signup_source)}</TableCell>
-                        <TableCell>{user.hoa_name || "Not Mapped"}</TableCell>
-                        <TableCell>{user.points || 0}</TableCell>
-                        <TableCell>
-                          {new Date(user.created_at).toLocaleDateString()}
+                  </TableHeader>
+                  <TableBody>
+                    {filteredUsers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8">
+                          No users found matching the current filters.
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex gap-1 justify-end">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setSelectedUserForModal({
-                                id: user.id,
-                                name: user.name || "Unknown",
-                                email: user.email,
-                                address: user.address,
-                                hoaName: user.hoa_name,
-                                signupSource: user.signup_source,
-                                points: user.points
-                              })}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            {user.is_orphaned ? (
+                      </TableRow>
+                    ) : (
+                      filteredUsers.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>{user.name || "—"}</TableCell>
+                          <TableCell>{getStatusBadge(user)}</TableCell>
+                          <TableCell>{getSignupSourceDisplay(user.signup_source)}</TableCell>
+                          <TableCell>{user.hoa_name || "Not Mapped"}</TableCell>
+                          <TableCell>{user.points || 0}</TableCell>
+                          <TableCell>
+                            {new Date(user.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex gap-1 justify-end">
                               <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
-                                onClick={() => handleUserAction(user.id, "cleanup")}
-                                disabled={!!loadingAction[user.id]}
-                                className="text-destructive hover:text-destructive"
+                                onClick={() => setSelectedUserForModal({
+                                  id: user.id,
+                                  name: user.name || "Unknown",
+                                  email: user.email,
+                                  address: user.address,
+                                  hoaName: user.hoa_name,
+                                  signupSource: user.signup_source,
+                                  points: user.points
+                                })}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Eye className="h-4 w-4" />
                               </Button>
-                            ) : (
-                              <>
-                                {user.is_verified ? (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleUserAction(user.id, "unverify")}
-                                    disabled={!!loadingAction[user.id]}
-                                  >
-                                    <UserX className="h-4 w-4" />
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleUserAction(user.id, "verify")}
-                                    disabled={!!loadingAction[user.id]}
-                                  >
-                                    <UserCheck className="h-4 w-4" />
-                                  </Button>
-                                )}
+                              {user.is_orphaned ? (
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => handleUserAction(user.id, "delete")}
+                                  onClick={() => handleUserAction(user.id, "cleanup")}
                                   disabled={!!loadingAction[user.id]}
                                   className="text-destructive hover:text-destructive"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
-                              </>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                              ) : (
+                                <>
+                                  {user.is_verified ? (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleUserAction(user.id, "unverify")}
+                                      disabled={!!loadingAction[user.id]}
+                                    >
+                                      <UserX className="h-4 w-4" />
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleUserAction(user.id, "verify")}
+                                      disabled={!!loadingAction[user.id]}
+                                    >
+                                      <UserCheck className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleUserAction(user.id, "delete")}
+                                    disabled={!!loadingAction[user.id]}
+                                    className="text-destructive hover:text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </CardContent>
         </Card>
 

@@ -11,6 +11,8 @@ import { AdminQuickAccess } from "@/components/admin/AdminQuickAccess";
 import EmailTemplatePanel from "@/components/admin/EmailTemplatePanel";
 import WeeklyEmailSender from "@/components/admin/WeeklyEmailSender";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PendingUserCard } from "@/components/admin/PendingUserCard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 interface PendingRow {
@@ -295,6 +297,8 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
     }
   };
 
+  const isMobile = useIsMobile();
+
   return (
     <main className="min-h-screen bg-background">
       <SEO
@@ -318,30 +322,30 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
             <AdminQuickAccess />
             
             <div className="rounded-md border border-border p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-medium">Admin Tools</h2>
-                <div className="flex gap-2">
-                  <Button asChild variant="outline" size="sm">
+              <div className="mb-3">
+                <h2 className="font-medium mb-3">Admin Tools</h2>
+                <div className={isMobile ? "grid grid-cols-1 gap-2" : "flex flex-wrap gap-2"}>
+                  <Button asChild variant="outline" size="sm" className={isMobile ? "w-full" : ""}>
                     <Link to="/admin/survey-ratings">Survey Ratings</Link>
                   </Button>
-                  <Button asChild variant="outline" size="sm">
+                  <Button asChild variant="outline" size="sm" className={isMobile ? "w-full" : ""}>
                     <Link to="/admin/vendors/seed">Seed Vendor</Link>
                   </Button>
-                  <Button asChild variant="outline" size="sm">
+                  <Button asChild variant="outline" size="sm" className={isMobile ? "w-full" : ""}>
                     <Link to="/admin/vendors/manage">Manage Vendors</Link>
                   </Button>
-                  <Button asChild variant="outline" size="sm">
+                  <Button asChild variant="outline" size="sm" className={isMobile ? "w-full" : ""}>
                     <Link to="/admin/badges">Manage Badges</Link>
                   </Button>
-                  <Button asChild variant="outline" size="sm">
+                  <Button asChild variant="outline" size="sm" className={isMobile ? "w-full" : ""}>
                     <Link to="/admin/costs">Manage Costs</Link>
                   </Button>
-                  <Button asChild variant="outline" size="sm">
+                  <Button asChild variant="outline" size="sm" className={isMobile ? "w-full" : ""}>
                     <Link to="/admin/users">Manage Users</Link>
                   </Button>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground">
                 Use these tools to manage the platform and seed initial vendor data for communities.
               </p>
             </div>
@@ -350,42 +354,63 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
 
             <div className="rounded-md border border-border p-4">
               <h2 className="font-medium mb-3">Pending Users ({pendingUsers.length})</h2>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Address</TableHead>
-                      <TableHead>Joined</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pendingUsers.length === 0 && (
+              {isMobile ? (
+                // Mobile Card View
+                <div className="space-y-3">
+                  {pendingUsers.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No users pending approval.</p>
+                  ) : (
+                    pendingUsers.map((u) => (
+                      <PendingUserCard
+                        key={u.id}
+                        user={u}
+                        onApprove={() => setUserVerification(u.id, true, u.email)}
+                        onReject={() => setUserVerification(u.id, false, u.email)}
+                        isLoading={!!userLoading?.[u.id]}
+                        loadingAction={userLoading?.[u.id]}
+                      />
+                    ))
+                  )}
+                </div>
+              ) : (
+                // Desktop Table View
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={5} className="text-sm text-muted-foreground">No users pending approval.</TableCell>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Address</TableHead>
+                        <TableHead>Joined</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    )}
-                    {pendingUsers.map((u) => (
-                        <TableRow key={u.id}>
-                          <TableCell>{u.email}</TableCell>
-                          <TableCell>{u.name || "—"}</TableCell>
-                          <TableCell>{u.formatted_address || u.address || "—"}</TableCell>
-                          <TableCell>{u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}</TableCell>
-                          <TableCell className="text-right space-x-2">
-                            <Button size="sm" variant="secondary" disabled={!!userLoading?.[u.id]} onClick={() => setUserVerification(u.id, false, u.email)}>
-                              {userLoading?.[u.id] === "reject" ? "Rejecting…" : "Reject"}
-                            </Button>
-                            <Button size="sm" disabled={!!userLoading?.[u.id]} onClick={() => setUserVerification(u.id, true, u.email)}>
-                              {userLoading?.[u.id] === "approve" ? "Approving…" : "Approve"}
-                            </Button>
-                          </TableCell>
+                    </TableHeader>
+                    <TableBody>
+                      {pendingUsers.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-sm text-muted-foreground">No users pending approval.</TableCell>
                         </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                      )}
+                      {pendingUsers.map((u) => (
+                          <TableRow key={u.id}>
+                            <TableCell>{u.email}</TableCell>
+                            <TableCell>{u.name || "—"}</TableCell>
+                            <TableCell>{u.formatted_address || u.address || "—"}</TableCell>
+                            <TableCell>{u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}</TableCell>
+                            <TableCell className="text-right space-x-2">
+                              <Button size="sm" variant="secondary" disabled={!!userLoading?.[u.id]} onClick={() => setUserVerification(u.id, false, u.email)}>
+                                {userLoading?.[u.id] === "reject" ? "Rejecting…" : "Reject"}
+                              </Button>
+                              <Button size="sm" disabled={!!userLoading?.[u.id]} onClick={() => setUserVerification(u.id, true, u.email)}>
+                                {userLoading?.[u.id] === "approve" ? "Approving…" : "Approve"}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </div>
           </div>
         )}
