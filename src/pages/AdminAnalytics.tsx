@@ -22,6 +22,9 @@ interface UserActivity {
   review_count: number;
   cost_count: number;
   vendor_count: number;
+  community: string | null;
+  total_clicks: number;
+  categories_viewed: number;
 }
 
 // Helper function to deduplicate sessions by user and time window
@@ -73,14 +76,54 @@ function deduplicateUserSessions(sessions: UserActivity[]): UserActivity[] {
 }
 
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'];
-
 export function AdminAnalytics() {
   const navigate = useNavigate();
   const [timeRange, setTimeRange] = useState('30');
   const [loading, setLoading] = useState(true);
   const [userActivities, setUserActivities] = useState<UserActivity[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<UserActivity[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [userTypeFilter, setUserTypeFilter] = useState<string>('all');
+  const [communityFilter, setCommunityFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('date');
+
+  // Get unique communities for filter
+  const communities = Array.from(new Set(userActivities.map(a => a.community).filter(Boolean)));
+
+  // Apply filters and sorting
+  useEffect(() => {
+    let filtered = [...userActivities];
+
+    // Apply user type filter
+    if (userTypeFilter === 'new') {
+      filtered = filtered.filter(a => !a.is_returning_user);
+    } else if (userTypeFilter === 'returning') {
+      filtered = filtered.filter(a => a.is_returning_user);
+    }
+
+    // Apply community filter
+    if (communityFilter !== 'all') {
+      filtered = filtered.filter(a => a.community === communityFilter);
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'date':
+          return new Date(b.session_start).getTime() - new Date(a.session_start).getTime();
+        case 'clicks':
+          return b.total_clicks - a.total_clicks;
+        case 'categories':
+          return b.categories_viewed - a.categories_viewed;
+        case 'community':
+          return (a.community || '').localeCompare(b.community || '');
+        default:
+          return 0;
+      }
+    });
+
+    setFilteredActivities(filtered);
+  }, [userActivities, userTypeFilter, communityFilter, sortBy]);
 
   const fetchAnalytics = async () => {
     setLoading(true);
@@ -104,7 +147,8 @@ export function AdminAnalytics() {
           session_start,
           session_end,
           duration_seconds,
-          is_returning_user
+          is_returning_user,
+          community
         `)
         .not('user_id', 'is', null)
         .neq('user_id', adminUserId)
@@ -125,6 +169,7 @@ export function AdminAnalytics() {
           let userData = null;
           let activityCounts = { review_count: 0, cost_count: 0, vendor_count: 0 };
           let sessionActivityCounts = { session_review_count: 0, session_cost_count: 0, session_vendor_count: 0 };
+          let analyticsData = { total_clicks: 0, categories_viewed: 0 };
 
           if (session.user_id) {
             try {
@@ -146,6 +191,17 @@ export function AdminAnalytics() {
               // Get session time boundaries
               const sessionStart = new Date(session.session_start);
               const sessionEnd = session.session_end ? new Date(session.session_end) : new Date();
+
+              // Get analytics data (clicks and categories) for this session
+              const { data: analyticsEvents } = await supabase
+                .from('user_analytics')
+                .select('id, category')
+                .eq('session_id', session.id);
+
+              analyticsData = {
+                total_clicks: analyticsEvents?.length || 0,
+                categories_viewed: new Set(analyticsEvents?.map(e => e.category).filter(Boolean)).size
+              };
 
               // Get activity counts for this user (lifetime totals and session-specific)
               const [
@@ -220,7 +276,10 @@ export function AdminAnalytics() {
             session_vendor_count: sessionActivityCounts.session_vendor_count,
             review_count: activityCounts.review_count,
             cost_count: activityCounts.cost_count,
-            vendor_count: activityCounts.vendor_count
+            vendor_count: activityCounts.vendor_count,
+            community: session.community,
+            total_clicks: analyticsData.total_clicks,
+            categories_viewed: analyticsData.categories_viewed
           };
         })
       );
@@ -276,42 +335,72 @@ export function AdminAnalytics() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Admin
         </Button>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-            <p className="text-muted-foreground">
-              Last updated: {lastUpdated.toLocaleString()}
-            </p>
-          </div>
-          
-          <div className="flex gap-3">
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7">Last 7 days</SelectItem>
-                <SelectItem value="30">Last 30 days</SelectItem>
-                <SelectItem value="90">Last 90 days</SelectItem>
-                <SelectItem value="365">Last year</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="flex flex-col gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
+              <p className="text-muted-foreground">
+                Last updated: {lastUpdated.toLocaleString()}
+              </p>
+            </div>
             
             <Button onClick={fetchAnalytics} size="sm" variant="outline">
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
           </div>
+
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
+            <Select value={userTypeFilter} onValueChange={setUserTypeFilter}>
+              <SelectTrigger className="w-full sm:w-40">
+                <SelectValue placeholder="User Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                <SelectItem value="new">New Users</SelectItem>
+                <SelectItem value="returning">Returning Users</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={communityFilter} onValueChange={setCommunityFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Community" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Communities</SelectItem>
+                {communities.map(community => (
+                  <SelectItem key={community} value={community!}>
+                    {community}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-full sm:w-40">
+                <SelectValue placeholder="Sort By" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">Date (Newest)</SelectItem>
+                <SelectItem value="clicks">Most Clicks</SelectItem>
+                <SelectItem value="categories">Most Categories</SelectItem>
+                <SelectItem value="community">Community</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* User Activity Table */}
         <div className="mb-4">
-          <h3 className="text-lg font-semibold">Unique User Sessions (Last 2 Days)</h3>
+          <h3 className="text-lg font-semibold">
+            Unique User Sessions ({filteredActivities.length} of {userActivities.length})
+          </h3>
           <p className="text-sm text-muted-foreground">
-            Deduplicated non-admin user sessions with session actions and lifetime totals
+            Deduplicated non-admin user sessions with clicks, categories, and activity totals
           </p>
         </div>
-        <UserActivityTable activities={userActivities} />
+        <UserActivityTable activities={filteredActivities} />
       </div>
     </div>
   );

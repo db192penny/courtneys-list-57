@@ -19,6 +19,9 @@ interface UserActivity {
   review_count: number;
   cost_count: number;
   vendor_count: number;
+  community: string | null;
+  total_clicks: number;
+  categories_viewed: number;
 }
 
 interface UserActivityTableProps {
@@ -54,14 +57,17 @@ export function UserActivityTable({ activities }: UserActivityTableProps) {
   }
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Date & Time</TableHead>
             <TableHead>User</TableHead>
+            <TableHead>Community</TableHead>
             <TableHead>Type</TableHead>
-            <TableHead>Device/Browser</TableHead>
+            <TableHead className="text-center">Clicks</TableHead>
+            <TableHead className="text-center">Categories</TableHead>
+            <TableHead>Device</TableHead>
             <TableHead>Duration</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -72,26 +78,45 @@ export function UserActivityTable({ activities }: UserActivityTableProps) {
             return (
               <TableRow key={activity.id}>
                 <TableCell>
-                  <div className="text-sm">
+                  <div className="text-sm whitespace-nowrap">
                     <div className="font-medium">{date}</div>
                     <div className="text-muted-foreground">{time}</div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="font-medium">
+                  <div className="font-medium whitespace-nowrap">
                     {activity.user_name || 'Anonymous'}
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge 
-                    variant={activity.is_returning_user ? "default" : "secondary"}
-                    className={activity.is_returning_user ? "bg-primary/10 text-primary" : ""}
-                  >
-                    {activity.is_returning_user ? 'Returning' : 'New User'}
-                  </Badge>
+                  {activity.community ? (
+                    <Badge variant="outline" className="whitespace-nowrap">
+                      {activity.community}
+                    </Badge>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">-</span>
+                  )}
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
+                  <Badge 
+                    variant={activity.is_returning_user ? "default" : "secondary"}
+                    className={activity.is_returning_user ? "bg-primary/10 text-primary whitespace-nowrap" : "whitespace-nowrap"}
+                  >
+                    {activity.is_returning_user ? 'Returning' : 'New'}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="font-semibold text-primary">
+                    {activity.total_clicks}
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="font-semibold text-secondary-foreground">
+                    {activity.categories_viewed}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2 whitespace-nowrap">
                     {activity.device_type === 'Mobile' ? (
                       <Smartphone className="h-4 w-4 text-muted-foreground" />
                     ) : (
@@ -99,11 +124,11 @@ export function UserActivityTable({ activities }: UserActivityTableProps) {
                     )}
                     <div className="text-sm">
                       <div>{activity.device_type}</div>
-                      <div className="text-muted-foreground">{activity.browser}</div>
+                      <div className="text-xs text-muted-foreground">{activity.browser}</div>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm">
+                <TableCell className="text-sm whitespace-nowrap">
                   {formatDuration(activity.duration_seconds)}
                 </TableCell>
                 <TableCell>

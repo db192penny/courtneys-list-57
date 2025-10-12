@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Monitor, Smartphone, Clock } from "lucide-react";
+import { Monitor, Smartphone, Clock, MousePointerClick, Layers } from "lucide-react";
 
 interface UserActivity {
   id: string;
@@ -17,6 +17,9 @@ interface UserActivity {
   review_count: number;
   cost_count: number;
   vendor_count: number;
+  community: string | null;
+  total_clicks: number;
+  categories_viewed: number;
 }
 
 interface ActivityCardProps {
@@ -51,13 +54,18 @@ export function ActivityCard({ activity }: ActivityCardProps) {
               <h3 className="font-semibold text-base truncate">
                 {activity.user_name || 'Anonymous'}
               </h3>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex flex-wrap items-center gap-2 mt-1">
                 <Badge 
                   variant={activity.is_returning_user ? "default" : "secondary"}
                   className={activity.is_returning_user ? "bg-primary/10 text-primary" : ""}
                 >
-                  {activity.is_returning_user ? 'Returning' : 'New User'}
+                  {activity.is_returning_user ? 'Returning' : 'New'}
                 </Badge>
+                {activity.community && (
+                  <Badge variant="outline" className="text-xs">
+                    {activity.community}
+                  </Badge>
+                )}
               </div>
             </div>
             <div className="text-right shrink-0 text-sm">
@@ -85,11 +93,29 @@ export function ActivityCard({ activity }: ActivityCardProps) {
             </div>
           </div>
 
+          {/* Engagement Stats */}
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t">
+            <div className="flex items-center gap-2 p-2 rounded-md bg-primary/5">
+              <MousePointerClick className="h-4 w-4 text-primary" />
+              <div>
+                <div className="text-xs text-muted-foreground">Clicks</div>
+                <div className="font-bold text-primary">{activity.total_clicks}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-2 rounded-md bg-secondary/10">
+              <Layers className="h-4 w-4 text-secondary-foreground" />
+              <div>
+                <div className="text-xs text-muted-foreground">Categories</div>
+                <div className="font-bold text-secondary-foreground">{activity.categories_viewed}</div>
+              </div>
+            </div>
+          </div>
+
           {/* Activity Stats */}
           <div className="grid grid-cols-3 gap-3 pt-2 border-t">
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">Reviews</div>
-              <div className="font-semibold">
+              <div className="font-semibold text-sm">
                 {activity.session_review_count}
                 <span className="text-xs text-muted-foreground ml-1">
                   ({activity.review_count})
@@ -98,7 +124,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
             </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">Costs</div>
-              <div className="font-semibold">
+              <div className="font-semibold text-sm">
                 {activity.session_cost_count}
                 <span className="text-xs text-muted-foreground ml-1">
                   ({activity.cost_count})
@@ -107,7 +133,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
             </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">Vendors</div>
-              <div className="font-semibold">
+              <div className="font-semibold text-sm">
                 {activity.session_vendor_count}
                 <span className="text-xs text-muted-foreground ml-1">
                   ({activity.vendor_count})
