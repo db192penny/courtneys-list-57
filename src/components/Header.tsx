@@ -308,22 +308,39 @@ const Header = () => {
                 </SheetContent>
               </Sheet>
             ) : !isAuthPage ? (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => {
-                  // Store current path before navigating
-                  const currentPath = window.location.pathname + window.location.search;
-                  sessionStorage.setItem('auth_return_path', currentPath);
-                  console.log('[Header] Stored path before signin:', currentPath);
-                  
-                  const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
-                  navigate(`/signin?community=${communitySlug}`);
-                }}
-                className="text-sm"
-              >
-                Log In
-              </Button>
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    // Store current path before navigating
+                    const currentPath = window.location.pathname + window.location.search;
+                    sessionStorage.setItem('auth_return_path', currentPath);
+                    console.log('[Header] Stored path before signin:', currentPath);
+                    
+                    const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
+                    navigate(`/signin?community=${communitySlug}`);
+                  }}
+                  className="text-sm"
+                >
+                  Log In
+                </Button>
+                <Button 
+                  size="sm" 
+                  onClick={() => {
+                    // Store current path before navigating
+                    const currentPath = window.location.pathname + window.location.search;
+                    sessionStorage.setItem('auth_return_path', currentPath);
+                    console.log('[Header] Stored path before signup:', currentPath);
+                    
+                    const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
+                    navigate(`/auth?community=${communitySlug}`);
+                  }}
+                  className="text-sm"
+                >
+                  Sign Up
+                </Button>
+              </>
             ) : null}
           </div>
         ) : (
@@ -353,20 +370,35 @@ const Header = () => {
                 </div>
               </div>
             ) : !isAuthPage ? (
-              <Button 
-                variant="ghost" 
-                onClick={() => {
-                  // Store current path before navigating
-                  const currentPath = window.location.pathname + window.location.search;
-                  sessionStorage.setItem('auth_return_path', currentPath);
-                  console.log('[Header] Stored path before signin:', currentPath);
-                  
-                  const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
-                  navigate(`/signin?community=${communitySlug}`);
-                }}
-              >
-                Log In
-              </Button>
+              <>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => {
+                    // Store current path before navigating
+                    const currentPath = window.location.pathname + window.location.search;
+                    sessionStorage.setItem('auth_return_path', currentPath);
+                    console.log('[Header] Stored path before signin:', currentPath);
+                    
+                    const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
+                    navigate(`/signin?community=${communitySlug}`);
+                  }}
+                >
+                  Log In
+                </Button>
+                <Button 
+                  onClick={() => {
+                    // Store current path before navigating
+                    const currentPath = window.location.pathname + window.location.search;
+                    sessionStorage.setItem('auth_return_path', currentPath);
+                    console.log('[Header] Stored path before signup:', currentPath);
+                    
+                    const communitySlug = communityDisplayName.toLowerCase().replace(/\s+/g, '-');
+                    navigate(`/auth?community=${communitySlug}`);
+                  }}
+                >
+                  Sign Up
+                </Button>
+              </>
             ) : null}
           </div>
         )}
