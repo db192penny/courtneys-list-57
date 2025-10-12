@@ -11,6 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import useIsAdmin from "@/hooks/useIsAdmin";
 import { formatUSPhoneDisplay } from "@/utils/phone";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { AdminVendorCard } from "@/components/admin/AdminVendorCard";
+import { ArrowLeft } from "lucide-react";
 
 interface Vendor {
   id: string;
@@ -160,6 +163,8 @@ const AdminVendorManagement = () => {
     );
   }
 
+  const isMobile = useIsMobile();
+
   return (
     <main className="min-h-screen bg-background">
       <SEO
@@ -167,7 +172,18 @@ const AdminVendorManagement = () => {
         description="Admin tool to manage all vendors in the system."
         canonical={canonical}
       />
-      <section className="container py-10 max-w-6xl">
+      <section className="container py-6 md:py-10 max-w-6xl">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/admin")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Admin
+        </Button>
+
         <header className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight">Vendor Management</h1>
           <p className="text-muted-foreground mt-2">
@@ -216,62 +232,81 @@ const AdminVendorManagement = () => {
           </div>
         </div>
 
-        {/* Vendors Table */}
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Community</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Google Rating</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredVendors.length === 0 && (
+        {/* Vendors Display - Mobile Cards or Desktop Table */}
+        {isMobile ? (
+          <div className="space-y-3">
+            {filteredVendors.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">
+                No vendors found.
+              </div>
+            ) : (
+              filteredVendors.map((vendor) => (
+                <AdminVendorCard
+                  key={vendor.id}
+                  vendor={vendor}
+                  onEdit={() => openEditPage(vendor)}
+                  onDelete={() => deleteVendor(vendor)}
+                />
+              ))
+            )}
+          </div>
+        ) : (
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
-                    No vendors found.
-                  </TableCell>
+                  <TableHead className="min-w-[200px]">Name</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Community</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Google Rating</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              )}
-              {filteredVendors.map((vendor) => (
-                <TableRow key={vendor.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      {vendor.name}
-                      {vendor.google_place_id && (
-                        <span className="text-xs text-green-600">✓</span>
+              </TableHeader>
+              <TableBody>
+                {filteredVendors.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                      No vendors found.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {filteredVendors.map((vendor) => (
+                  <TableRow key={vendor.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <span className="break-words">{vendor.name}</span>
+                        {vendor.google_place_id && (
+                          <span className="text-xs text-green-600">✓</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{vendor.category}</TableCell>
+                    <TableCell>{vendor.community}</TableCell>
+                    <TableCell>{formatUSPhoneDisplay(vendor.contact_info)}</TableCell>
+                    <TableCell>
+                      {vendor.google_rating ? (
+                        <span>{vendor.google_rating} ({vendor.google_rating_count})</span>
+                      ) : (
+                        "—"
                       )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{vendor.category}</TableCell>
-                  <TableCell>{vendor.community}</TableCell>
-                  <TableCell>{formatUSPhoneDisplay(vendor.contact_info)}</TableCell>
-                  <TableCell>
-                    {vendor.google_rating ? (
-                      <span>{vendor.google_rating} ({vendor.google_rating_count})</span>
-                    ) : (
-                      "—"
-                    )}
-                  </TableCell>
-                  <TableCell>{new Date(vendor.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => openEditPage(vendor)}>
-                      Edit
-                    </Button>
-                    <Button size="sm" variant="destructive" onClick={() => deleteVendor(vendor)}>
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                    </TableCell>
+                    <TableCell>{new Date(vendor.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Button size="sm" variant="outline" onClick={() => openEditPage(vendor)}>
+                        Edit
+                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteVendor(vendor)}>
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
 
         {/* Results count */}
         <div className="mt-4 text-sm text-muted-foreground">

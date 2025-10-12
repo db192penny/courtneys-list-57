@@ -9,11 +9,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Search, UserCheck, UserX, Trash2, Eye, Loader2 } from "lucide-react";
+import { Search, UserCheck, UserX, Trash2, Eye, Loader2, ArrowLeft } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { UserActivityDetailsModal } from "@/components/admin/UserActivityDetailsModal";
 import { UserCard } from "@/components/admin/UserCard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
 
 interface User {
   id: string;
@@ -40,10 +41,12 @@ interface UserActivity {
 const AdminUsers = () => {
   const canonical = typeof window !== "undefined" ? window.location.href : undefined;
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "verified" | "pending">("all");
   const [sourceFilter, setSourceFilter] = useState<"all" | "community" | "regular">("all");
+  const [communityFilter, setCommunityFilter] = useState<string>("all");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedUserForModal, setSelectedUserForModal] = useState<{
     id: string;
@@ -80,7 +83,7 @@ const AdminUsers = () => {
     },
   });
 
-  // Filter users based on search term and source
+  // Filter users based on search term, source, and community
   const filteredUsers = (users as User[]).filter(user => {
     const matchesSearch = !searchTerm || 
       user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -91,8 +94,16 @@ const AdminUsers = () => {
       (sourceFilter === "community" && user.signup_source?.startsWith("community:")) ||
       (sourceFilter === "regular" && !user.signup_source?.startsWith("community:"));
 
-    return matchesSearch && matchesSource;
+    const matchesCommunity = communityFilter === "all" || 
+      user.hoa_name?.toLowerCase() === communityFilter.toLowerCase();
+
+    return matchesSearch && matchesSource && matchesCommunity;
   });
+
+  // Get unique communities for filter
+  const communities = Array.from(
+    new Set(users.map((u) => u.hoa_name).filter(Boolean))
+  ).sort() as string[];
 
   // Fetch user activity when user is selected
   useEffect(() => {
@@ -241,7 +252,18 @@ const AdminUsers = () => {
         canonical={canonical}
       />
 
-      <section className="container py-10 max-w-7xl">
+      <section className="container py-6 md:py-10 max-w-7xl">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/admin")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Admin
+        </Button>
+
         <header className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
           <p className="text-muted-foreground">
@@ -284,6 +306,19 @@ const AdminUsers = () => {
                   <SelectItem value="all">All Sources</SelectItem>
                   <SelectItem value="community">Community Signups</SelectItem>
                   <SelectItem value="regular">Regular Signups</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={communityFilter} onValueChange={setCommunityFilter}>
+                <SelectTrigger className="w-full md:w-48">
+                  <SelectValue placeholder="All communities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Communities</SelectItem>
+                  {communities.map((community) => (
+                    <SelectItem key={community} value={community}>
+                      {community}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
