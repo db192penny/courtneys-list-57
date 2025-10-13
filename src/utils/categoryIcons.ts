@@ -34,6 +34,7 @@ import {
   Wind,
   Warehouse,
   Shirt,
+  Dumbbell,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -43,6 +44,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "HVAC": Thermometer,
   "Electrician": Plug,
   "Grill Cleaning": Flame,
+  "Gym Equipment Install/Repair": Dumbbell,
   "Plumbing": Droplets,
   "Painters": PaintBucket,
   "Landscaping": Trees,

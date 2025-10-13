@@ -212,6 +212,15 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "installation", amount: null, unit: "window", notes: null },
     ];
   }
+
+  // Gym Equipment Install/Repair: Service call + hourly rate + installation
+  if (c === "gym equipment install/repair") {
+    return [
+      { cost_kind: "service_call", amount: null, unit: "visit", notes: null },
+      { cost_kind: "hourly", amount: null, unit: "hour", notes: null },
+      { cost_kind: "installation", amount: null, unit: "equipment", notes: null },
+    ];
+  }
   
   // General Contractor: No structured fields
   if (c === "general contractor") {

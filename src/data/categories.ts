@@ -14,6 +14,7 @@ export const CATEGORIES = [
   "Generator",
   "Garage Remodeling",
   "Grill Cleaning",
+  "Gym Equipment Install/Repair",
   "Handyman",
   "Holiday Lighting",
   "Home Theater & AV",
