@@ -5,7 +5,7 @@ export const CATEGORIES = [
   "Car Service",
   "Catering",
   "Car Wash & Detail",
-  "Closet Remodeling",
+  "Custom Closets",
   "DJs",
   "Dryer Vent Cleaning",
   "Carpet/Upholstery Cleaning",

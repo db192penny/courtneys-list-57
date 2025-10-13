@@ -64,7 +64,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Auto Transport": Truck,
   "Bartenders": Wine,
   "Catering": UtensilsCrossed,
-  "Closet Remodeling": Shirt,
+  "Custom Closets": Shirt,
   "DJs": Music,
   "Dryer Vent Cleaning": Wind,
   "Garage Remodeling": Warehouse,
