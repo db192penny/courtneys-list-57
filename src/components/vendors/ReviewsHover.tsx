@@ -6,11 +6,20 @@ import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
+interface Review {
+  id: string;
+  rating: number;
+  comments: string;
+  created_at: string;
+  author_label: string;
+  is_pending?: boolean;
+}
+
 export default function ReviewsHover({ vendorId, children }) {
   const { data: profile } = useUserProfile();
   const isVerified = !!profile?.isVerified;
   
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<Review[]>({
     queryKey: ["reviews-hover", vendorId],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("list_vendor_reviews", { 
@@ -18,7 +27,7 @@ export default function ReviewsHover({ vendorId, children }) {
       });
       if (error) throw error;
       
-      return data || [];
+      return (data || []) as Review[];
     },
     enabled: !!vendorId,
   });
@@ -56,6 +65,11 @@ export default function ReviewsHover({ vendorId, children }) {
                     <Badge variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
                       {r.author_label}
                     </Badge>
+                    {r.is_pending && (
+                      <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 border-orange-200">
+                        Pending
+                      </Badge>
+                    )}
                   </div>
                   {r.created_at && (
                     <div className="text-[10px] text-muted-foreground">

@@ -9,12 +9,21 @@ import { ReviewSourceIcon } from "./ReviewSourceIcon";
 import { RatingStars } from "@/components/ui/rating-stars";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+interface Review {
+  id: string;
+  rating: number;
+  comments: string;
+  created_at: string;
+  author_label: string;
+  is_pending?: boolean;
+}
+
 export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
   const { data: profile } = useUserProfile();
   const navigate = useNavigate();
   const isVerified = !!profile?.isVerified;
   
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<Review[]>({
     queryKey: ["mobile-reviews", vendor?.id],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("list_vendor_reviews", { 
@@ -22,7 +31,7 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
       });
       if (error) throw error;
       
-      return data || [];
+      return (data || []) as Review[];
     },
     enabled: isVerified && !!vendor?.id,
   });
@@ -83,8 +92,15 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
               <div key={r.id} className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4">
                 {/* Header with neighbor info and date */}
                 <div className="flex justify-between items-center mb-3">
-                  <div className="text-xs text-blue-600 font-medium">
-                    {r.author_label}
+                  <div className="flex items-center gap-2">
+                    <div className="text-xs text-blue-600 font-medium">
+                      {r.author_label}
+                    </div>
+                    {r.is_pending && (
+                      <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 border-orange-200">
+                        Pending
+                      </Badge>
+                    )}
                   </div>
                   {r.created_at && (
                     <div className="text-xs text-blue-600">
