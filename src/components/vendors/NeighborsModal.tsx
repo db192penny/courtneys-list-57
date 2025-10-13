@@ -112,7 +112,7 @@ export function NeighborsModal({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-800 flex items-center justify-center gap-1">
-                      <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+                      <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
                       {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
                     </div>
                     <div className="text-xs text-blue-600">Average Rating</div>
@@ -154,7 +154,7 @@ export function NeighborsModal({
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 text-amber-500 font-bold">
+                        <div className="flex items-center gap-1 text-yellow-400 font-bold">
                           <Star className="h-4 w-4 fill-current" />
                           <span>{review.rating}</span>
                         </div>
