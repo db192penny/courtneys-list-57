@@ -11,6 +11,7 @@ export const CATEGORIES = [
   "Damage Assessment/Restoration",
   "Electrician",
   "Generator",
+  "Garage Remodeling",
   "Grill Cleaning",
   "Handyman",
   "Holiday Lighting",

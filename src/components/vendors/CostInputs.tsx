@@ -68,8 +68,8 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
   
-  // Interior Design: Hourly Rate + Project Fee
-  if (c === "interior design") {
+  // Interior Design/Garage Remodeling: Hourly Rate + Project Fee
+  if (c === "interior design" || c === "garage remodeling") {
     return [
       { cost_kind: "hourly", amount: null, unit: "hour", notes: null },
       { cost_kind: "project_fee", amount: null, unit: "project", notes: null },

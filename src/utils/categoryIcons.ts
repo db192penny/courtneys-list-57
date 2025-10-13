@@ -32,6 +32,7 @@ import {
   UtensilsCrossed,
   Music,
   Wind,
+  Warehouse,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -64,6 +65,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Catering": UtensilsCrossed,
   "DJs": Music,
   "Dryer Vent Cleaning": Wind,
+  "Garage Remodeling": Warehouse,
   "Water Filtration": Filter,
   "Interior Design": Palette,
   "Moving Company": Truck,
