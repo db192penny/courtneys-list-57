@@ -27,7 +27,7 @@ export function GoogleSignInButton({
       <Button
         onClick={onClick}
         variant="outline"
-        className="w-full border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950"
+        className="w-full bg-gray-50 border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
         type="button"
         disabled={loading}
       >
