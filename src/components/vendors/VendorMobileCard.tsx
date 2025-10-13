@@ -192,9 +192,10 @@ export default function VendorMobileCard({
                     setAccessGateOpen(true);
                   }
                 }}
-                className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors cursor-pointer flex items-center gap-1"
+                className="flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary font-medium text-sm active:scale-95 transition-transform"
               >
                 👥 {vendor.homes_serviced} neighbor{vendor.homes_serviced !== 1 ? 's' : ''}
+                <ChevronRight size={14} className="shrink-0" />
               </button>
             )}
           </div>
