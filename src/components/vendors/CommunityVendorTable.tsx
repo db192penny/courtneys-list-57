@@ -157,8 +157,7 @@ export default function CommunityVendorTable({
       const uniqueCategories = [...new Set(data?.map((v: any) => v.category) || [])];
       return uniqueCategories.sort();
     },
-    enabled: !!communityName && 
-      (communityName === "The Bridges" || communityName === "the-bridges"),
+    enabled: !!communityName,
   });
 
   // Fetch community photo for the review source icon
@@ -274,7 +273,6 @@ export default function CommunityVendorTable({
                 selectedCategory={category}
                 onCategoryChange={handleCategoryChange}
                 categories={(
-                  (communityName === "The Bridges" || communityName === "the-bridges") && 
                   availableCategories?.length > 0 ? 
                   availableCategories : CATEGORIES
                 ) as string[]}
