@@ -22,6 +22,7 @@ export const categoryEmojiMap: Record<string, string> = {
   'Car Wash & Detail': '✨',
   'Pet Grooming': '🐕',
   'Mobile Tire Repair': '🔧',
+  'Mobile Scratch/Dent Repair': '🚘',
   'Appliance Repair': '🔌',
   'Auto Transport': '🚛',
   'Bartenders': '🍸',

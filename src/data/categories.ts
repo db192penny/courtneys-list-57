@@ -22,6 +22,7 @@ export const CATEGORIES = [
   "Landscape Lighting",
   "Landscaping",
   "Mobile Tire Repair",
+  "Mobile Scratch/Dent Repair",
   "Moving Company",
   "Painters",
   "Patio Screening",
