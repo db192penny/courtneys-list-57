@@ -221,6 +221,15 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "installation", amount: null, unit: "equipment", notes: null },
     ];
   }
+
+  // Kitchen Cabinetry: Consultation + installation + materials
+  if (c === "kitchen cabinetry") {
+    return [
+      { cost_kind: "service_call", amount: null, unit: "visit", notes: null },
+      { cost_kind: "installation", amount: null, unit: "linear_foot", notes: null },
+      { cost_kind: "hourly", amount: null, unit: "cabinet", notes: null },
+    ];
+  }
   
   // General Contractor: No structured fields
   if (c === "general contractor") {

@@ -19,6 +19,7 @@ export const CATEGORIES = [
   "Holiday Lighting",
   "Home Theater & AV",
   "House Cleaning",
+  "Kitchen Cabinetry",
   "House Manager",
   "HVAC",
   "Interior Design",
