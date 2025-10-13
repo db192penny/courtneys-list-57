@@ -23,6 +23,7 @@ import { MobileGoogleReviewsModal } from "@/components/vendors/MobileGoogleRevie
 import { ReviewSourceIcon } from "./ReviewSourceIcon";
 import { NeighborReviewPreview } from "./NeighborReviewPreview";
 import { MobileCostsModal } from "./MobileCostsModal";
+import { NeighborsModal } from "./NeighborsModal";
 import type { CommunityVendorRow } from "@/components/vendors/CommunityVendorTable";
 import React, { useState } from "react";
 import { GATracking } from "@/components/analytics/GoogleAnalytics";
@@ -122,6 +123,7 @@ export default function VendorMobileCard({
   const [contactPopoverOpen, setContactPopoverOpen] = useState(false);
   const [accessGateOpen, setAccessGateOpen] = useState(false);
   const [accessGateType, setAccessGateType] = useState<"rate" | "reviews" | "costs">("rate");
+  const [neighborsModalOpen, setNeighborsModalOpen] = useState(false);
 
   const handleCall = () => {
     window.location.href = `tel:${vendor.contact_info}`;
@@ -175,9 +177,25 @@ export default function VendorMobileCard({
               {getCategoryEmoji(vendor.category)} {vendor.category}
             </Badge>
             {vendor.homes_serviced > 0 && (
-              <span className="text-sm text-muted-foreground">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  GATracking.trackModalOpen('neighbors_modal', { 
+                    vendor_id: vendor.id,
+                    vendor_name: vendor.name,
+                    homes_serviced: vendor.homes_serviced 
+                  });
+                  if (isAuthenticated) {
+                    setNeighborsModalOpen(true);
+                  } else {
+                    setAccessGateType("reviews");
+                    setAccessGateOpen(true);
+                  }
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors cursor-pointer flex items-center gap-1"
+              >
                 👥 {vendor.homes_serviced} neighbor{vendor.homes_serviced !== 1 ? 's' : ''}
-              </span>
+              </button>
             )}
           </div>
           <Button
@@ -415,6 +433,18 @@ export default function VendorMobileCard({
       communityName={communityName || "Boca Bridges"}
       vendorName={vendor.name}
     />
+
+    {/* Neighbors Modal - Only for authenticated users */}
+    {isAuthenticated && (
+      <NeighborsModal
+        open={neighborsModalOpen}
+        onOpenChange={setNeighborsModalOpen}
+        vendorId={vendor.id}
+        vendorName={vendor.name}
+        homesServiced={vendor.homes_serviced}
+        communityName={communityName}
+      />
+    )}
   </>
   );
 }

@@ -1,0 +1,179 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RatingStars } from "@/components/ui/rating-stars";
+import { Badge } from "@/components/ui/badge";
+import { Users, Star } from "lucide-react";
+import { formatNameWithLastInitial } from "@/utils/nameFormatting";
+import { extractStreetName, capitalizeStreetName } from "@/utils/address";
+
+interface Review {
+  id: string;
+  rating: number;
+  comments: string | null;
+  created_at: string;
+  author_label: string;
+}
+
+interface NeighborsModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  vendorId: string;
+  vendorName: string;
+  homesServiced: number;
+  communityName?: string;
+}
+
+export function NeighborsModal({
+  open,
+  onOpenChange,
+  vendorId,
+  vendorName,
+  homesServiced,
+  communityName = "Boca Bridges"
+}: NeighborsModalProps) {
+  const { data: reviews, isLoading, error } = useQuery({
+    queryKey: ["neighbors-reviews", vendorId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("list_vendor_reviews", { 
+        _vendor_id: vendorId 
+      });
+      if (error) throw error;
+      return data as Review[];
+    },
+    enabled: !!vendorId && open,
+  });
+
+  const formatAuthorDisplay = (authorLabel: string): { name: string; street: string } => {
+    const parts = String(authorLabel).split('|');
+    if (parts.length !== 2) return { name: authorLabel, street: "" };
+    
+    const [nameOrNeighbor, street] = parts.map(p => p.trim());
+    const cleanStreet = street ? extractStreetName(street) : "";
+    const formattedStreet = cleanStreet ? capitalizeStreetName(cleanStreet) : "";
+    
+    if (nameOrNeighbor === 'Neighbor' || nameOrNeighbor === '') {
+      return { name: 'Neighbor', street: formattedStreet };
+    }
+    
+    const formattedName = formatNameWithLastInitial(nameOrNeighbor);
+    return { name: formattedName, street: formattedStreet };
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) return "Today";
+    if (diffInDays === 1) return "Yesterday";
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+    if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`;
+    return date.toLocaleDateString();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md mx-auto max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-blue-600" />
+            <span>Neighbors Using {vendorName}</span>
+          </DialogTitle>
+          <p className="text-sm text-muted-foreground pt-1">
+            {homesServiced} neighbor{homesServiced !== 1 ? 's' : ''} in {communityName}
+          </p>
+        </DialogHeader>
+
+        <div className="space-y-4 pt-2">
+          {isLoading && (
+            <div className="text-sm text-muted-foreground text-center py-8">
+              Loading neighbor reviews...
+            </div>
+          )}
+
+          {error && (
+            <div className="text-sm text-muted-foreground text-center py-8">
+              Unable to load reviews
+            </div>
+          )}
+
+          {!isLoading && !error && reviews && reviews.length === 0 && (
+            <div className="text-sm text-muted-foreground text-center py-8">
+              No reviews yet from neighbors
+            </div>
+          )}
+
+          {!isLoading && !error && reviews && reviews.length > 0 && (
+            <>
+              {/* Summary Stats */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-800 flex items-center justify-center gap-1">
+                      <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+                      {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
+                    </div>
+                    <div className="text-xs text-blue-600">Average Rating</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-800 flex items-center justify-center gap-1">
+                      <Users className="h-5 w-5 text-blue-600" />
+                      {reviews.length}
+                    </div>
+                    <div className="text-xs text-blue-600">Total Reviews</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Reviews List */}
+              <div className="space-y-3">
+                {reviews.map((review) => {
+                  const { name, street } = formatAuthorDisplay(review.author_label);
+                  return (
+                    <div 
+                      key={review.id}
+                      className="border rounded-lg p-4 bg-card hover:bg-accent/5 transition-colors"
+                    >
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-sm">{name}</span>
+                            {street && (
+                              <Badge variant="outline" className="text-xs">
+                                {street}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <RatingStars rating={review.rating} />
+                            <span className="text-xs text-muted-foreground">
+                              {formatDate(review.created_at)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-amber-500 font-bold">
+                          <Star className="h-4 w-4 fill-current" />
+                          <span>{review.rating}</span>
+                        </div>
+                      </div>
+
+                      {/* Comments */}
+                      {review.comments && review.comments.trim() && (
+                        <div className="text-sm text-muted-foreground leading-relaxed">
+                          "{review.comments}"
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
