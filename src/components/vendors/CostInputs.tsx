@@ -165,6 +165,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "yearly_plan", amount: null, period: "yearly", unit: "season", quantity: null, notes: null },
     ];
   }
+
+  // Garage Door Maintenance: Service call + Annual maintenance
+  if (c === "garage door maintenance") {
+    return [
+      { cost_kind: "service_call", amount: null, unit: "visit", notes: null },
+      { cost_kind: "yearly_plan", amount: null, period: "yearly", unit: "year", notes: null },
+    ];
+  }
   
   // Power Washing/Car Wash & Detail: Per visit with yearly quantity
   if (c === "power washing" || c === "car wash & detail") {

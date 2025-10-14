@@ -34,6 +34,7 @@ import {
   Wind,
   Warehouse,
   Shirt,
+  DoorOpen,
   Dumbbell,
   Package,
   LucideIcon
@@ -71,6 +72,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Custom Closets": Shirt,
   "DJs": Music,
   "Dryer Vent Cleaning": Wind,
+  "Garage Door Maintenance": DoorOpen,
   "Garage Remodeling": Warehouse,
   "Water Filtration": Filter,
   "Interior Design": Palette,

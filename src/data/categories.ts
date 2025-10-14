@@ -12,6 +12,7 @@ export const CATEGORIES = [
   "Damage Assessment/Restoration",
   "Electrician",
   "Generator",
+  "Garage Door Maintenance",
   "Garage Remodeling",
   "Grill Cleaning",
   "Gym Equipment Install/Repair",
