@@ -18,6 +18,7 @@ export const CATEGORIES = [
   "Gym Equipment Install/Repair",
   "Handyman",
   "Holiday Lighting",
+  "Home Organization",
   "Home Theater & AV",
   "House Cleaning",
   "Kitchen Cabinetry",

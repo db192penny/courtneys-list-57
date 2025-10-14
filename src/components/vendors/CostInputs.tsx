@@ -173,6 +173,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "yearly_plan", amount: null, period: "yearly", unit: "year", notes: null },
     ];
   }
+
+  // Home Organization: Hourly rate + Project fee
+  if (c === "home organization") {
+    return [
+      { cost_kind: "hourly", amount: null, unit: "hour", notes: null },
+      { cost_kind: "project_fee", amount: null, unit: "project", notes: null },
+    ];
+  }
   
   // Power Washing/Car Wash & Detail: Per visit with yearly quantity
   if (c === "power washing" || c === "car wash & detail") {
