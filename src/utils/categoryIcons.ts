@@ -72,7 +72,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Custom Closets": Shirt,
   "DJs": Music,
   "Dryer Vent Cleaning": Wind,
-  "Garage Door Maintenance": DoorOpen,
+  "Garage Door Repair": DoorOpen,
   "Garage Remodeling": Warehouse,
   "Home Organization": Package,
   "Water Filtration": Filter,

@@ -166,8 +166,8 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
 
-  // Garage Door Maintenance: Service call + Annual maintenance
-  if (c === "garage door maintenance") {
+  // Garage Door Repair: Service call + Annual maintenance
+  if (c === "garage door repair") {
     return [
       { cost_kind: "service_call", amount: null, unit: "visit", notes: null },
       { cost_kind: "yearly_plan", amount: null, period: "yearly", unit: "year", notes: null },

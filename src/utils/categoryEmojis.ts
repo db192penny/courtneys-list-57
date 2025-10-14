@@ -30,7 +30,7 @@ export const categoryEmojiMap: Record<string, string> = {
   'Custom Closets': '👔',
   'DJs': '🎧',
   'Dryer Vent Cleaning': '🌬️',
-  'Garage Door Maintenance': '🚪',
+  'Garage Door Repair': '🚪',
   'Garage Remodeling': '🚪',
   'Painters': '🖌️',
   'Grill Cleaning': '🔥',
