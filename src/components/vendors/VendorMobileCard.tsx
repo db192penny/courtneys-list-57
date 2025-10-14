@@ -29,6 +29,13 @@ import React, { useState } from "react";
 import { GATracking } from "@/components/analytics/GoogleAnalytics";
 import { AccessGateModal } from "@/components/vendors/AccessGateModal";
 
+const isContactInfoPending = (contactInfo: string | null | undefined): boolean => {
+  return !contactInfo || 
+         contactInfo === 'PENDING_CONTACT_INFO' || 
+         contactInfo.toLowerCase().includes('phone not') ||
+         contactInfo.toLowerCase().includes('pending') ||
+         contactInfo.toLowerCase().includes('not available');
+};
 
 interface VendorMobileCardProps {
   vendor: CommunityVendorRow;
@@ -335,7 +342,7 @@ export default function VendorMobileCard({
           </Button>
 
           {/* Contact Button */}
-          {showContact && vendor.contact_info && (
+          {showContact && (
             <Popover open={contactPopoverOpen} onOpenChange={setContactPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -347,35 +354,74 @@ export default function VendorMobileCard({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-2">
-                <div className="flex flex-col gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleCall}
-                    className="flex items-center gap-2 justify-start"
-                  >
-                    <Phone size={16} />
-                    Call
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleText}
-                    className="flex items-center gap-2 justify-start"
-                  >
-                    <MessageSquare size={16} />
-                    Text
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleCopyNumber}
-                    className="flex items-center gap-2 justify-start"
-                  >
-                    <Copy size={16} />
-                    Copy Number
-                  </Button>
-                </div>
+                {isContactInfoPending(vendor.contact_info) ? (
+                  <div className="space-y-3">
+                    <div className="text-sm text-muted-foreground">
+                      <p className="font-medium text-foreground mb-2">Contact info coming soon!</p>
+                      <p className="mb-3">
+                        We're working on getting {vendor.name}'s phone number. Check back soon or help us out below.
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2 pt-2 border-t">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => {
+                          window.location.href = `/submit?vendor_id=${vendor.id}&name=${encodeURIComponent(vendor.name)}`;
+                        }}
+                        className="w-full text-xs"
+                      >
+                        📝 I have their contact info
+                      </Button>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          toast({
+                            title: "Thanks for your patience!",
+                            description: "We'll update this vendor's contact info soon.",
+                          });
+                          setContactPopoverOpen(false);
+                        }}
+                        className="w-full text-xs"
+                      >
+                        Got it, thanks
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCall}
+                      className="flex items-center gap-2 justify-start"
+                    >
+                      <Phone size={16} />
+                      Call
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleText}
+                      className="flex items-center gap-2 justify-start"
+                    >
+                      <MessageSquare size={16} />
+                      Text
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyNumber}
+                      className="flex items-center gap-2 justify-start"
+                    >
+                      <Copy size={16} />
+                      Copy Number
+                    </Button>
+                  </div>
+                )}
               </PopoverContent>
             </Popover>
           )}
