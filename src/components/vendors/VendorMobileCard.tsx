@@ -24,6 +24,7 @@ import { ReviewSourceIcon } from "./ReviewSourceIcon";
 import { NeighborReviewPreview } from "./NeighborReviewPreview";
 import { MobileCostsModal } from "./MobileCostsModal";
 import { NeighborsModal } from "./NeighborsModal";
+import { AddContactModal } from "./AddContactModal";
 import type { CommunityVendorRow } from "@/components/vendors/CommunityVendorTable";
 import React, { useState } from "react";
 import { GATracking } from "@/components/analytics/GoogleAnalytics";
@@ -131,6 +132,7 @@ export default function VendorMobileCard({
   const [accessGateOpen, setAccessGateOpen] = useState(false);
   const [accessGateType, setAccessGateType] = useState<"rate" | "reviews" | "costs">("rate");
   const [neighborsModalOpen, setNeighborsModalOpen] = useState(false);
+  const [addContactModalOpen, setAddContactModalOpen] = useState(false);
 
   const handleCall = () => {
     window.location.href = `tel:${vendor.contact_info}`;
@@ -368,7 +370,8 @@ export default function VendorMobileCard({
                         variant="default"
                         size="sm"
                         onClick={() => {
-                          window.location.href = `/submit?vendor_id=${vendor.id}&name=${encodeURIComponent(vendor.name)}`;
+                          setContactPopoverOpen(false);
+                          setAddContactModalOpen(true);
                         }}
                         className="w-full text-xs"
                       >
@@ -492,6 +495,17 @@ export default function VendorMobileCard({
         communityName={communityName}
       />
     )}
+
+    {/* Add Contact Modal */}
+    <AddContactModal
+      open={addContactModalOpen}
+      onOpenChange={setAddContactModalOpen}
+      vendorId={vendor.id}
+      vendorName={vendor.name}
+      onSuccess={() => {
+        window.location.reload();
+      }}
+    />
   </>
   );
 }
