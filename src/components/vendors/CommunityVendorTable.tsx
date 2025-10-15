@@ -279,7 +279,7 @@ export default function CommunityVendorTable({
                 className="w-5 h-5 rounded-full object-cover ring-1 ring-primary/30 shadow-sm"
               />
               <span className="text-[11px] font-medium text-muted-foreground tracking-wide">
-                {communityName} Community Directory
+                {communityName} Provider Directory
               </span>
             </div>
           )}
