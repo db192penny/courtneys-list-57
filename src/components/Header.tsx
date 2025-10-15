@@ -44,28 +44,18 @@ function NewLogoMobile() {
 function PointsBadge() {
   const navigate = useNavigate();
   const { data: profile } = useUserProfile();
-  const { data: badgeLevels } = useBadgeLevels();
   
   const points = profile?.points || 0;
-  const currentBadge = getUserCurrentBadge(points, badgeLevels || []);
   
   return (
     <Button
       variant="outline"
       size="sm"
       onClick={() => navigate('/neighborhood-cred')}
-      className="flex items-center gap-2 bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20 hover:from-primary/10 hover:to-accent/10 transition-all shadow-sm px-3 py-2"
+      className="flex items-center gap-1.5 bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20 hover:from-primary/10 hover:to-accent/10 transition-all shadow-sm px-2.5 py-1.5"
     >
       <span className="text-base">☕</span>
-      <div className="flex flex-col items-start leading-tight">
-        <span className="font-semibold text-xs">{points} pts</span>
-        {currentBadge && (
-          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-            <span>{currentBadge.icon}</span>
-            <span className="truncate max-w-[80px]">{currentBadge.name}</span>
-          </span>
-        )}
-      </div>
+      <span className="font-semibold text-sm">{points}</span>
     </Button>
   );
 }
@@ -209,7 +199,7 @@ const Header = () => {
     switch (label) {
       case "Service Providers":
         return <Users className="h-4 w-4 text-blue-600" />;
-      case "Rewards & Recognition":
+      case "Community Rewards":
         return <Trophy className="h-4 w-4 text-blue-600" />;
       case "Settings":
         return <Settings className="h-4 w-4 text-blue-600" />;
@@ -222,7 +212,7 @@ const Header = () => {
 
   const navigationItems = authed ? [
     { to: serviceProvidersLink, label: "Service Providers" },
-    { to: "/neighborhood-cred", label: "Rewards & Recognition" },
+    { to: "/neighborhood-cred", label: "Community Rewards" },
     { to: "/settings", label: "Settings" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
   ] : [];

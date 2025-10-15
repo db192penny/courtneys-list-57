@@ -61,12 +61,12 @@ const NeighborhoodCred = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Rewards & Recognition — Courtney's List"
+        title="Community Rewards — Courtney's List"
         description="Track your community contributions and unlock exclusive rewards."
         canonical={canonical}
       />
       <section className="container max-w-4xl py-10">
-        <h1 className="text-3xl font-semibold mb-6">Rewards & Recognition</h1>
+        <h1 className="text-3xl font-semibold mb-6">Community Rewards</h1>
 
         {/* Reward Progress Card */}
         <Card className="mb-6 relative overflow-hidden">
@@ -86,8 +86,8 @@ const NeighborhoodCred = () => {
                 <div className="flex items-center gap-2">
                   <div className="text-2xl">☕</div>
                   <div>
-                    <h3 className="font-semibold">Coffee on Courtney</h3>
-                    <p className="text-sm text-muted-foreground">$10 Starbucks Gift Card at 20 points</p>
+                    <h3 className="font-semibold">$10 Starbucks Gift Card</h3>
+                    <p className="text-sm text-muted-foreground">Earn 20 points to unlock this limited-time reward</p>
                   </div>
                 </div>
                 {points >= 20 ? (
