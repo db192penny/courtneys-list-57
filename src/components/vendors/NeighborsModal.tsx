@@ -105,7 +105,25 @@ export function NeighborsModal({
             </div>
           )}
 
-          {!isLoading && !error && reviews && reviews.length > 0 && (
+          {!isLoading && !error && reviews && reviews.length > 0 && (() => {
+            // Sort reviews: verified first, then by comment length, then by date
+            const sortedReviews = [...reviews].sort((a, b) => {
+              // Verified (non-pending) reviews first - checking author_label format
+              const aIsPending = a.author_label.includes('Pending') || a.author_label === 'Neighbor';
+              const bIsPending = b.author_label.includes('Pending') || b.author_label === 'Neighbor';
+              if (aIsPending !== bIsPending) return aIsPending ? 1 : -1;
+              
+              // Then by substantial comments
+              const aCommentLength = (a.comments || '').trim().length;
+              const bCommentLength = (b.comments || '').trim().length;
+              if (aCommentLength > 10 && bCommentLength <= 10) return -1;
+              if (aCommentLength <= 10 && bCommentLength > 10) return 1;
+              
+              // Finally by most recent date
+              return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            });
+
+            return (
             <>
               {/* Summary Stats */}
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
@@ -129,7 +147,7 @@ export function NeighborsModal({
 
               {/* Reviews List */}
               <div className="space-y-3">
-                {reviews.map((review) => {
+                {sortedReviews.map((review) => {
                   const { name, street } = formatAuthorDisplay(review.author_label);
                   return (
                     <div 
@@ -171,7 +189,8 @@ export function NeighborsModal({
                 })}
               </div>
             </>
-          )}
+            );
+          })()}
         </div>
       </DialogContent>
     </Dialog>
