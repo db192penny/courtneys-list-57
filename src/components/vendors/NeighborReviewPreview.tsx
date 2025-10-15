@@ -67,7 +67,6 @@ export function NeighborReviewPreview({
         .maybeSingle();
       
       // Fetch preview reviews by vendor NAME (not vendor_id which is often NULL)
-      // Filter by community if provided
       const { data: previewReviews, error: previewError } = vendorData ? await supabase
         .from("preview_reviews")
         .select(`
@@ -76,19 +75,10 @@ export function NeighborReviewPreview({
           comments, 
           created_at, 
           anonymous,
-          preview_sessions!inner(name, community),
+          preview_sessions!inner(name),
           vendors!inner(name)
         `)
         .eq("vendors.name", vendorData.name)
-        .then(result => {
-          if (!result.data || !communityName) return result;
-          return {
-            ...result,
-            data: result.data.filter(pr => 
-              pr.preview_sessions.community?.toLowerCase() === communityName.toLowerCase()
-            )
-          };
-        })
         : { data: [], error: null };
       
       if (previewError) {
@@ -96,39 +86,19 @@ export function NeighborReviewPreview({
       }
 
       // Fetch survey ratings by vendor ID (more reliable than name matching for anonymous users)
-      // Filter by community if provided
       let surveyReviews: any[] = [];
       try {
         const result = await supabase
           .from("survey_ratings" as any)
-          .select("id, rating, comments, created_at, respondent_name, show_name, session_id")
+          .select("id, rating, comments, created_at, respondent_name, show_name")
           .eq("vendor_id", vendorId)
           .not("rating", "is", null);
         
         if (result.error) {
           console.error("Error fetching survey reviews:", result.error);
         } else {
-          let filteredReviews: any[] = result.data || [];
-          
-          // Filter by community if needed
-          if (communityName && filteredReviews.length > 0) {
-            const sessionIds = filteredReviews.map((r: any) => r.session_id);
-            const { data: sessions } = await supabase
-              .from("preview_sessions")
-              .select("id, community")
-              .in("id", sessionIds);
-            
-            const sessionCommunityMap = new Map(
-              sessions?.map(s => [s.id, s.community]) || []
-            );
-            
-            filteredReviews = filteredReviews.filter((r: any) => 
-              sessionCommunityMap.get(r.session_id)?.toLowerCase() === communityName.toLowerCase()
-            );
-          }
-          
-          surveyReviews = filteredReviews;
-          console.log(`[NeighborReviewPreview] Found ${surveyReviews.length} survey reviews for vendor ${vendorId} in ${communityName || 'all communities'}`);
+          surveyReviews = result.data || [];
+          console.log(`[NeighborReviewPreview] Found ${surveyReviews.length} survey reviews for vendor ${vendorId}`);
         }
       } catch (err) {
         console.error("Error fetching survey reviews:", err);
