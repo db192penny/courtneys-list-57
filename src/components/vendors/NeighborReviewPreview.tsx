@@ -31,6 +31,7 @@ interface Review {
   comments: string | null;
   created_at: string;
   author_label: string;
+  is_pending: boolean;
 }
 
 export function NeighborReviewPreview({ 
@@ -68,7 +69,13 @@ export function NeighborReviewPreview({
         console.error("Error fetching preview reviews:", previewError);
       }
       
-      // Format preview reviews
+      // Format and tag verified reviews
+      const taggedVerifiedReviews = (verifiedReviews || []).map(vr => ({
+        ...vr,
+        is_pending: false
+      }));
+      
+      // Format and tag preview reviews as pending
       const formattedPreviewReviews = (previewReviews || []).map(pr => ({
         id: pr.id,
         rating: pr.rating,
@@ -76,30 +83,37 @@ export function NeighborReviewPreview({
         created_at: pr.created_at,
         author_label: pr.anonymous 
           ? "Anonymous Neighbor|in The Bridges"
-          : `${pr.preview_sessions.name}|in The Bridges`
+          : `${pr.preview_sessions.name}|in The Bridges`,
+        is_pending: true
       }));
       
       // Combine all reviews
       return [
-        ...(verifiedReviews || []),
+        ...taggedVerifiedReviews,
         ...formattedPreviewReviews
       ] as Review[];
     },
     enabled: !!vendorId,
   });
 
-  // Smart review selection: prioritize recent reviews with substantial content, then ratings-only
+  // Smart review selection: prioritize verified over pending, then substantial content, then date
   const selectBestReview = (reviews: Review[]): Review | null => {
     if (!reviews || reviews.length === 0) return null;
     
-    // Sort by: substantial comments first, then ratings-only by date
+    // Sort by: verified first, then substantial comments, then date
     const sorted = [...reviews].sort((a, b) => {
+      // 1. Prioritize verified reviews over pending
+      if (!a.is_pending && b.is_pending) return -1;
+      if (a.is_pending && !b.is_pending) return 1;
+      
+      // 2. Then prioritize reviews with substantial comments
       const aHasComment = a.comments && a.comments.trim().length > 10;
       const bHasComment = b.comments && b.comments.trim().length > 10;
       
       if (aHasComment && !bHasComment) return -1;
       if (!aHasComment && bHasComment) return 1;
       
+      // 3. Finally sort by most recent
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
     
@@ -171,12 +185,13 @@ export function NeighborReviewPreview({
   }
 
   const selectedReview = selectBestReview(reviews || []);
-  const totalReviews = reviews?.length || 0;
+  const totalReviews: number = reviews?.length || 0;
   
   // Calculate if we should show the CTA box
   const shouldShowCTA = (() => {
-    if (totalReviews > 1) return true; // Multiple reviews
-    if (totalReviews === 1 && selectedReview) {
+    const reviewCount = totalReviews as number;
+    if (reviewCount > 1) return true; // Multiple reviews
+    if (reviewCount === 1 && selectedReview) {
       const hasComments = selectedReview.comments && selectedReview.comments.trim();
       if (!hasComments) return false; // Rating-only
       const { wasTruncated } = truncateComment(selectedReview.comments);
@@ -185,7 +200,7 @@ export function NeighborReviewPreview({
     return false;
   })();
 
-  if (!selectedReview) {
+  if (totalReviews === 0) {
     return (
       <div 
         className={cn("bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 cursor-pointer hover:scale-[1.02] hover:shadow-md hover:border-blue-300 transition-all duration-200 active:scale-[0.98]", className)}
@@ -226,7 +241,7 @@ export function NeighborReviewPreview({
               </span>
             </div>
             <div className="text-sm text-blue-600 font-medium">
-              {vendor?.hoa_rating_count || 0} review{(vendor?.hoa_rating_count || 0) !== 1 ? 's' : ''}
+              {totalReviews} {(totalReviews as number) !== 1 ? 'reviews' : 'review'}
             </div>
           </div>
         </div>
@@ -267,7 +282,7 @@ export function NeighborReviewPreview({
             </span>
           </div>
           <div className="text-sm text-blue-600 font-medium">
-            {vendor?.hoa_rating_count || 0} review{(vendor?.hoa_rating_count || 0) !== 1 ? 's' : ''}
+            {totalReviews} {(totalReviews as number) !== 1 ? 'reviews' : 'review'}
           </div>
         </div>
       </div>
