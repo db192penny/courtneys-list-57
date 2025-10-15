@@ -44,41 +44,31 @@ function NewLogoMobile() {
 function PointsBadge() {
   const navigate = useNavigate();
   const { data: profile } = useUserProfile();
-  const { data: badgeLevels } = useBadgeLevels();
   
   const points = profile?.points || 0;
-  const currentBadge = getUserCurrentBadge(points, badgeLevels || []);
-  
-  // Determine which icon to show based on badge icon from database
-  const getBadgeIcon = () => {
-    if (!currentBadge) return <Star className="h-4 w-4" />;
-    
-    switch (currentBadge.icon) {
-      case "coffee":
-        return <Coffee className="h-4 w-4" />;
-      case "star":
-        return <Star className="h-4 w-4" />;
-      case "trophy":
-        return <Trophy className="h-4 w-4" />;
-      case "award":
-        return <Award className="h-4 w-4" />;
-      case "medal":
-        return <Medal className="h-4 w-4" />;
-      default:
-        return <Star className="h-4 w-4" />;
-    }
-  };
+  const starbucksGoal = 20;
+  const pointsToGo = Math.max(starbucksGoal - points, 0);
   
   return (
     <Button
       variant="outline"
       size="sm"
       onClick={() => navigate('/neighborhood-cred')}
-      className="flex items-center gap-1.5 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 hover:from-blue-100 hover:to-purple-100 transition-all"
+      className="flex items-center gap-1.5 bg-gradient-to-r from-green-50 to-green-100 border-green-300 hover:from-green-100 hover:to-green-200 transition-all shadow-sm"
     >
-      <span className="text-blue-600">{getBadgeIcon()}</span>
-      <span className="font-semibold text-sm">{points}</span>
-      <span className="text-xs text-muted-foreground">pts</span>
+      {/* Starbucks Icon */}
+      <span className="text-lg">☕</span>
+      
+      {/* Points Display with Progress */}
+      <div className="flex flex-col items-start leading-tight">
+        <span className="font-bold text-xs text-green-700">{points}/{starbucksGoal}</span>
+        {pointsToGo > 0 && (
+          <span className="text-[10px] text-muted-foreground">-{pointsToGo} to $10</span>
+        )}
+        {pointsToGo === 0 && (
+          <span className="text-[10px] text-green-600 font-semibold">Claim $10!</span>
+        )}
+      </div>
     </Button>
   );
 }
