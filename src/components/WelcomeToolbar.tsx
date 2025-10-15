@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PartyPopper, X } from "lucide-react";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/useAuth";
 
 interface WelcomeToolbarProps {
   communitySlug: string;
@@ -15,6 +16,7 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const welcome = searchParams.get("welcome");
   const autoHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cleanupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -58,11 +60,11 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
   };
 
   useEffect(() => {
-    // Show to all first-time visitors (per community)
+    // Only show if user is authenticated and hasn't dismissed it before
     const storageKey = `welcome_dismissed_${communitySlug}`;
     const dismissed = localStorage.getItem(storageKey);
     
-    if (dismissed !== "1") {
+    if (isAuthenticated && dismissed !== "1") {
       setIsVisible(true);
       
       // Scroll to top on mobile to ensure welcome message is visible
@@ -100,7 +102,7 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
         clearTimeout(cleanupTimeoutRef.current);
       }
     };
-  }, [communitySlug, isVisible, isExiting, isMobile]);
+  }, [isAuthenticated, communitySlug, isVisible, isExiting, isMobile]);
 
   if (!isVisible) return null;
 
