@@ -184,7 +184,7 @@ const Auth = () => {
             : communityName || "your community";
 
           setDetectedCommunity(communityForDisplay);
-          setShowSuccessModal(true);
+          // setShowSuccessModal(true); // Commented out - blocks WelcomeToolbar
 
           setTimeout(() => {
             navigate(cleanDestination, { replace: true });
@@ -757,36 +757,7 @@ const Auth = () => {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-              <PartyPopper className="w-8 h-8 text-green-600 dark:text-green-400" />
-            </div>
-            <AlertDialogTitle className="text-2xl font-bold text-green-700 dark:text-green-400">
-              Welcome to Your Community! 🎉
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-base space-y-2">
-              <p className="font-semibold">
-                You've been successfully onboarded{detectedCommunity && ` to ${detectedCommunity}`}!
-              </p>
-              <p className="text-muted-foreground">
-                Explore local vendors recommended by your neighbors and start discovering trusted services in your area.
-              </p>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogAction
-            onClick={() => {
-              setShowSuccessModal(false);
-              const cleanDestination = `/communities/${toSlug(detectedCommunity)}`.split("#")[0];
-              navigate(cleanDestination, { replace: true });
-            }}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
-          >
-            Start Exploring
-          </AlertDialogAction>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Success modal removed - WelcomeToolbar now shows the Starbucks incentive */}
 
       <WelcomeBackModal
         open={showWelcomeBackModal}
