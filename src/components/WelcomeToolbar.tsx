@@ -21,12 +21,14 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
   const isMobile = useIsMobile();
 
   const cleanupURL = () => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.delete("welcome");
-    navigate({ 
-      pathname: location.pathname,
-      search: newSearchParams.toString() 
-    }, { replace: true });
+    if (searchParams.has("welcome")) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete("welcome");
+      navigate({ 
+        pathname: location.pathname,
+        search: newSearchParams.toString() 
+      }, { replace: true });
+    }
   };
 
   const handleDismiss = (isManual = true) => {
@@ -56,11 +58,11 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
   };
 
   useEffect(() => {
-    // Check if welcome parameter is present and user hasn't dismissed it
+    // Show to all first-time visitors (per community)
     const storageKey = `welcome_dismissed_${communitySlug}`;
     const dismissed = localStorage.getItem(storageKey);
     
-    if (welcome === "true" && dismissed !== "1") {
+    if (dismissed !== "1") {
       setIsVisible(true);
       
       // Scroll to top on mobile to ensure welcome message is visible
@@ -98,7 +100,7 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
         clearTimeout(cleanupTimeoutRef.current);
       }
     };
-  }, [welcome, communitySlug, isVisible, isExiting]);
+  }, [communitySlug, isVisible, isExiting, isMobile]);
 
   if (!isVisible) return null;
 
