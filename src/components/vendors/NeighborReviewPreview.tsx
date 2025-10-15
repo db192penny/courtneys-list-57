@@ -59,7 +59,7 @@ export function NeighborReviewPreview({
         console.error("Error fetching verified reviews:", verifiedError);
       }
       
-      // First get the vendor name to match preview reviews
+      // First get the vendor name to match preview reviews and survey ratings
       const { data: vendorData } = await supabase
         .from("vendors")
         .select("name")
@@ -84,6 +84,26 @@ export function NeighborReviewPreview({
       if (previewError) {
         console.error("Error fetching preview reviews:", previewError);
       }
+
+      // Fetch survey ratings by vendor NAME
+      let surveyReviews: any[] = [];
+      if (vendorData) {
+        try {
+          const result = await supabase
+            .from("survey_ratings" as any)
+            .select("id, rating, comments, created_at, respondent_name, show_name")
+            .eq("vendor_name", vendorData.name)
+            .not("vendor_id", "is", null);
+          
+          if (result.error) {
+            console.error("Error fetching survey reviews:", result.error);
+          } else {
+            surveyReviews = result.data || [];
+          }
+        } catch (err) {
+          console.error("Error fetching survey reviews:", err);
+        }
+      }
       
       // Format and tag verified reviews
       const taggedVerifiedReviews = (verifiedReviews || []).map(vr => ({
@@ -98,15 +118,32 @@ export function NeighborReviewPreview({
         comments: pr.comments,
         created_at: pr.created_at,
         author_label: pr.anonymous 
-          ? "Anonymous Neighbor|in The Bridges"
+          ? "Neighbor|in The Bridges"
           : `${pr.preview_sessions.name}|in The Bridges`,
         is_pending: true
       }));
+
+      // Format and tag survey reviews as pending
+      const formattedSurveyReviews = (surveyReviews || []).map(sr => {
+        const authorLabel = sr.show_name && sr.respondent_name
+          ? `${sr.respondent_name}|in The Bridges`
+          : "Neighbor|in The Bridges";
+
+        return {
+          id: sr.id,
+          rating: sr.rating,
+          comments: sr.comments,
+          created_at: sr.created_at,
+          author_label: authorLabel,
+          is_pending: true,
+        };
+      });
       
-      // Combine all reviews
+      // Combine all three sources: verified reviews, preview reviews, and survey ratings
       return [
         ...taggedVerifiedReviews,
-        ...formattedPreviewReviews
+        ...formattedPreviewReviews,
+        ...formattedSurveyReviews
       ] as Review[];
     },
     enabled: !!vendorId,
