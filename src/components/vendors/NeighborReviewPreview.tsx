@@ -47,14 +47,43 @@ export function NeighborReviewPreview({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isMobile = useIsMobile();
   const { data: reviews, isLoading, error } = useQuery({
-    queryKey: ["vendor-reviews", vendorId, isAuthenticated],
+    queryKey: ["vendor-reviews", vendorId],
     queryFn: async () => {
+      // Fetch verified user reviews
       const functionName = isAuthenticated ? 'list_vendor_reviews' : 'list_vendor_reviews_preview';
-      const { data, error } = await supabase
+      const { data: verifiedReviews, error: verifiedError } = await supabase
         .rpc(functionName as any, { _vendor_id: vendorId });
       
-      if (error) throw error;
-      return data as Review[];
+      if (verifiedError) {
+        console.error("Error fetching verified reviews:", verifiedError);
+      }
+      
+      // Fetch preview reviews (pending users) - for EVERYONE
+      const { data: previewReviews, error: previewError } = await supabase
+        .from("preview_reviews")
+        .select("id, rating, comments, created_at, anonymous, preview_sessions!inner(name)")
+        .eq("vendor_id", vendorId);
+      
+      if (previewError) {
+        console.error("Error fetching preview reviews:", previewError);
+      }
+      
+      // Format preview reviews
+      const formattedPreviewReviews = (previewReviews || []).map(pr => ({
+        id: pr.id,
+        rating: pr.rating,
+        comments: pr.comments,
+        created_at: pr.created_at,
+        author_label: pr.anonymous 
+          ? "Anonymous Neighbor|in The Bridges"
+          : `${pr.preview_sessions.name}|in The Bridges`
+      }));
+      
+      // Combine all reviews
+      return [
+        ...(verifiedReviews || []),
+        ...formattedPreviewReviews
+      ] as Review[];
     },
     enabled: !!vendorId,
   });
