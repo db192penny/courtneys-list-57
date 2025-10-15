@@ -90,12 +90,12 @@ const AuthCallback = () => {
               session.user.email,
             );
 
-            toast({
-              title: "Complete Your Profile",
-              description: "Let's finish setting up your account! Please add your address to continue.",
-              variant: "default",
-              duration: 6000,
-            });
+            // toast({
+            //   title: "Complete Your Profile",
+            //   description: "Let's finish setting up your account! Please add your address to continue.",
+            //   variant: "default",
+            //   duration: 6000,
+            // });
 
             const community = contextParam || "boca-bridges";
             navigate(`/complete-profile?community=${community}&from=signin`, { replace: true });
@@ -118,12 +118,12 @@ const AuthCallback = () => {
             session.user.email,
           );
 
-          toast({
-            title: "Welcome!",
-            description: "Please complete your profile to get started.",
-            variant: "default",
-            duration: 5000,
-          });
+          // toast({
+          //   title: "Welcome!",
+          //   description: "Please complete your profile to get started.",
+          //   variant: "default",
+          //   duration: 5000,
+          // });
 
           const community = contextParam || "boca-bridges";
           navigate(`/complete-profile?community=${community}`, { replace: true });

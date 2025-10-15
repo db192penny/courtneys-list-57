@@ -88,13 +88,13 @@ const CompleteProfile = () => {
       }
 
       // Show helpful message if coming from failed sign-in attempt
-      if (fromSignIn && isGoogleUser) {
-        toast({
-          title: "Almost There!",
-          description: "We just need your address to complete your account.",
-          duration: 6000,
-        });
-      }
+      // if (fromSignIn && isGoogleUser) {
+      //   toast({
+      //     title: "Almost There!",
+      //     description: "We just need your address to complete your account.",
+      //     duration: 6000,
+      //   });
+      // }
     };
 
     checkAuthAndPrefill();
@@ -244,10 +244,10 @@ const CompleteProfile = () => {
         // Don't fail the signup if notification fails
       }
 
-      toast({
-        title: "Profile completed!",
-        description: `Welcome to ${communityName}`,
-      });
+      // toast({
+      //   title: "Profile completed!",
+      //   description: `Welcome to ${communityName}`,
+      // });
 
       // Redirect to their community
       navigate(`/communities/${toSlug(communityName)}?welcome=true`, { replace: true });
