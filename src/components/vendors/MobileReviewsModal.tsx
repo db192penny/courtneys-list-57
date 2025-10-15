@@ -78,23 +78,6 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
     return <div className="text-sm text-muted-foreground p-4">No reviews yet.</div>;
   }
 
-  // Sort reviews: verified first, then by comment length, then by date
-  const sortedReviews = [...data].sort((a, b) => {
-    // Verified (non-pending) reviews first
-    const aPending = a.is_pending ? 1 : 0;
-    const bPending = b.is_pending ? 1 : 0;
-    if (aPending !== bPending) return aPending - bPending;
-    
-    // Then by substantial comments
-    const aCommentLength = (a.comments || '').trim().length;
-    const bCommentLength = (b.comments || '').trim().length;
-    if (aCommentLength > 10 && bCommentLength <= 10) return -1;
-    if (aCommentLength <= 10 && bCommentLength > 10) return 1;
-    
-    // Finally by most recent date
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
-
   return (
     <div className="flex flex-col h-full">
       <Tabs defaultValue="neighbor" className="w-full">
@@ -105,7 +88,7 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
         
         <TabsContent value="neighbor" className="mt-0">
           <div className="flex-1 max-h-96 overflow-y-auto space-y-4 p-4">
-            {sortedReviews.map((r) => (
+            {data.map((r) => (
               <div key={r.id} className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4">
                 {/* Header with neighbor info and date */}
                 <div className="flex justify-between items-center mb-3">
