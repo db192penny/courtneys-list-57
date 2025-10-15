@@ -8,14 +8,33 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { ReviewSourceIcon } from "./ReviewSourceIcon";
 import { RatingStars } from "@/components/ui/rating-stars";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useVendorReviews } from "@/hooks/useVendorReviews";
+
+interface Review {
+  id: string;
+  rating: number;
+  comments: string;
+  created_at: string;
+  author_label: string;
+  is_pending?: boolean;
+}
 
 export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
   const { data: profile } = useUserProfile();
   const navigate = useNavigate();
   const isVerified = !!profile?.isVerified;
   
-  const { data, isLoading, error } = useVendorReviews(vendor?.id, isVerified);
+  const { data, isLoading, error } = useQuery<Review[]>({
+    queryKey: ["mobile-reviews", vendor?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("list_vendor_reviews", { 
+        _vendor_id: vendor?.id 
+      });
+      if (error) throw error;
+      
+      return (data || []) as Review[];
+    },
+    enabled: isVerified && !!vendor?.id,
+  });
 
   const { data: googleReviews } = useQuery({
     queryKey: ["google-reviews", vendor?.id],
