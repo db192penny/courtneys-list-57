@@ -270,6 +270,20 @@ export default function CommunityVendorTable({
         <div className={`sticky top-2 sm:top-16 z-40 bg-background/80 backdrop-blur-sm transition-transform duration-300 ease-out mb-3 sm:mb-6 ${
           isScrollingDown ? '-translate-y-full' : 'translate-y-0'
         }`}>
+          {/* Community Badge - Persistent Branding */}
+          {communityPhotoUrl && (
+            <div className="flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-background via-background/95 to-background/90 border-b border-border/40">
+              <img 
+                src={communityPhotoUrl} 
+                alt={communityName}
+                className="w-5 h-5 rounded-full object-cover ring-1 ring-primary/30 shadow-sm"
+              />
+              <span className="text-[11px] font-medium text-muted-foreground tracking-wide">
+                {communityName} Community Directory
+              </span>
+            </div>
+          )}
+
           {/* Row 1: Category Dropdown + Share Button */}
           <div className="flex items-end gap-3 mb-4">
             <div className="flex-1 flex flex-col justify-end">
