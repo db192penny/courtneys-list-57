@@ -680,30 +680,42 @@ export type Database = {
           comments: string | null
           created_at: string | null
           id: string
+          metadata: Json | null
           rating: number
           recommended: boolean | null
           session_id: string
-          vendor_id: string
+          use_for_home: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
         }
         Insert: {
           anonymous?: boolean
           comments?: string | null
           created_at?: string | null
           id?: string
+          metadata?: Json | null
           rating: number
           recommended?: boolean | null
           session_id: string
-          vendor_id: string
+          use_for_home?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
         }
         Update: {
           anonymous?: boolean
           comments?: string | null
           created_at?: string | null
           id?: string
+          metadata?: Json | null
           rating?: number
           recommended?: boolean | null
           session_id?: string
-          vendor_id?: string
+          use_for_home?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
         }
         Relationships: [
           {
@@ -717,43 +729,49 @@ export type Database = {
       }
       preview_sessions: {
         Row: {
-          address: string
+          address: string | null
           community: string
           created_at: string
+          email: string | null
           expires_at: string
           formatted_address: string | null
           google_place_id: string | null
           id: string
+          metadata: Json | null
           name: string
-          normalized_address: string
+          normalized_address: string | null
           session_token: string
           source: string | null
           street_name: string | null
         }
         Insert: {
-          address: string
+          address?: string | null
           community: string
           created_at?: string
+          email?: string | null
           expires_at?: string
           formatted_address?: string | null
           google_place_id?: string | null
           id?: string
+          metadata?: Json | null
           name: string
-          normalized_address: string
+          normalized_address?: string | null
           session_token: string
           source?: string | null
           street_name?: string | null
         }
         Update: {
-          address?: string
+          address?: string | null
           community?: string
           created_at?: string
+          email?: string | null
           expires_at?: string
           formatted_address?: string | null
           google_place_id?: string | null
           id?: string
+          metadata?: Json | null
           name?: string
-          normalized_address?: string
+          normalized_address?: string | null
           session_token?: string
           source?: string | null
           street_name?: string | null
@@ -928,6 +946,267 @@ export type Database = {
           street_name?: string | null
         }
         Relationships: []
+      }
+      survey_pending_ratings: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          rated: boolean | null
+          rated_at: string | null
+          session_id: string | null
+          vendor_name: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          rated?: boolean | null
+          rated_at?: string | null
+          session_id?: string | null
+          vendor_name: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          rated?: boolean | null
+          rated_at?: string | null
+          session_id?: string | null
+          vendor_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_pending_ratings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "preview_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      survey_pending_vendors: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          rated: boolean | null
+          rated_at: string | null
+          survey_response_id: string | null
+          vendor_name: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          rated?: boolean | null
+          rated_at?: string | null
+          survey_response_id?: string | null
+          vendor_name: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          rated?: boolean | null
+          rated_at?: string | null
+          survey_response_id?: string | null
+          vendor_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_pending_vendors_survey_response_id_fkey"
+            columns: ["survey_response_id"]
+            isOneToOne: false
+            referencedRelation: "survey_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      survey_ratings: {
+        Row: {
+          comments: string | null
+          cost_amount: number | null
+          cost_entries: Json | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          cost_quantity: number | null
+          cost_unit: string | null
+          created_at: string | null
+          current_vendor: boolean | null
+          id: string
+          rating: number
+          respondent_email: string | null
+          respondent_name: string | null
+          session_id: string | null
+          session_token: string
+          show_name: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string
+          vendor_phone: string | null
+        }
+        Insert: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string
+          rating: number
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token: string
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name: string
+          vendor_phone?: string | null
+        }
+        Update: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string
+          rating?: number
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string
+          vendor_phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_ratings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "preview_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "survey_ratings_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      survey_responses: {
+        Row: {
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          respondent_contact: string
+          respondent_contact_method: string
+          respondent_email: string | null
+          respondent_name: string
+          session_token: string
+          source: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          respondent_contact: string
+          respondent_contact_method: string
+          respondent_email?: string | null
+          respondent_name: string
+          session_token: string
+          source?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          respondent_contact?: string
+          respondent_contact_method?: string
+          respondent_email?: string | null
+          respondent_name?: string
+          session_token?: string
+          source?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      survey_vendor_ratings: {
+        Row: {
+          category: string
+          comments: string
+          cost_amount: number | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          created_at: string | null
+          id: string
+          rating: number
+          show_name_in_review: boolean | null
+          survey_response_id: string | null
+          use_for_home: boolean | null
+          vendor_contact: string | null
+          vendor_name: string
+        }
+        Insert: {
+          category: string
+          comments: string
+          cost_amount?: number | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          created_at?: string | null
+          id?: string
+          rating: number
+          show_name_in_review?: boolean | null
+          survey_response_id?: string | null
+          use_for_home?: boolean | null
+          vendor_contact?: string | null
+          vendor_name: string
+        }
+        Update: {
+          category?: string
+          comments?: string
+          cost_amount?: number | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number
+          show_name_in_review?: boolean | null
+          survey_response_id?: string | null
+          use_for_home?: boolean | null
+          vendor_contact?: string | null
+          vendor_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_vendor_ratings_survey_response_id_fkey"
+            columns: ["survey_response_id"]
+            isOneToOne: false
+            referencedRelation: "survey_responses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_analytics: {
         Row: {
@@ -1226,6 +1505,7 @@ export type Database = {
           google_rating: number | null
           google_rating_count: number | null
           google_reviews_json: Json | null
+          hidden: boolean | null
           id: string
           name: string
           typical_cost: number | null
@@ -1242,6 +1522,7 @@ export type Database = {
           google_rating?: number | null
           google_rating_count?: number | null
           google_reviews_json?: Json | null
+          hidden?: boolean | null
           id?: string
           name: string
           typical_cost?: number | null
@@ -1258,6 +1539,7 @@ export type Database = {
           google_rating?: number | null
           google_rating_count?: number | null
           google_reviews_json?: Json | null
+          hidden?: boolean | null
           id?: string
           name?: string
           typical_cost?: number | null
@@ -1273,8 +1555,180 @@ export type Database = {
           },
         ]
       }
+      vendors_backup_category_fix: {
+        Row: {
+          category: string | null
+          community: string | null
+          contact_info: string | null
+          created_at: string | null
+          created_by: string | null
+          google_last_updated: string | null
+          google_place_id: string | null
+          google_rating: number | null
+          google_rating_count: number | null
+          google_reviews_json: Json | null
+          hidden: boolean | null
+          id: string | null
+          name: string | null
+          typical_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      vendors_backup_duplicates: {
+        Row: {
+          category: string | null
+          community: string | null
+          contact_info: string | null
+          created_at: string | null
+          created_by: string | null
+          google_last_updated: string | null
+          google_place_id: string | null
+          google_rating: number | null
+          google_rating_count: number | null
+          google_reviews_json: Json | null
+          hidden: boolean | null
+          id: string | null
+          name: string | null
+          typical_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      vendors_bridges_backup: {
+        Row: {
+          category: string | null
+          community: string | null
+          contact_info: string | null
+          created_at: string | null
+          created_by: string | null
+          google_last_updated: string | null
+          google_place_id: string | null
+          google_rating: number | null
+          google_rating_count: number | null
+          google_reviews_json: Json | null
+          hidden: boolean | null
+          id: string | null
+          name: string | null
+          typical_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
+      vendor_duplicate_monitor: {
+        Row: {
+          category: string | null
+          duplicate_count: number | null
+          normalized_community: string | null
+          normalized_name: string | null
+          variations: string | null
+        }
+        Relationships: []
+      }
       weekly_rating_changes: {
         Row: {
           avg_change: number | null
@@ -1311,6 +1765,14 @@ export type Database = {
       admin_cleanup_orphaned_user: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      admin_complete_delete_user: {
+        Args: { _user_id: string }
+        Returns: Json
+      }
+      admin_delete_vendor_cascade: {
+        Args: { vendor_uuid: string }
+        Returns: Json
       }
       admin_fix_address_mismatch: {
         Args: { _new_address: string; _new_hoa: string; _user_id: string }
@@ -1415,6 +1877,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      can_seed_vendors: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       check_orphaned_users: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1438,10 +1904,6 @@ export type Database = {
       }
       current_user_normalized_address: {
         Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      detect_address_mismatch: {
-        Args: { _address: string; _user_id: string }
         Returns: string
       }
       fix_all_point_discrepancies: {
@@ -1537,6 +1999,14 @@ export type Database = {
           hoa_name: string
         }[]
       }
+      get_pending_vendors: {
+        Args: { token: string }
+        Returns: {
+          category: string
+          vendor_id: string
+          vendor_name: string
+        }[]
+      }
       get_user_leaderboard_position: {
         Args: { _community_name: string; _user_id: string }
         Returns: {
@@ -1551,6 +2021,26 @@ export type Database = {
           email: string
           name: string
         }[]
+      }
+      gtrgm_compress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_decompress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_options: {
+        Args: { "": unknown }
+        Returns: undefined
+      }
+      gtrgm_out: {
+        Args: { "": unknown }
+        Returns: unknown
       }
       has_role: {
         Args: {
@@ -1572,6 +2062,10 @@ export type Database = {
         Returns: boolean
       }
       is_user_hoa_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_vendor_contributor: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
@@ -1599,6 +2093,7 @@ export type Database = {
           comments: string
           created_at: string
           id: string
+          is_pending: boolean
           rating: number
         }[]
       }
@@ -1647,12 +2142,66 @@ export type Database = {
           typical_cost: number
         }[]
       }
+      list_vendor_stats_v2: {
+        Args: {
+          _category?: string
+          _hoa_name: string
+          _limit?: number
+          _offset?: number
+          _sort_by?: string
+        }
+        Returns: {
+          avg_cost_amount: number
+          avg_cost_display: string
+          avg_monthly_cost: number
+          category: string
+          community_amount: number
+          community_sample_size: number
+          community_unit: string
+          contact_info: string
+          google_place_id: string
+          google_rating: number
+          google_rating_count: number
+          google_reviews_json: Json
+          hoa_rating: number
+          hoa_rating_count: number
+          homes_pct: number
+          homes_serviced: number
+          id: string
+          market_amount: number
+          market_unit: string
+          monthly_sample_size: number
+          name: string
+          service_call_avg: number
+          service_call_sample_size: number
+          typical_cost: number
+        }[]
+      }
+      match_survey_vendor_simple: {
+        Args: { _category: string; _community?: string; _survey_name: string }
+        Returns: string
+      }
+      match_survey_vendors: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          confidence: number
+          match_type: string
+          matched_vendor_id: string
+          matched_vendor_name: string
+          review_id: string
+          survey_vendor_name: string
+        }[]
+      }
       monthlyize_cost: {
         Args: { _amount: number; _period: string }
         Returns: number
       }
       normalize_address: {
         Args: { _addr: string }
+        Returns: string
+      }
+      normalize_category_name: {
+        Args: { input_category: string }
         Returns: string
       }
       redeem_invite_code: {
@@ -1676,9 +2225,21 @@ export type Database = {
           success: boolean
         }[]
       }
+      set_limit: {
+        Args: { "": number }
+        Returns: number
+      }
       short_name: {
         Args: { full_name: string }
         Returns: string
+      }
+      show_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      show_trgm: {
+        Args: { "": string }
+        Returns: string[]
       }
       slug_to_community_name: {
         Args: { _slug: string }
@@ -1687,6 +2248,17 @@ export type Database = {
       street_only: {
         Args: { addr: string }
         Returns: string
+      }
+      test_auto_upgrade: {
+        Args: { test_email: string }
+        Returns: {
+          costs_to_migrate: number
+          email_location: string
+          reviews_to_migrate: number
+          session_found: boolean
+          session_id: string
+          survey_vendor_names: string
+        }[]
       }
       validate_invite: {
         Args: { _token: string }
@@ -1709,7 +2281,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin"
+      app_role: "admin" | "vendor_contributor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1837,7 +2409,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin"],
+      app_role: ["admin", "vendor_contributor"],
     },
   },
 } as const

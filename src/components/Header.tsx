@@ -209,7 +209,7 @@ const Header = () => {
     switch (label) {
       case "Service Providers":
         return <Users className="h-4 w-4 text-blue-600" />;
-      case "Points & Rewards":
+      case "Rewards & Recognition":
         return <Trophy className="h-4 w-4 text-blue-600" />;
       case "Settings":
         return <Settings className="h-4 w-4 text-blue-600" />;
@@ -222,7 +222,7 @@ const Header = () => {
 
   const navigationItems = authed ? [
     { to: serviceProvidersLink, label: "Service Providers" },
-    { to: "/neighborhood-cred", label: "Points & Rewards" },
+    { to: "/neighborhood-cred", label: "Rewards & Recognition" },
     { to: "/settings", label: "Settings" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
   ] : [];
