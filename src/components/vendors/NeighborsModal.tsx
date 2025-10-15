@@ -1,19 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RatingStars } from "@/components/ui/rating-stars";
 import { Badge } from "@/components/ui/badge";
 import { Users, Star } from "lucide-react";
 import { formatNameWithLastInitial } from "@/utils/nameFormatting";
 import { extractStreetName, capitalizeStreetName } from "@/utils/address";
-
-interface Review {
-  id: string;
-  rating: number;
-  comments: string | null;
-  created_at: string;
-  author_label: string;
-}
+import { useVendorReviews } from "@/hooks/useVendorReviews";
 
 interface NeighborsModalProps {
   open: boolean;
@@ -32,17 +23,7 @@ export function NeighborsModal({
   homesServiced,
   communityName = "Boca Bridges"
 }: NeighborsModalProps) {
-  const { data: reviews, isLoading, error } = useQuery({
-    queryKey: ["neighbors-reviews", vendorId],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("list_vendor_reviews", { 
-        _vendor_id: vendorId 
-      });
-      if (error) throw error;
-      return data as Review[];
-    },
-    enabled: !!vendorId && open,
-  });
+  const { data: reviews, isLoading, error } = useVendorReviews(vendorId, true);
 
   const formatAuthorDisplay = (authorLabel: string): { name: string; street: string } => {
     const parts = String(authorLabel).split('|');
@@ -108,10 +89,10 @@ export function NeighborsModal({
           {!isLoading && !error && reviews && reviews.length > 0 && (() => {
             // Sort reviews: verified first, then by comment length, then by date
             const sortedReviews = [...reviews].sort((a, b) => {
-              // Verified (non-pending) reviews first - checking author_label format
-              const aIsPending = a.author_label.includes('Pending') || a.author_label === 'Neighbor';
-              const bIsPending = b.author_label.includes('Pending') || b.author_label === 'Neighbor';
-              if (aIsPending !== bIsPending) return aIsPending ? 1 : -1;
+              // Verified (non-pending) reviews first - using is_pending flag
+              const aPending = a.is_pending ? 1 : 0;
+              const bPending = b.is_pending ? 1 : 0;
+              if (aPending !== bPending) return aPending - bPending;
               
               // Then by substantial comments
               const aCommentLength = (a.comments || '').trim().length;
