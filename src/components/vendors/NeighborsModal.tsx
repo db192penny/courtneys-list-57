@@ -35,11 +35,50 @@ export function NeighborsModal({
   const { data: reviews, isLoading, error } = useQuery({
     queryKey: ["neighbors-reviews", vendorId],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("list_vendor_reviews", { 
+      // Fetch verified user reviews
+      const { data: verifiedReviews, error: verifiedError } = await supabase.rpc("list_vendor_reviews", { 
         _vendor_id: vendorId 
       });
-      if (error) throw error;
-      return data as Review[];
+      
+      if (verifiedError) {
+        console.error("Error fetching verified reviews:", verifiedError);
+      }
+      
+      // Fetch preview reviews (pending users)
+      const { data: previewReviews, error: previewError } = await supabase
+        .from("preview_reviews")
+        .select(`
+          id,
+          rating,
+          comments,
+          created_at,
+          anonymous,
+          preview_sessions!inner(name, street_name)
+        `)
+        .eq("vendor_id", vendorId);
+      
+      if (previewError) {
+        console.error("Error fetching preview reviews:", previewError);
+      }
+      
+      // Format preview reviews to match the Review interface
+      const formattedPreviewReviews = (previewReviews || []).map(pr => ({
+        id: `preview-${pr.id}`,
+        rating: pr.rating,
+        comments: pr.comments,
+        created_at: pr.created_at,
+        author_label: pr.anonymous 
+          ? "Neighbor|in The Bridges"
+          : `${pr.preview_sessions.name}|in The Bridges`
+      }));
+      
+      // Combine and return all reviews
+      const allReviews = [
+        ...(verifiedReviews || []),
+        ...formattedPreviewReviews
+      ];
+      
+      return allReviews as Review[];
     },
     enabled: !!vendorId && open,
   });
