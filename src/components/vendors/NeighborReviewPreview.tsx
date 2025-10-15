@@ -139,11 +139,21 @@ export function NeighborReviewPreview({
       });
       
       // Combine all three sources: verified reviews, preview reviews, and survey ratings
-      return [
+      const allReviews = [
         ...taggedVerifiedReviews,
         ...formattedPreviewReviews,
         ...formattedSurveyReviews
-      ] as Review[];
+      ];
+      
+      // Deduplicate by ID (survey reviews may appear in both list_vendor_reviews and survey_ratings)
+      const uniqueReviewsMap = new Map<string, Review>();
+      allReviews.forEach(review => {
+        if (!uniqueReviewsMap.has(review.id)) {
+          uniqueReviewsMap.set(review.id, review);
+        }
+      });
+      
+      return Array.from(uniqueReviewsMap.values()) as Review[];
     },
     enabled: !!vendorId,
   });
