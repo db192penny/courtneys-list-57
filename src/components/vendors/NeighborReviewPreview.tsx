@@ -59,11 +59,27 @@ export function NeighborReviewPreview({
         console.error("Error fetching verified reviews:", verifiedError);
       }
       
-      // Fetch preview reviews (pending users) - for EVERYONE
-      const { data: previewReviews, error: previewError } = await supabase
+      // First get the vendor name to match preview reviews
+      const { data: vendorData } = await supabase
+        .from("vendors")
+        .select("name")
+        .eq("id", vendorId)
+        .single();
+      
+      // Fetch preview reviews by vendor NAME (not vendor_id which is often NULL)
+      const { data: previewReviews, error: previewError } = vendorData ? await supabase
         .from("preview_reviews")
-        .select("id, rating, comments, created_at, anonymous, preview_sessions!inner(name)")
-        .eq("vendor_id", vendorId);
+        .select(`
+          id, 
+          rating, 
+          comments, 
+          created_at, 
+          anonymous,
+          preview_sessions!inner(name),
+          vendors!inner(name)
+        `)
+        .eq("vendors.name", vendorData.name)
+        : { data: [], error: null };
       
       if (previewError) {
         console.error("Error fetching preview reviews:", previewError);
