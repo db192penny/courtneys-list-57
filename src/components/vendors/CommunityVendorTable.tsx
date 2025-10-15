@@ -138,6 +138,8 @@ export default function CommunityVendorTable({
       return (data || []) as any[];
     },
     enabled: !!communityName,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 
   // Fetch available categories for The Bridges
@@ -158,6 +160,8 @@ export default function CommunityVendorTable({
       return uniqueCategories.sort();
     },
     enabled: !!communityName,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   // Fetch community photo for the review source icon
