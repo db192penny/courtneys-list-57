@@ -59,12 +59,12 @@ export function NeighborReviewPreview({
         console.error("Error fetching verified reviews:", verifiedError);
       }
       
-      // First get the vendor name to match preview reviews and survey ratings
+      // First get the vendor name to match preview reviews (use maybeSingle to handle RLS gracefully)
       const { data: vendorData } = await supabase
         .from("vendors")
         .select("name")
         .eq("id", vendorId)
-        .single();
+        .maybeSingle();
       
       // Fetch preview reviews by vendor NAME (not vendor_id which is often NULL)
       const { data: previewReviews, error: previewError } = vendorData ? await supabase
@@ -85,24 +85,23 @@ export function NeighborReviewPreview({
         console.error("Error fetching preview reviews:", previewError);
       }
 
-      // Fetch survey ratings by vendor NAME
+      // Fetch survey ratings by vendor ID (more reliable than name matching for anonymous users)
       let surveyReviews: any[] = [];
-      if (vendorData) {
-        try {
-          const result = await supabase
-            .from("survey_ratings" as any)
-            .select("id, rating, comments, created_at, respondent_name, show_name")
-            .eq("vendor_name", vendorData.name)
-            .not("vendor_id", "is", null);
-          
-          if (result.error) {
-            console.error("Error fetching survey reviews:", result.error);
-          } else {
-            surveyReviews = result.data || [];
-          }
-        } catch (err) {
-          console.error("Error fetching survey reviews:", err);
+      try {
+        const result = await supabase
+          .from("survey_ratings" as any)
+          .select("id, rating, comments, created_at, respondent_name, show_name")
+          .eq("vendor_id", vendorId)
+          .not("rating", "is", null);
+        
+        if (result.error) {
+          console.error("Error fetching survey reviews:", result.error);
+        } else {
+          surveyReviews = result.data || [];
+          console.log(`[NeighborReviewPreview] Found ${surveyReviews.length} survey reviews for vendor ${vendorId}`);
         }
+      } catch (err) {
+        console.error("Error fetching survey reviews:", err);
       }
       
       // Format and tag verified reviews
