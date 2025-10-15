@@ -44,29 +44,26 @@ function NewLogoMobile() {
 function PointsBadge() {
   const navigate = useNavigate();
   const { data: profile } = useUserProfile();
+  const { data: badgeLevels } = useBadgeLevels();
   
   const points = profile?.points || 0;
-  const starbucksGoal = 20;
-  const pointsToGo = Math.max(starbucksGoal - points, 0);
+  const currentBadge = getUserCurrentBadge(points, badgeLevels || []);
   
   return (
     <Button
       variant="outline"
       size="sm"
       onClick={() => navigate('/neighborhood-cred')}
-      className="flex items-center gap-1.5 bg-gradient-to-r from-green-50 to-green-100 border-green-300 hover:from-green-100 hover:to-green-200 transition-all shadow-sm"
+      className="flex items-center gap-2 bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20 hover:from-primary/10 hover:to-accent/10 transition-all shadow-sm px-3 py-2"
     >
-      {/* Starbucks Icon */}
-      <span className="text-lg">☕</span>
-      
-      {/* Points Display with Progress */}
+      <span className="text-base">☕</span>
       <div className="flex flex-col items-start leading-tight">
-        <span className="font-bold text-xs text-green-700">{points}/{starbucksGoal}</span>
-        {pointsToGo > 0 && (
-          <span className="text-[10px] text-muted-foreground">-{pointsToGo} to $10</span>
-        )}
-        {pointsToGo === 0 && (
-          <span className="text-[10px] text-green-600 font-semibold">Claim $10!</span>
+        <span className="font-semibold text-xs">{points} pts</span>
+        {currentBadge && (
+          <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+            <span>{currentBadge.icon}</span>
+            <span className="truncate max-w-[80px]">{currentBadge.name}</span>
+          </span>
         )}
       </div>
     </Button>

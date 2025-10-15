@@ -61,19 +61,22 @@ const NeighborhoodCred = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Neighborhood Cred — Courtney's List"
-        description="Track your community contributions and unlock rewards."
+        title="Rewards & Recognition — Courtney's List"
+        description="Track your community contributions and unlock exclusive rewards."
         canonical={canonical}
       />
       <section className="container max-w-4xl py-10">
-        <h1 className="text-3xl font-semibold mb-6">Neighborhood Cred</h1>
+        <h1 className="text-3xl font-semibold mb-6">Rewards & Recognition</h1>
 
         {/* Reward Progress Card */}
-        <Card className="mb-6">
+        <Card className="mb-6 relative overflow-hidden">
+          <div className="absolute top-2 right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">
+            LIMITED TIME
+          </div>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Gift className="h-5 w-5" />
-              Reward Progress
+              Launch Reward
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
