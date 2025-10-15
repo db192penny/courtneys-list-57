@@ -9,9 +9,9 @@ import { cn } from "@/lib/utils";
 
 const activityTypeLabels = {
   join_site: "Joined Courtney's List",
-  vendor_submission: "Submitted a New Vendor",
-  review_submission: "Rated a Vendor", 
-  rate_vendor: "Rated a Vendor",
+  vendor_submission: "Submitted a New Service Provider",
+  review_submission: "Rated a Service Provider", 
+  rate_vendor: "Rated a Service Provider",
   invite_neighbor: "Invited a Neighbor",
   successful_invite: "Successful Invite",
   cost_submission: "Shared Cost Information",

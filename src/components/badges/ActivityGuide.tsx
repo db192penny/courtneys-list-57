@@ -123,18 +123,9 @@ export default function ActivityGuide() {
 
   const activities = [
     {
-      type: "invite_neighbor",
-      title: "Invite a Neighbor", 
-      description: "Invite someone from your community to join",
-      points: rewards.find(r => r.activity === "invite_neighbor")?.points || 10,
-      action: generateInvite,
-      buttonText: "Invite",
-      buttonIcon: <Share2 className="w-4 h-4" />
-    },
-    {
       type: "rate_vendor", 
-      title: "Rate a Vendor",
-      description: "Share your experience with a vendor (unique per vendor)",
+      title: "Rate a Service Provider",
+      description: "Share your experience with a service provider (one review per provider)",
       points: rewards.find(r => r.activity === "rate_vendor")?.points || 5,
       action: () => {
         const communitySlug = toSlug(userData?.communityName || 'Boca Bridges');
@@ -144,8 +135,17 @@ export default function ActivityGuide() {
       buttonIcon: <ArrowRight className="w-4 h-4" />
     },
     {
+      type: "invite_neighbor",
+      title: "Invite a Neighbor", 
+      description: "Invite someone from your community to join",
+      points: rewards.find(r => r.activity === "invite_neighbor")?.points || 10,
+      action: generateInvite,
+      buttonText: "Invite",
+      buttonIcon: <Share2 className="w-4 h-4" />
+    },
+    {
       type: "vendor_submission",
-      title: "Submit a New Vendor",
+      title: "Submit a New Service Provider",
       description: "Add a new service provider to help your community",
       points: rewards.find(r => r.activity === "vendor_submission")?.points || 5,
       action: () => {

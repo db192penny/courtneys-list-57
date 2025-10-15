@@ -47,7 +47,7 @@ export default function ProgressInsights({ currentPoints }: ProgressInsightsProp
 
   const suggestions = [
     {
-      activity: "Submit vendors",
+      activity: "Submit service providers",
       count: Math.ceil(pointsNeeded / vendorReward),
       points: vendorReward,
       icon: "🏢"
@@ -73,11 +73,11 @@ export default function ProgressInsights({ currentPoints }: ProgressInsightsProp
 
   let personalizedTip = "";
   if (hasVendorSubmissions && !hasReviews) {
-    personalizedTip = "You've submitted vendors but haven't reviewed them yet. Writing reviews earns extra points!";
+    personalizedTip = "You've submitted service providers but haven't reviewed them yet. Writing reviews earns extra points!";
   } else if (hasReviews && !hasCosts) {
-    personalizedTip = "Consider sharing cost information for vendors you've reviewed to help neighbors budget.";
+    personalizedTip = "Consider sharing cost information for service providers you've reviewed to help neighbors budget.";
   } else if (!hasVendorSubmissions) {
-    personalizedTip = "Submitting a new vendor gives the most points per action. Know any great service providers?";
+    personalizedTip = "Submitting a new service provider gives the most points per action. Know any great service providers?";
   } else {
     personalizedTip = "You're doing great! Keep contributing in all areas to maximize your points.";
   }

@@ -4,7 +4,7 @@ import { TrendingUp } from "lucide-react";
 import { usePointBreakdown } from "@/hooks/usePointHistory";
 
 const activityTypeLabels = {
-  vendor_submission: "Vendor Submissions",
+  vendor_submission: "Service Provider Submissions",
   review_submission: "Reviews", 
   cost_submission: "Cost Information"
 };
