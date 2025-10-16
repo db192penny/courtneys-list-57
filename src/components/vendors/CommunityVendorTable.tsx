@@ -516,30 +516,6 @@ export default function CommunityVendorTable({
           category={addVendorCategory}
         />
 
-        {/* Sticky Bottom Bar - Mobile Only for Unauthenticated Users */}
-        {!isAuthenticated && isMobile && (
-          <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border shadow-lg z-50 px-4 py-3">
-            <div className="flex items-center justify-between gap-3 max-w-4xl mx-auto">
-              <Button
-                variant="default"
-                size="lg"
-                onClick={() => navigate('/auth?mode=signup')}
-                className="flex-1"
-              >
-                Join Now
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => navigate('/auth?mode=signin')}
-                className="flex-1"
-              >
-                Sign In
-              </Button>
-            </div>
-          </div>
-        )}
-
       </div>
     </TooltipProvider>
   );
