@@ -311,18 +311,29 @@ const Auth = () => {
     const missingKeys = (Object.keys(fieldErrors) as Array<keyof typeof fieldErrors>).filter((k) => fieldErrors[k]);
     if (missingKeys.length > 0) {
       setErrors(fieldErrors);
-      const labelMap: Record<string, string> = {
-        name: "Name",
-        email: "Email",
-        address: "Full Address",
-        resident: "Resident status",
-      };
-      const missingLabels = missingKeys.map((k) => labelMap[k as string]);
-      toast({
-        title: "Incomplete form",
-        description: `Please complete ${missingLabels.join(", ")}`,
-        variant: "destructive",
-      });
+      
+      // Show friendly, specific message based on what's missing
+      if (fieldErrors.address) {
+        toast({
+          title: "Incomplete",
+          description: "Please put in a few numbers and use the dropdown to select your address",
+          variant: "default",
+        });
+      } else {
+        const labelMap: Record<string, string> = {
+          name: "Name",
+          email: "Email",
+          address: "Full Address",
+          resident: "Resident status",
+        };
+        const missingLabels = missingKeys.map((k) => labelMap[k as string]);
+        toast({
+          title: "Incomplete",
+          description: `Please complete ${missingLabels.join(", ")}`,
+          variant: "default",
+        });
+      }
+      
       const firstId = missingKeys[0] === "resident" ? "resident" : (missingKeys[0] as string);
       setTimeout(() => document.getElementById(firstId)?.focus(), 0);
       return;
