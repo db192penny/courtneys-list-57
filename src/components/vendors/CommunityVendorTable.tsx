@@ -385,6 +385,7 @@ export default function CommunityVendorTable({
                   availableCategories?.length > 0 ? 
                   availableCategories : CATEGORIES
                 ) as string[]}
+                isBannerVisible={isMobile && isBannerVisible}
               />
             </div>
             
