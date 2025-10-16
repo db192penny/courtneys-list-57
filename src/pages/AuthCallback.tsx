@@ -83,32 +83,26 @@ const AuthCallback = () => {
         // If no user record exists and this is Google OAuth
         if (!existingUser && isGoogleUser) {
           if (intent === "signin") {
-            // User tried to SIGN IN but has no account - redirect to signup
+            // User tried to SIGN IN but has no account
+            // Delete the orphaned session and redirect to signup
             console.log(
-              "Sign-in attempted by non-registered user, redirecting to signup:",
+              "Sign-in attempted by non-registered user, deleting session and redirecting to signup:",
               session.user.email,
             );
-            
-            // Show friendly welcome message
-            toast({
-              title: "Hi there! 👋",
-              description: "We need you to join our community first. It only takes a minute to sign up and then you'll have access to all your neighbors' vendor recommendations!",
-              variant: "default",
-              duration: 8000,
-            });
 
-            // Brief delay so user can read the message
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Sign out to prevent orphaned auth records
+            // Sign out to delete the orphaned auth record
             await supabase.auth.signOut();
 
-            // Redirect to sign up page with community context preserved
+            // Show simple message
+            toast({
+              title: "No account found, please sign up",
+              variant: "default",
+              duration: 5000,
+            });
+
+            // Redirect to signup page
             const community = contextParam || "boca-bridges";
-            setTimeout(() => {
-              navigate(`/auth?community=${community}`, { replace: true });
-            }, 500);
-            
+            navigate(`/auth?community=${community}`, { replace: true });
             return;
           }
 
