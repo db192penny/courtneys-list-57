@@ -105,7 +105,9 @@ export default function CommunityVendorTable({
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [showInitialAnimation, setShowInitialAnimation] = useState(true);
-  const { isScrollingDown } = useScrollDirection();
+  const { isScrollingDown, hasScrolled } = useScrollDirection();
+  const [isBannerVisible, setIsBannerVisible] = useState(true);
+  const [isBannerExiting, setIsBannerExiting] = useState(false);
 
   // Initialize category from URL parameter
   useEffect(() => {
@@ -122,6 +124,33 @@ export default function CommunityVendorTable({
     }, 3000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Check if banner was previously dismissed
+  useEffect(() => {
+    const bannerKey = `banner_dismissed_${communityName}`;
+    const wasDismissed = localStorage.getItem(bannerKey);
+    if (wasDismissed) {
+      setIsBannerVisible(false);
+    }
+  }, [communityName]);
+
+  // Auto-dismiss banner on scroll
+  useEffect(() => {
+    if (!isBannerVisible || !hasScrolled) return;
+
+    const bannerKey = `banner_dismissed_${communityName}`;
+    
+    // Trigger fade-out animation
+    setIsBannerExiting(true);
+    
+    // After animation, hide banner and store dismissal
+    const timer = setTimeout(() => {
+      setIsBannerVisible(false);
+      localStorage.setItem(bannerKey, 'true');
+    }, 300); // Match animation duration
+
+    return () => clearTimeout(timer);
+  }, [hasScrolled, communityName, isBannerVisible]);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery<CommunityVendorRow[]>({
     queryKey: ["community-stats", communityName, category, sortBy],
@@ -300,8 +329,10 @@ export default function CommunityVendorTable({
           isScrollingDown ? '-translate-y-full' : 'translate-y-0'
         }`}>
           {/* Hero-Style Community Banner - Mobile Only */}
-          {isMobile && communityPhotoUrl && (
-            <div className="bg-gradient-to-br from-primary/10 via-background to-background border border-border/50 shadow-md rounded-lg p-6 mb-6">
+          {isMobile && communityPhotoUrl && isBannerVisible && (
+            <div className={`bg-gradient-to-br from-primary/10 via-background to-background border border-border/50 shadow-md rounded-lg p-6 mb-6 transition-all duration-300 ${
+              isBannerExiting ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
+            }`}>
               <div className="flex items-start gap-4">
                 <img 
                   src={communityPhotoUrl} 
