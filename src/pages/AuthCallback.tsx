@@ -84,21 +84,31 @@ const AuthCallback = () => {
         if (!existingUser && isGoogleUser) {
           if (intent === "signin") {
             // User tried to SIGN IN but has no account
-            // FIX: Don't sign them out - guide them to complete profile instead
             console.log(
-              "Sign-in attempted by non-registered user, redirecting to complete profile:",
+              "Sign-in attempted by non-registered user, showing friendly message:",
               session.user.email,
             );
+            
+            // Show warm, welcoming message
+            toast({
+              title: "Hi there! 👋",
+              description: "We need you to join our community first. It only takes a minute to sign up and then you'll have access to all your neighbors' vendor recommendations!",
+              variant: "default",
+              duration: 8000,
+            });
 
-            // toast({
-            //   title: "Complete Your Profile",
-            //   description: "Let's finish setting up your account! Please add your address to continue.",
-            //   variant: "default",
-            //   duration: 6000,
-            // });
+            // Wait a moment for them to see the message
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Sign them out to prevent orphaned auth records
+            await supabase.auth.signOut();
 
+            // Redirect to sign up page with community context
             const community = contextParam || "boca-bridges";
-            navigate(`/complete-profile?community=${community}&from=signin`, { replace: true });
+            setTimeout(() => {
+              navigate(`/auth?community=${community}`, { replace: true });
+            }, 500);
+            
             return;
           }
 
