@@ -103,8 +103,7 @@ export default function CommunityVendorTable({
   const SORTS = getSorts(communityName);
   const [sortBy, setSortBy] = useState<typeof SORTS[number]["key"]>("hoa_rating");
   const { toast } = useToast();
-  // Always use mobile layout for desktop - removed isMobile detection
-  const isMobile = true;
+  const isMobile = useIsMobile();
   const [showInitialAnimation, setShowInitialAnimation] = useState(true);
   const { isScrollingDown } = useScrollDirection();
 
@@ -287,8 +286,8 @@ export default function CommunityVendorTable({
         <div className={`sticky top-2 sm:top-16 z-40 bg-background/80 backdrop-blur-sm transition-transform duration-300 ease-out mb-3 sm:mb-6 ${
           isScrollingDown ? '-translate-y-full' : 'translate-y-0'
         }`}>
-          {/* Hero-Style Community Banner */}
-          {communityPhotoUrl && (
+          {/* Hero-Style Community Banner - Mobile Only */}
+          {isMobile && communityPhotoUrl && (
             <div className="bg-gradient-to-br from-primary/10 via-background to-background border border-border/50 shadow-md rounded-lg p-6 mb-6">
               <div className="flex items-start gap-4">
                 <img 
