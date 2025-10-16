@@ -125,32 +125,38 @@ export default function CommunityVendorTable({
     return () => clearTimeout(timer);
   }, []);
 
-  // Check if banner was previously dismissed
+  // Check if banner was previously dismissed (separate keys for auth states)
   useEffect(() => {
-    const bannerKey = `banner_dismissed_${communityName}`;
+    const authState = isAuthenticated ? 'authenticated' : 'unauthenticated';
+    const bannerKey = `banner_dismissed_${communityName}_${authState}`;
     const wasDismissed = localStorage.getItem(bannerKey);
     if (wasDismissed) {
       setIsBannerVisible(false);
+    } else {
+      // Reset visibility when auth state changes and banner wasn't dismissed for this state
+      setIsBannerVisible(true);
+      setIsBannerExiting(false);
     }
-  }, [communityName]);
+  }, [communityName, isAuthenticated]);
 
-  // Auto-dismiss banner on scroll
+  // Auto-dismiss banner on scroll (separate dismissal per auth state)
   useEffect(() => {
     if (!isBannerVisible || !hasScrolled) return;
 
-    const bannerKey = `banner_dismissed_${communityName}`;
+    const authState = isAuthenticated ? 'authenticated' : 'unauthenticated';
+    const bannerKey = `banner_dismissed_${communityName}_${authState}`;
     
     // Trigger fade-out animation
     setIsBannerExiting(true);
     
-    // After animation, hide banner and store dismissal
+    // After animation, hide banner and store dismissal for current auth state
     const timer = setTimeout(() => {
       setIsBannerVisible(false);
       localStorage.setItem(bannerKey, 'true');
     }, 300); // Match animation duration
 
     return () => clearTimeout(timer);
-  }, [hasScrolled, communityName, isBannerVisible]);
+  }, [hasScrolled, communityName, isAuthenticated, isBannerVisible]);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery<CommunityVendorRow[]>({
     queryKey: ["community-stats", communityName, category, sortBy],
