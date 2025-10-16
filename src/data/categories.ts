@@ -44,6 +44,7 @@ export const CATEGORIES = [
   "Turf Installation",
   "Wallpaper Installation",
   "Water Filtration",
+  "Window Cleaning",
   "Window Treatment",
 ] as const;
 

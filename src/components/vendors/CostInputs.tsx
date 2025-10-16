@@ -53,6 +53,13 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
 
+  // Window Cleaning: Service call with optional frequency
+  if (c === "window cleaning") {
+    return [
+      { cost_kind: "service_call", amount: null, unit: "visit", quantity: null, notes: null },
+    ];
+  }
+
   // Plumbing/Electrical/Painters/Pet Grooming/House Cleaning/Mobile Tire Repair/Mobile Scratch/Dent Repair/Appliance Repair/Grill Cleaning/Dryer Vent Cleaning: Service Call only
   if (c === "plumbing" || c === "electrical" || c === "painters" || c === "pet grooming" || c === "house cleaning" || c === "mobile tire repair" || c === "mobile scratch/dent repair" || c === "appliance repair" || c === "grill cleaning" || c === "dryer vent cleaning") {
     return [
@@ -365,12 +372,12 @@ export default function CostInputs({
             />
             <span className="text-sm text-muted-foreground">{unitDisplay}</span>
           </div>
-          {/* Show visits quantity for Pool/Landscaping/Pest Control monthly plans, HVAC yearly plans, and Power Washing/Car Wash & Detail */}
+          {/* Show visits quantity for Pool/Landscaping/Pest Control monthly plans, HVAC yearly plans, and Power Washing/Car Wash & Detail/Window Cleaning */}
           {((entry.cost_kind === "monthly_plan" && (c === "pool" || c === "pool service" || c === "landscaping" || c === "pest control")) ||
             (entry.cost_kind === "yearly_plan" && c === "hvac") ||
-            (entry.cost_kind === "service_call" && (c === "power washing" || c === "car wash & detail"))) && (
+            (entry.cost_kind === "service_call" && (c === "power washing" || c === "car wash & detail" || c === "window cleaning"))) && (
             <div className="grid gap-2">
-              <Label># of Visits: {entry.cost_kind === "monthly_plan" ? "visits per Month" : entry.cost_kind === "service_call" && (c === "power washing" || c === "car wash & detail") ? "visits per Year" : "visits per Year"}</Label>
+              <Label># of Visits: {entry.cost_kind === "monthly_plan" ? "visits per Month" : entry.cost_kind === "service_call" && (c === "power washing" || c === "car wash & detail" || c === "window cleaning") ? "visits per Year" : "visits per Year"}</Label>
               <Input
                 type="number"
                 inputMode="numeric"

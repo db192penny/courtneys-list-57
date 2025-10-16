@@ -78,6 +78,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Garage Remodeling": Warehouse,
   "Home Organization": Package,
   "Water Filtration": Filter,
+  "Window Cleaning": Sparkles,
   "Interior Design": Palette,
   "Moving Company": Truck,
   "Damage Assessment/Restoration": Shield,
