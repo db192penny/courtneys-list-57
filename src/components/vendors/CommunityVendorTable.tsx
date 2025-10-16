@@ -424,13 +424,15 @@ export default function CommunityVendorTable({
               <h3 className="text-lg font-semibold text-foreground">
                 {category} Providers
               </h3>
-              <button
+              <Button
                 onClick={handleAddVendor}
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
               >
-                <Plus className="h-3 w-3" />
-                Add
-              </button>
+                <Plus className="h-4 w-4" />
+                Add Provider
+              </Button>
             </div>
           )}
           {isLoading && (
