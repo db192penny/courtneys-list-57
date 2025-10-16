@@ -15,8 +15,8 @@ export type CostEntry = {
 export function buildDefaultCosts(category?: string): CostEntry[] {
   const c = (category || "").toLowerCase();
   
-  // Pool/Landscaping/Pest Control: Maintenance Plan with visits
-  if (c === "pool" || c === "pool service" || c === "landscaping" || c === "pest control") {
+  // Pool/Landscaping/Pest Control/Bin Cleaning: Maintenance Plan with visits
+  if (c === "pool" || c === "pool service" || c === "landscaping" || c === "pest control" || c === "bin cleaning") {
     return [
       { cost_kind: "monthly_plan", amount: null, period: "monthly", unit: "month", quantity: null, notes: null },
     ];
@@ -358,8 +358,8 @@ export default function CostInputs({
             />
             <span className="text-sm text-muted-foreground">{unitDisplay}</span>
           </div>
-          {/* Show visits quantity for Pool/Landscaping/Pest Control monthly plans, HVAC yearly plans, and Power Washing/Car Wash & Detail */}
-          {((entry.cost_kind === "monthly_plan" && (c === "pool" || c === "pool service" || c === "landscaping" || c === "pest control")) ||
+          {/* Show visits quantity for Pool/Landscaping/Pest Control/Bin Cleaning monthly plans, HVAC yearly plans, and Power Washing/Car Wash & Detail */}
+          {((entry.cost_kind === "monthly_plan" && (c === "pool" || c === "pool service" || c === "landscaping" || c === "pest control" || c === "bin cleaning")) ||
             (entry.cost_kind === "yearly_plan" && c === "hvac") ||
             (entry.cost_kind === "service_call" && (c === "power washing" || c === "car wash & detail"))) && (
             <div className="grid gap-2">

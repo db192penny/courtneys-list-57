@@ -37,6 +37,7 @@ import {
   DoorOpen,
   Dumbbell,
   Package,
+  Trash2,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -68,6 +69,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Appliance Repair": Settings,
   "Auto Transport": Truck,
   "Bartenders": Wine,
+  "Bin Cleaning": Trash2,
   "Catering": UtensilsCrossed,
   "Custom Closets": Shirt,
   "DJs": Music,
