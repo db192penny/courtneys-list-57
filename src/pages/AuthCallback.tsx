@@ -83,13 +83,13 @@ const AuthCallback = () => {
         // If no user record exists and this is Google OAuth
         if (!existingUser && isGoogleUser) {
           if (intent === "signin") {
-            // User tried to SIGN IN but has no account
+            // User tried to SIGN IN but has no account - redirect to signup
             console.log(
-              "Sign-in attempted by non-registered user, showing friendly message:",
+              "Sign-in attempted by non-registered user, redirecting to signup:",
               session.user.email,
             );
             
-            // Show warm, welcoming message
+            // Show friendly welcome message
             toast({
               title: "Hi there! 👋",
               description: "We need you to join our community first. It only takes a minute to sign up and then you'll have access to all your neighbors' vendor recommendations!",
@@ -97,13 +97,13 @@ const AuthCallback = () => {
               duration: 8000,
             });
 
-            // Wait a moment for them to see the message
+            // Brief delay so user can read the message
             await new Promise(resolve => setTimeout(resolve, 1000));
             
-            // Sign them out to prevent orphaned auth records
+            // Sign out to prevent orphaned auth records
             await supabase.auth.signOut();
 
-            // Redirect to sign up page with community context
+            // Redirect to sign up page with community context preserved
             const community = contextParam || "boca-bridges";
             setTimeout(() => {
               navigate(`/auth?community=${community}`, { replace: true });
