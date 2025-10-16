@@ -303,35 +303,21 @@ export default function CommunityVendorTable({
                     Service Providers
                   </p>
                   
-                  {/* Social Proof Stats */}
+                  {/* Social Proof Stats - Compact Single Line */}
                   {socialProofStats && (
-                    <div className="flex flex-wrap items-center gap-2 mt-3">
+                    <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
                       <span className="text-yellow-500">⭐</span>
-                      <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
-                        <span className="bg-background/80 border border-border/30 px-2.5 py-1 rounded-full">
-                          {socialProofStats.neighbors}+ neighbors
-                        </span>
-                        <span className="text-border/50">·</span>
-                        <span className="bg-background/80 border border-border/30 px-2.5 py-1 rounded-full">
-                          {socialProofStats.providers} providers
-                        </span>
-                        <span className="text-border/50">·</span>
-                        <span className="bg-background/80 border border-border/30 px-2.5 py-1 rounded-full">
-                          {socialProofStats.reviews} reviews
-                        </span>
-                        <span className="text-border/50">·</span>
-                        <span className="bg-background/80 border border-border/30 px-2.5 py-1 rounded-full">
-                          {socialProofStats.categories} categories
-                        </span>
-                      </div>
+                      <span className="font-medium">
+                        {socialProofStats.neighbors}+ neighbors · {socialProofStats.providers} providers
+                      </span>
                     </div>
                   )}
                   
                   {/* Loading state for stats */}
                   {!socialProofStats && isLoading && (
-                    <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
                       <span className="text-yellow-500">⭐</span>
-                      <span>Loading community insights...</span>
+                      <span>Loading...</span>
                     </div>
                   )}
                 </div>
