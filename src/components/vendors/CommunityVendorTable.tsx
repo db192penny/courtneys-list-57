@@ -308,7 +308,7 @@ export default function CommunityVendorTable({
                     <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
                       <span className="text-yellow-500">⭐</span>
                       <span className="font-medium">
-                        {socialProofStats.neighbors}+ neighbors · {socialProofStats.providers} providers
+                        {socialProofStats.neighbors} neighbors, {socialProofStats.reviews} reviews
                       </span>
                     </div>
                   )}
