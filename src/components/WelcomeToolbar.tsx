@@ -78,10 +78,10 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
         }, 500);
       }
       
-      // Auto-hide after 15 seconds
+      // Auto-hide after 7 seconds
       autoHideTimeoutRef.current = setTimeout(() => {
         handleDismiss(false); // Auto dismiss
-      }, 15000);
+      }, 7000);
     }
 
     // ESC key handler
