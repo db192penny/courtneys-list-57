@@ -297,10 +297,10 @@ export default function CommunityVendorTable({
                 />
                 <div className="flex-1 min-w-0">
                   <h2 className="text-xl font-bold text-foreground tracking-tight leading-tight">
-                    Trusted {communityName}
+                    {communityName}
                   </h2>
                   <p className="text-lg font-semibold text-muted-foreground tracking-wide leading-tight mt-0.5">
-                    Service Providers
+                    Trusted Provider List
                   </p>
                   
                   {/* Social Proof Stats - Compact Single Line */}
