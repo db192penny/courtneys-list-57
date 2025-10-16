@@ -194,7 +194,7 @@ export default function CommunityVendorTable({
   const socialProofStats = useMemo(() => {
     if (!data || data.length === 0) return null;
     
-    const totalNeighbors = Math.max(...data.map(v => v.homes_serviced || 0));
+    const totalNeighbors = data.reduce((sum, v) => sum + (v.homes_serviced || 0), 0);
     const totalProviders = data.length;
     const totalReviews = data.reduce((sum, v) => sum + (v.hoa_rating_count || 0), 0);
     const totalCategories = availableCategories?.length || 0;
