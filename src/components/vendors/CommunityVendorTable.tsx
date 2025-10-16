@@ -272,13 +272,13 @@ export default function CommunityVendorTable({
         }`}>
           {/* Community Badge - Persistent Branding */}
           {communityPhotoUrl && (
-            <div className="flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-background via-background/95 to-background/90 border-b border-border/40">
+            <div className="flex items-center gap-3 px-4 py-5 bg-gradient-to-r from-background via-background/95 to-background/90 border-b border-border/40 mb-6">
               <img 
                 src={communityPhotoUrl} 
                 alt={communityName}
-                className="w-5 h-5 rounded-full object-cover ring-1 ring-primary/30 shadow-sm"
+                className="w-6 h-6 rounded-full object-cover ring-1 ring-primary/30 shadow-sm"
               />
-              <span className="text-[11px] font-medium text-muted-foreground tracking-wide">
+              <span className="text-lg font-semibold text-foreground tracking-tight">
                 {communityName} Provider Directory
               </span>
             </div>
