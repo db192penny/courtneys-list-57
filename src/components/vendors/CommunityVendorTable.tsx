@@ -191,6 +191,23 @@ export default function CommunityVendorTable({
     return data.publicUrl;
   }, [communityAssets]);
 
+  // Calculate social proof stats
+  const socialProofStats = useMemo(() => {
+    if (!data || data.length === 0) return null;
+    
+    const totalNeighbors = Math.max(...data.map(v => v.homes_serviced || 0));
+    const totalProviders = data.length;
+    const totalReviews = data.reduce((sum, v) => sum + (v.hoa_rating_count || 0), 0);
+    const totalCategories = availableCategories?.length || 0;
+    
+    return {
+      neighbors: totalNeighbors,
+      providers: totalProviders,
+      reviews: totalReviews,
+      categories: totalCategories
+    };
+  }, [data, availableCategories]);
+
   const { data: userHomeVendors } = useUserHomeVendors();
   const { data: userReviews } = useUserReviews();
   const userCosts = useUserCosts();
@@ -270,17 +287,56 @@ export default function CommunityVendorTable({
         <div className={`sticky top-2 sm:top-16 z-40 bg-background/80 backdrop-blur-sm transition-transform duration-300 ease-out mb-3 sm:mb-6 ${
           isScrollingDown ? '-translate-y-full' : 'translate-y-0'
         }`}>
-          {/* Community Badge - Persistent Branding */}
+          {/* Hero-Style Community Banner */}
           {communityPhotoUrl && (
-            <div className="flex items-center gap-3 px-4 py-5 bg-gradient-to-r from-background via-background/95 to-background/90 border-b border-border/40 mb-6">
-              <img 
-                src={communityPhotoUrl} 
-                alt={communityName}
-                className="w-6 h-6 rounded-full object-cover ring-1 ring-primary/30 shadow-sm"
-              />
-              <span className="text-lg font-semibold text-foreground tracking-tight">
-                {communityName} Provider Directory
-              </span>
+            <div className="bg-gradient-to-br from-primary/10 via-background to-background border border-border/50 shadow-md rounded-lg p-6 mb-6">
+              <div className="flex items-start gap-4">
+                <img 
+                  src={communityPhotoUrl} 
+                  alt={communityName}
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/50 shadow-lg flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl font-bold text-foreground tracking-tight leading-tight">
+                    Trusted {communityName}
+                  </h2>
+                  <p className="text-lg font-semibold text-muted-foreground tracking-wide leading-tight mt-0.5">
+                    Service Providers
+                  </p>
+                  
+                  {/* Social Proof Stats */}
+                  {socialProofStats && (
+                    <div className="flex flex-wrap items-center gap-2 mt-3">
+                      <span className="text-yellow-500">⭐</span>
+                      <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
+                        <span className="bg-background/80 border border-border/30 px-2.5 py-1 rounded-full">
+                          {socialProofStats.neighbors}+ neighbors
+                        </span>
+                        <span className="text-border/50">·</span>
+                        <span className="bg-background/80 border border-border/30 px-2.5 py-1 rounded-full">
+                          {socialProofStats.providers} providers
+                        </span>
+                        <span className="text-border/50">·</span>
+                        <span className="bg-background/80 border border-border/30 px-2.5 py-1 rounded-full">
+                          {socialProofStats.reviews} reviews
+                        </span>
+                        <span className="text-border/50">·</span>
+                        <span className="bg-background/80 border border-border/30 px-2.5 py-1 rounded-full">
+                          {socialProofStats.categories} categories
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Loading state for stats */}
+                  {!socialProofStats && isLoading && (
+                    <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+                      <span className="text-yellow-500">⭐</span>
+                      <span>Loading community insights...</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
