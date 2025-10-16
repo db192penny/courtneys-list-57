@@ -429,10 +429,68 @@ const Auth = () => {
 
           if (!existingUser) {
             // ORPHANED ACCOUNT DETECTED!
-            // Auth record exists but no public.users record
             console.log("Orphaned account detected for:", targetEmail);
-
-            // Use the fix function that already exists in your database
+            
+            // Try to delete if it's a recent Google OAuth orphan
+            const { data: wasDeleted } = await supabase.rpc("delete_orphaned_google_auth" as any, {
+              _email: targetEmail,
+            });
+            
+            if (wasDeleted) {
+              // Successfully deleted orphaned Google OAuth record
+              // Now retry the signup automatically
+              console.log("Deleted orphaned Google OAuth record, retrying signup...");
+              
+              // Retry signup with same data
+              const { data: retryAuthData, error: retryError } = await supabase.auth.signUp({
+                email: targetEmail,
+                password: tempPassword,
+                options: {
+                  emailRedirectTo: redirectUrl,
+                  data: metaData,
+                },
+              });
+              
+              if (retryError) {
+                toast({
+                  title: "Signup failed",
+                  description: retryError.message,
+                  variant: "destructive",
+                });
+                setLoading(false);
+                return;
+              }
+              
+              const retryUserId = retryAuthData.user?.id;
+              if (!retryUserId) {
+                toast({ title: "Signup failed", description: "Could not create user account", variant: "destructive" });
+                setLoading(false);
+                return;
+              }
+              
+              // Send admin notification
+              try {
+                await supabase.functions.invoke("send-admin-notification", {
+                  body: {
+                    userEmail: targetEmail,
+                    userName: name.trim(),
+                    userAddress: address.trim(),
+                    community: communityName || "Direct Signup",
+                    signupSource: communityName ? `community:${communityName}` : "direct",
+                  },
+                });
+              } catch (adminNotificationError) {
+                // Don't fail the signup
+              }
+              
+              // User is now signed in automatically - redirect to community
+              const communitySlug = communityName ? toSlug(communityName) : 'the-bridges';
+              navigate(`/communities/${communitySlug}?welcome=true`, { replace: true });
+              setLoading(false);
+              return;
+            }
+            
+            // If not deleted, it's an older orphaned account - try to fix it
             const { data: fixResult, error: fixError } = await supabase.rpc("fix_specific_orphaned_user", {
               _email: targetEmail,
               _name: name.trim(),
@@ -440,7 +498,6 @@ const Auth = () => {
             });
 
             if (!fixError && fixResult && fixResult.length > 0 && fixResult[0].created_record) {
-              // Successfully fixed! Now sign them in
               console.log("Orphaned account fixed, sending magic link...");
 
               const { error: magicLinkError } = await supabase.auth.signInWithOtp({
