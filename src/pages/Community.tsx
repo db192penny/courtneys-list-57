@@ -261,19 +261,25 @@ export default function Community() {
       {/* Back to Top Button */}
       <BackToTopButton />
 
-      {/* Sticky Join Now Bar - Bottom (Desktop Only) */}
+      {/* Sticky Join Now Bar - Bottom */}
       {showSignUpPrompt && (
-        <div className="hidden md:block fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border shadow-2xl animate-fade-in">
-          <div className="container py-4">
-            <div className="flex items-center justify-between gap-4">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border shadow-2xl animate-fade-in">
+          <div className="container py-2 sm:py-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
               
               {/* Left: Value Proposition + Social Proof */}
-              <div className="flex-1 text-left space-y-1">
-                <p className="text-lg font-semibold text-foreground">
-                  See who your neighbors are using and trust
+              <div className="flex-1 text-center sm:text-left space-y-1">
+                <p className="text-sm sm:text-lg font-semibold text-foreground">
+                  <span className="sm:hidden">
+                    {activeUsers >= 100 
+                      ? `Join ${activeUsers}+ ${communityName === "The Bridges" ? "your Bridges" : communityName} neighbors`
+                      : `Join ${communityName === "The Bridges" ? "your Bridges" : communityName} neighbors`
+                    }
+                  </span>
+                  <span className="hidden sm:inline">See who your neighbors are using and trust</span>
                 </p>
                 {activeUsers >= 100 && (
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <div className="hidden sm:flex items-center justify-center sm:justify-start gap-3 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <Users className="h-4 w-4 text-primary" />
                       <span className="font-medium">{activeUsers}+ active neighbors</span>
@@ -288,11 +294,12 @@ export default function Community() {
               </div>
 
               {/* Right: CTAs */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Button
                   onClick={() => navigate(`/signin?community=${communityName}`)}
                   size="sm"
                   variant="outline"
+                  className="flex-1 sm:flex-initial"
                 >
                   Log In
                 </Button>
@@ -310,7 +317,7 @@ export default function Community() {
                     }
                   }}
                   size="sm"
-                  className="font-semibold shadow-lg flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white"
+                  className="flex-1 sm:flex-initial font-semibold shadow-lg flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white"
                 >
                   <UserPlus className="h-4 w-4" />
                   Sign Up

@@ -108,7 +108,7 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
 
   return (
     <div 
-      className={`mb-6 z-50 relative transition-all duration-400 ease-out ${
+      className={`mb-6 transition-all duration-400 ease-out ${
         isExiting 
           ? "opacity-0 transform translate-y-[-10px]" 
           : "opacity-100 transform translate-y-0 animate-fade-in"

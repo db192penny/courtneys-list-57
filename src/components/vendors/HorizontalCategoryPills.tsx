@@ -8,14 +8,12 @@ interface HorizontalCategoryPillsProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
   categories: string[];
-  isBannerVisible?: boolean;
 }
 
 export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = ({
   selectedCategory,
   onCategoryChange,
-  categories,
-  isBannerVisible = false
+  categories
 }) => {
   const isMobile = useIsMobile();
   
@@ -39,7 +37,7 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
       </label>
       
       <Select value={selectedCategory} onValueChange={onCategoryChange}>
-        <SelectTrigger className={`${isMobile ? "w-full h-11 text-left text-sm" : "w-full h-12 text-left"} ${isBannerVisible ? "ring-2 ring-ring ring-offset-2" : ""}`}>
+        <SelectTrigger className={isMobile ? "w-full h-11 text-left text-sm" : "w-full h-12 text-left"}>
           <SelectValue>
             <span className="flex items-center gap-2">
               {getDisplayValue()}

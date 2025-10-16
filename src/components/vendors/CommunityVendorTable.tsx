@@ -125,38 +125,32 @@ export default function CommunityVendorTable({
     return () => clearTimeout(timer);
   }, []);
 
-  // Check if banner was previously dismissed (separate keys for auth states)
+  // Check if banner was previously dismissed
   useEffect(() => {
-    const authState = isAuthenticated ? 'authenticated' : 'unauthenticated';
-    const bannerKey = `banner_dismissed_${communityName}_${authState}`;
+    const bannerKey = `banner_dismissed_${communityName}`;
     const wasDismissed = localStorage.getItem(bannerKey);
     if (wasDismissed) {
       setIsBannerVisible(false);
-    } else {
-      // Reset visibility when auth state changes and banner wasn't dismissed for this state
-      setIsBannerVisible(true);
-      setIsBannerExiting(false);
     }
-  }, [communityName, isAuthenticated]);
+  }, [communityName]);
 
-  // Auto-dismiss banner on scroll (separate dismissal per auth state)
+  // Auto-dismiss banner on scroll
   useEffect(() => {
     if (!isBannerVisible || !hasScrolled) return;
 
-    const authState = isAuthenticated ? 'authenticated' : 'unauthenticated';
-    const bannerKey = `banner_dismissed_${communityName}_${authState}`;
+    const bannerKey = `banner_dismissed_${communityName}`;
     
     // Trigger fade-out animation
     setIsBannerExiting(true);
     
-    // After animation, hide banner and store dismissal for current auth state
+    // After animation, hide banner and store dismissal
     const timer = setTimeout(() => {
       setIsBannerVisible(false);
       localStorage.setItem(bannerKey, 'true');
     }, 300); // Match animation duration
 
     return () => clearTimeout(timer);
-  }, [hasScrolled, communityName, isAuthenticated, isBannerVisible]);
+  }, [hasScrolled, communityName, isBannerVisible]);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery<CommunityVendorRow[]>({
     queryKey: ["community-stats", communityName, category, sortBy],
@@ -385,7 +379,6 @@ export default function CommunityVendorTable({
                   availableCategories?.length > 0 ? 
                   availableCategories : CATEGORIES
                 ) as string[]}
-                isBannerVisible={isMobile && isBannerVisible}
               />
             </div>
             
