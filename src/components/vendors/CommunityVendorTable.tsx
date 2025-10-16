@@ -190,7 +190,21 @@ export default function CommunityVendorTable({
     return data.publicUrl;
   }, [communityAssets]);
 
-  // Calculate social proof stats
+  // Community-wide stats (independent of category)
+  const { data: communityStats } = useQuery<{ total_reviews: number; active_users: number } | null>({
+    queryKey: ["community-wide-stats", communityName],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_community_stats", { _hoa_name: communityName });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : (data as any);
+      return row ? { total_reviews: row.total_reviews, active_users: row.active_users } : null;
+    },
+    enabled: !!communityName,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+  // Calculate social proof stats (category-scoped fallback)
   const socialProofStats = useMemo(() => {
     if (!data || data.length === 0) return null;
     
@@ -206,7 +220,6 @@ export default function CommunityVendorTable({
       categories: totalCategories
     };
   }, [data, availableCategories]);
-
   const { data: userHomeVendors } = useUserHomeVendors();
   const { data: userReviews } = useUserReviews();
   const userCosts = useUserCosts();
@@ -304,11 +317,11 @@ export default function CommunityVendorTable({
                   </p>
                   
                   {/* Social Proof Stats - Compact Single Line */}
-                  {socialProofStats && (
+                  {(communityStats || socialProofStats) && (
                     <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
                       <span className="text-yellow-500">⭐</span>
                       <span className="font-medium">
-                        {socialProofStats.neighbors} neighbors, {socialProofStats.reviews} reviews
+                        {(communityStats?.active_users ?? socialProofStats?.neighbors) || 0} neighbors, {(communityStats?.total_reviews ?? socialProofStats?.reviews) || 0} reviews
                       </span>
                     </div>
                   )}
