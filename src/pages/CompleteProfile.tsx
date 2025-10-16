@@ -321,7 +321,7 @@ const CompleteProfile = () => {
                   </TooltipProvider>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Please ensure your full address includes your house/building number
+                  Please put in a few numbers and use the dropdown
                 </p>
                 <AddressInput
                   id="address"
