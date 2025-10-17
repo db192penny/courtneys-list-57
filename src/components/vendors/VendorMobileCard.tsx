@@ -181,10 +181,15 @@ export default function VendorMobileCard({
 
         {/* Category, Neighbors, and Rate Button */}
         <div className="flex items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-3 flex-1">
+          <div className="flex items-center gap-3 flex-1 flex-wrap">
             <Badge variant="secondary" className="text-sm px-3 py-1">
               {getCategoryEmoji(vendor.category)} {vendor.category}
             </Badge>
+            {vendor.secondary_categories && vendor.secondary_categories.length > 0 && (
+              <Badge variant="outline" className="text-xs text-muted-foreground">
+                Also does: {vendor.secondary_categories.join(', ')}
+              </Badge>
+            )}
             {vendor.homes_serviced > 0 && (
               <button
                 onClick={(e) => {
