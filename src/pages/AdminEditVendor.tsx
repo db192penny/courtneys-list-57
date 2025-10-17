@@ -39,6 +39,7 @@ const AdminEditVendor = () => {
   const [myReviewId, setMyReviewId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [secondaryCategories, setSecondaryCategories] = useState<string[]>([]);
   const { data: isAdmin } = useIsAdmin();
   const { data: isHoaAdmin } = useIsHoaAdmin();
   const { data: userData } = useUserData();
@@ -85,6 +86,7 @@ const AdminEditVendor = () => {
         setCommunity(data.community || "Boca Bridges");
         setGooglePlaceId(data.google_place_id || "");
         setIsManualEntry(!data.google_place_id);
+        setSecondaryCategories((data as any).secondary_categories || []);
         
         const defaults = buildDefaultCosts(data.category || "");
         if (data.typical_cost != null && defaults.length) {
@@ -178,6 +180,7 @@ const AdminEditVendor = () => {
         community: community.trim(),
         typical_cost: costNum,
         google_place_id: googlePlaceId || null,
+        secondary_categories: secondaryCategories,
       };
 
       // If we have a Google Place ID, fetch and update Google data
@@ -271,6 +274,33 @@ const AdminEditVendor = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="secondary-categories">Also Provides (Optional)</Label>
+              <p className="text-xs text-muted-foreground">Select additional service categories this vendor provides</p>
+              <div className="space-y-2 max-h-64 overflow-y-auto border rounded-md p-4">
+                {CATEGORIES.filter(cat => cat !== category).map((cat) => (
+                  <div key={cat} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`secondary-${cat}`}
+                      checked={secondaryCategories.includes(cat)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSecondaryCategories([...secondaryCategories, cat]);
+                        } else {
+                          setSecondaryCategories(secondaryCategories.filter(c => c !== cat));
+                        }
+                      }}
+                      className="rounded border-gray-300"
+                    />
+                    <label htmlFor={`secondary-${cat}`} className="text-sm cursor-pointer">
+                      {cat}
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="grid gap-2">
