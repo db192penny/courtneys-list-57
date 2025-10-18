@@ -53,10 +53,7 @@ export function NeighborReviewPreview({
       // Fetch verified user reviews
       const functionName = isAuthenticated ? 'list_vendor_reviews' : 'list_vendor_reviews_preview';
       const { data: verifiedReviews, error: verifiedError } = await supabase
-        .rpc(functionName as any, { 
-          _vendor_id: vendorId,
-          _hoa_name: communityName || null
-        });
+        .rpc(functionName as any, { _vendor_id: vendorId });
       
       if (verifiedError) {
         console.error("Error fetching verified reviews:", verifiedError);
