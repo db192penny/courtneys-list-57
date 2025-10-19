@@ -42,6 +42,7 @@ export const CATEGORIES = [
   "Power Washing",
   "Tile Installation",
   "Turf Installation",
+  "Pavers",
   "Wallpaper Installation",
   "Water Filtration",
   "Window Cleaning",

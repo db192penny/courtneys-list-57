@@ -88,6 +88,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Home Theater & AV": Tv,
   "Tile Installation": Layers,
   "Turf Installation": Sprout,
+  "Pavers": Grid3x3,
   "Wallpaper Installation": Scroll,
   "Window Treatment": Square,
 };
