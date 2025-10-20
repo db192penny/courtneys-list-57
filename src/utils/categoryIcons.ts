@@ -38,6 +38,7 @@ import {
   Dumbbell,
   Package,
   Trash2,
+  HardHat,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -91,6 +92,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Pavers": Grid3x3,
   "Wallpaper Installation": Scroll,
   "Window Treatment": Square,
+  "General Contractor": HardHat,
 };
 
 export function getCategoryIcon(category: Category): LucideIcon {
