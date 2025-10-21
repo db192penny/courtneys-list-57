@@ -76,7 +76,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <label className="text-sm mb-2 block">Service Category</label>
-              <Select onValueChange={(val) => {
+              <Select value={selectedCategory} onValueChange={(val) => {
                 if (val === "__suggest__") {
                   setShowSuggestionModal(true);
                   // Don't change the selected category
