@@ -126,13 +126,6 @@ export default function CategorySuggestionModal({ open, onOpenChange }: Category
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label>For Community</Label>
-            <Badge variant="secondary" className="text-base px-3 py-1">
-              {displayCommunityName}
-            </Badge>
-          </div>
-
           <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-4">
             <Button
               type="button"
