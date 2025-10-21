@@ -103,6 +103,13 @@ const CompleteProfile = () => {
   // ENHANCED GOOGLE USER HANDLING - END
   // ========================================
 
+  // Prevent back navigation while completing profile
+  useEffect(() => {
+    const preventBack = () => window.history.forward();
+    window.addEventListener('popstate', preventBack);
+    return () => window.removeEventListener('popstate', preventBack);
+  }, []);
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -270,7 +277,17 @@ const CompleteProfile = () => {
       />
 
       <section className="container max-w-xl py-4 sm:py-6 px-4 sm:px-6">
-        <h1 className="text-3xl font-semibold mb-4 sm:mb-6">Complete Your Profile</h1>
+        <div className="text-center mb-6">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <span className="text-2xl">🏘️</span>
+            <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Courtney's List
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Complete your profile to continue
+          </p>
+        </div>
         <Card>
           <CardHeader>
             <CardTitle>Welcome to {communityName}!</CardTitle>

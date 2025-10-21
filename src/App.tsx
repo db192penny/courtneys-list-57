@@ -152,10 +152,17 @@ function AuthWatcher() {
 
 function ConditionalHeader() {
   const location = useLocation();
-  const isPreviewRoute = location.pathname.startsWith('/community-preview/');
-  const isSurveyRoute = location.pathname === '/bridges/rate-vendors';
+  const hideHeaderPaths = [
+    '/community-preview/',
+    '/bridges/rate-vendors',
+    '/complete-profile'
+  ];
   
-  return (isPreviewRoute || isSurveyRoute) ? null : <Header />;
+  const shouldHideHeader = hideHeaderPaths.some(path => 
+    location.pathname === path || location.pathname.startsWith(path)
+  );
+  
+  return shouldHideHeader ? null : <Header />;
 }
 
 function ActivityTimeoutManager() {
