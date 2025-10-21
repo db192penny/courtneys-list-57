@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StarRating } from "@/components/ui/star-rating";
@@ -22,6 +22,8 @@ import ReviewPreview from "@/components/ReviewPreview";
 import VendorNameInput, { type VendorSelectedPayload } from "@/components/VendorNameInput";
 import SubmitCostModal from "@/components/vendors/SubmitCostModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import CategorySuggestionModal from "@/components/CategorySuggestionModal";
+import { useIsMobile } from "@/hooks/use-mobile";
 const SubmitVendor = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -48,6 +50,9 @@ const SubmitVendor = () => {
   const [showCostConfirm, setShowCostConfirm] = useState(false);
   const [showCostModal, setShowCostModal] = useState(false);
   const [submittedVendorId, setSubmittedVendorId] = useState<string | null>(null);
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
+  const [previousCategory, setPreviousCategory] = useState<string>(initialCategory);
+  const isMobile = useIsMobile();
   const { data: isAdmin } = useIsAdmin();
   const { data: canSeed } = useCanSeedVendors();
   const isAdminUser = canSeed || false;
@@ -527,7 +532,15 @@ const SubmitVendor = () => {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="category">Service Category</Label>
-              <Select value={category} onValueChange={setCategory}>
+              <Select value={category} onValueChange={(val) => {
+                if (val === "__suggest__") {
+                  setShowSuggestionModal(true);
+                  // Don't change the selected category
+                } else {
+                  setPreviousCategory(category);
+                  setCategory(val);
+                }
+              }}>
                 <SelectTrigger id="category" disabled={!!(vendorId && !canEditCore)}>
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
@@ -535,6 +548,19 @@ const SubmitVendor = () => {
                   {CATEGORIES.map((c) => (
                     <SelectItem key={c} value={c}>{c}</SelectItem>
                   ))}
+                  <SelectSeparator />
+                  <SelectItem 
+                    value="__suggest__" 
+                    className={`
+                      text-primary font-medium
+                      ${isMobile ? 'min-h-[48px] text-base' : 'min-h-[36px]'}
+                    `}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>💡</span>
+                      <span>Can't find your category? Suggest one</span>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -659,6 +685,10 @@ const SubmitVendor = () => {
           }}
         />
       </section>
+      <CategorySuggestionModal 
+        open={showSuggestionModal} 
+        onOpenChange={setShowSuggestionModal} 
+      />
     </main>
   );
 };
