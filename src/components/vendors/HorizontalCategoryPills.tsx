@@ -1,8 +1,9 @@
-import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectScrollUpButton, SelectScrollDownButton } from "@/components/ui/select";
+import React, { useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectScrollUpButton, SelectScrollDownButton, SelectSeparator } from "@/components/ui/select";
 import { getCategoryEmoji } from "@/utils/categoryEmojis";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import CategorySuggestionModal from "@/components/CategorySuggestionModal";
 
 interface HorizontalCategoryPillsProps {
   selectedCategory: string;
@@ -18,6 +19,15 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
   isBannerVisible = false
 }) => {
   const isMobile = useIsMobile();
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
+  
+  const handleCategoryChange = (val: string) => {
+    if (val === "__suggest__") {
+      setShowSuggestionModal(true);
+    } else {
+      onCategoryChange(val);
+    }
+  };
   
   // Create sorted categories with "all" first
   const sortedCategories = [
@@ -38,7 +48,7 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
         Choose Category
       </label>
       
-      <Select value={selectedCategory} onValueChange={onCategoryChange}>
+      <Select value={selectedCategory} onValueChange={handleCategoryChange}>
         <SelectTrigger className={`${isMobile ? "w-full h-11 text-left text-sm" : "w-full h-12 text-left"} ${isBannerVisible ? "ring-2 ring-ring ring-offset-2" : ""}`}>
           <SelectValue>
             <span className="flex items-center gap-2">
@@ -67,11 +77,29 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
               </SelectItem>
             );
           })}
+          <SelectSeparator />
+          <SelectItem 
+            value="__suggest__" 
+            className={`
+              text-primary font-medium
+              ${isMobile ? 'min-h-[48px] text-base' : 'min-h-[36px]'}
+            `}
+          >
+            <div className="flex items-center gap-2">
+              <span>💡</span>
+              <span>Can't find your category? Suggest one</span>
+            </div>
+          </SelectItem>
           <SelectScrollDownButton>
             <ChevronDown className="h-4 w-4" />
           </SelectScrollDownButton>
         </SelectContent>
       </Select>
+      
+      <CategorySuggestionModal 
+        open={showSuggestionModal} 
+        onOpenChange={setShowSuggestionModal} 
+      />
     </div>
   );
 };
