@@ -1,11 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { 
-  User, 
-  Users, 
-  Heart, 
-  Star, 
-  Crown, 
+  Home,
+  Star,
+  Shield,
   Trophy,
+  Award,
+  Crown,
   Lock,
   CheckCircle,
   LucideIcon
@@ -14,12 +14,12 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const iconMap: Record<string, LucideIcon> = {
-  user: User,
-  users: Users,
-  heart: Heart,
+  home: Home,
   star: Star,
-  crown: Crown,
+  shield: Shield,
   trophy: Trophy,
+  award: Award,
+  crown: Crown,
 };
 
 type UserBadgeProps = {
