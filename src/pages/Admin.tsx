@@ -303,30 +303,6 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
-  const { data: suggestionsData } = useQuery({
-    queryKey: ['pending-category-suggestions'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('category_suggestions' as any)
-        .select('community, status')
-        .eq('status', 'pending');
-      
-      if (!data) return { total: 0, byCommunity: {} };
-      
-      // Count by community
-      const byCommunity = data.reduce((acc: Record<string, number>, s: any) => {
-        acc[s.community] = (acc[s.community] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      
-      return {
-        total: data.length,
-        byCommunity
-      };
-    },
-    enabled: !!isSiteAdmin, // Only run query if user is site admin
-  });
-
   return (
     <main className="min-h-screen bg-background">
       <SEO
@@ -377,45 +353,6 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
                 Use these tools to manage the platform and seed initial vendor data for communities.
               </p>
             </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span>📋</span>
-                  <span>Category Suggestions</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {suggestionsData?.total === 0 ? (
-                  <p className="text-sm text-muted-foreground">No pending suggestions</p>
-                ) : (
-                  <>
-                    <p className="text-sm font-medium">
-                      {suggestionsData?.total} suggestion{suggestionsData?.total !== 1 ? 's' : ''} pending
-                    </p>
-                    
-                    {Object.entries(suggestionsData?.byCommunity || {}).length > 0 && (
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        {Object.entries(suggestionsData.byCommunity).map(([community, count]) => (
-                          <div key={community} className="flex items-center gap-2">
-                            <span>•</span>
-                            <span>{getCommunityDisplayName(community)}: {count}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    <Button 
-                      onClick={() => navigate('/admin/category-suggestions')}
-                      className="w-full"
-                      variant="outline"
-                    >
-                      Review Suggestions
-                    </Button>
-                  </>
-                )}
-              </CardContent>
-            </Card>
 
             <div className="rounded-md border border-border p-4">
               <h2 className="font-medium mb-3">Pending Users ({pendingUsers.length})</h2>
