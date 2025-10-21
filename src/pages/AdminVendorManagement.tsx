@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { CATEGORIES } from "@/data/categories";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,7 @@ import { formatUSPhoneDisplay } from "@/utils/phone";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminVendorCard } from "@/components/admin/AdminVendorCard";
 import { ArrowLeft } from "lucide-react";
+import CategorySuggestionModal from "@/components/CategorySuggestionModal";
 
 interface Vendor {
   id: string;
@@ -40,6 +41,8 @@ const AdminVendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [communityFilter, setCommunityFilter] = useState("all");
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
+  const [previousCategory, setPreviousCategory] = useState<string>("all");
 
 
   const canonical = typeof window !== "undefined" ? window.location.href : undefined;
@@ -203,7 +206,15 @@ const AdminVendorManagement = () => {
           </div>
           <div className="w-48">
             <Label htmlFor="category-filter">Category</Label>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select value={categoryFilter} onValueChange={(val) => {
+              if (val === "__suggest__") {
+                setShowSuggestionModal(true);
+                // Don't change the selected category
+              } else {
+                setPreviousCategory(categoryFilter);
+                setCategoryFilter(val);
+              }
+            }}>
               <SelectTrigger id="category-filter">
                 <SelectValue />
               </SelectTrigger>
@@ -212,6 +223,19 @@ const AdminVendorManagement = () => {
                 {CATEGORIES.map((category) => (
                   <SelectItem key={category} value={category}>{category}</SelectItem>
                 ))}
+                <SelectSeparator />
+                <SelectItem 
+                  value="__suggest__" 
+                  className={`
+                    text-primary font-medium
+                    ${isMobile ? 'min-h-[48px] text-base' : 'min-h-[36px]'}
+                  `}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>💡</span>
+                    <span>Can't find your category? Suggest one</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -313,6 +337,10 @@ const AdminVendorManagement = () => {
         </div>
 
       </section>
+      <CategorySuggestionModal 
+        open={showSuggestionModal} 
+        onOpenChange={setShowSuggestionModal} 
+      />
     </main>
   );
 };
