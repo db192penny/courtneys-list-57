@@ -1,12 +1,14 @@
 
 import SEO from "@/components/SEO";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORIES } from "@/data/categories";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import VendorList from "@/components/vendors/VendorList";
+import CategorySuggestionModal from "@/components/CategorySuggestionModal";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Dashboard = () => {
   const canonical = typeof window !== "undefined" ? window.location.href : undefined;
@@ -16,6 +18,9 @@ const Dashboard = () => {
   const [submissionsCount, setSubmissionsCount] = useState<number>(0);
   const [points, setPoints] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
+  const [previousCategory, setPreviousCategory] = useState<string>(selectedCategory || "all");
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     let cancelled = false;
@@ -71,7 +76,15 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <label className="text-sm mb-2 block">Service Category</label>
-              <Select onValueChange={(val) => setSelectedCategory(val)}>
+              <Select onValueChange={(val) => {
+                if (val === "__suggest__") {
+                  setShowSuggestionModal(true);
+                  // Don't change the selected category
+                } else {
+                  setPreviousCategory(selectedCategory || "all");
+                  setSelectedCategory(val);
+                }
+              }}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="All categories" />
                 </SelectTrigger>
@@ -80,6 +93,19 @@ const Dashboard = () => {
                   {CATEGORIES.map((c) => (
                     <SelectItem key={c} value={c}>{c}</SelectItem>
                   ))}
+                  <SelectSeparator />
+                  <SelectItem 
+                    value="__suggest__" 
+                    className={`
+                      text-primary font-medium
+                      ${isMobile ? 'min-h-[48px] text-base' : 'min-h-[36px]'}
+                    `}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>💡</span>
+                      <span>Can't find your category? Suggest one</span>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </CardContent>
@@ -135,6 +161,10 @@ const Dashboard = () => {
           </div>
         </div>
       </section>
+      <CategorySuggestionModal 
+        open={showSuggestionModal} 
+        onOpenChange={setShowSuggestionModal} 
+      />
     </main>
   );
 };
