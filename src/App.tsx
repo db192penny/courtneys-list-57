@@ -36,6 +36,7 @@ import AdminVendorSeed from "./pages/AdminVendorSeed";
 import AdminVendorManagement from "./pages/AdminVendorManagement";
 import AdminEditVendor from "./pages/AdminEditVendor";
 import AdminCostManagement from "./pages/AdminCostManagement";
+import AdminCategorySuggestions from "./pages/AdminCategorySuggestions";
 import AdminPreviewLinks from "./pages/AdminPreviewLinks";
 import AdminPreviewUsers from "./pages/AdminPreviewUsers";
 import AdminUsers from "./pages/AdminUsers";
@@ -231,6 +232,7 @@ function AppContent() {
         <Route path="/admin/vendors/manage" element={<AdminProtectedRoute><AdminVendorManagement /></AdminProtectedRoute>} />
         <Route path="/admin/vendors/edit" element={<AdminProtectedRoute><AdminEditVendor /></AdminProtectedRoute>} />
         <Route path="/admin/costs" element={<AdminProtectedRoute><AdminCostManagement /></AdminProtectedRoute>} />
+        <Route path="/admin/category-suggestions" element={<AdminProtectedRoute><AdminCategorySuggestions /></AdminProtectedRoute>} />
         <Route path="/admin/preview-links" element={<AdminProtectedRoute><AdminPreviewLinks /></AdminProtectedRoute>} />
         <Route path="/admin/preview-users" element={<AdminProtectedRoute><AdminPreviewUsers /></AdminProtectedRoute>} />
         <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
