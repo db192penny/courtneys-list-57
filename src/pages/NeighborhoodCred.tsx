@@ -14,7 +14,7 @@ import BadgeProgress from "@/components/badges/BadgeProgress";
 import PointHistoryTable from "@/components/badges/PointHistoryTable";
 import ActivityGuide from "@/components/badges/ActivityGuide";
 import BadgeLevelChart from "@/components/badges/BadgeLevelChart";
-import { Gift, Trophy } from "lucide-react";
+import { Gift, Trophy, Coffee, CheckCircle, Award } from "lucide-react";
 
 const NeighborhoodCred = () => {
   const [loading, setLoading] = useState(true);
@@ -59,91 +59,106 @@ const NeighborhoodCred = () => {
   const pointsToStarbucks = Math.max(20 - points, 0);
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <SEO
         title="Community Rewards — Courtney's List"
         description="Track your community contributions and unlock exclusive rewards."
         canonical={canonical}
       />
       <section className="container max-w-4xl py-10">
-        <h1 className="text-3xl font-semibold mb-6">Community Rewards</h1>
+        <h1 className="text-2xl font-semibold mb-8">Community Rewards</h1>
 
         {/* Reward Progress Card */}
-        <Card className="mb-6 relative overflow-hidden">
-          <div className="absolute top-2 right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">
+        <Card className="mb-6 relative overflow-hidden border-2 shadow-lg">
+          <div className="absolute top-3 right-3 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
             LIMITED TIME
           </div>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Gift className="h-5 w-5" />
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Gift className="h-5 w-5 text-primary" />
               Launch Reward
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4">
             {/* Starbucks Reward */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="text-2xl">☕</div>
-                  <div>
-                    <h3 className="font-semibold">$10 Starbucks Gift Card</h3>
-                    <p className="text-sm text-muted-foreground">Earn 20 points to unlock this limited-time reward</p>
+            <div className="space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3 flex-1">
+                  <div className="bg-primary/10 p-2 rounded-lg">
+                    <Coffee className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-base mb-1">$10 Starbucks Gift Card</h3>
+                    <p className="text-sm text-foreground/70">Earn 20 points to unlock this limited-time reward</p>
                   </div>
                 </div>
                 {points >= 20 ? (
-                  <div className="text-green-600 font-semibold">🎉 Earned!</div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">{pointsToStarbucks} points to go</div>
-                )}
+                  <div className="flex items-center gap-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-semibold px-3 py-1.5 rounded-full text-sm whitespace-nowrap">
+                    <CheckCircle className="h-4 w-4" />
+                    Earned!
+                  </div>
+                ) : null}
               </div>
               
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${starbucksProgress * 100}%` }}
-                />
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-foreground/80">{points} / 20 points</span>
+                  {points < 20 && (
+                    <span className="text-muted-foreground">{pointsToStarbucks} to go</span>
+                  )}
+                </div>
+                <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${starbucksProgress * 100}%` }}
+                  />
+                </div>
               </div>
               
-            {points < 20 && (
-              <div className="text-sm text-muted-foreground">
-                Need {pointsToStarbucks} more points: Invite a neighbor (10 pts) or leave reviews (5 pts each)
-              </div>
-            )}
-          </div>
-        </CardContent>
+              {points < 20 && (
+                <div className="text-sm text-foreground/70 bg-muted/50 p-3 rounded-lg">
+                  <span className="font-medium">Quick ways to earn:</span> Invite a neighbor (10 pts) or leave reviews (5 pts each)
+                </div>
+              )}
+            </div>
+          </CardContent>
         </Card>
 
         {/* Current Status Card */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5" />
+        <Card className="mb-6 border-2">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Award className="h-5 w-5 text-primary" />
               Your Status
             </CardTitle>
-            <div className="flex flex-col gap-3 mt-3">
-              <div className="flex items-center gap-3 flex-wrap">
-                {currentBadge && (
-                  <UserBadge
-                    name={formatBadgeName(currentBadge.name, communityName)}
-                    color={currentBadge.color}
-                    icon={currentBadge.icon}
-                    size="lg"
-                  />
-                )}
-                {isAdmin && <AdminBadge size="lg" />}
-              </div>
-              
-              <div className="text-sm text-muted-foreground">
-                <span className="font-medium">{points} Activity Points</span>
-              </div>
-              
-              <BadgeProgress
-                currentPoints={points}
-                currentBadge={currentBadge}
-                nextBadge={nextBadge}
-              />
-            </div>
           </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              {currentBadge && (
+                <UserBadge
+                  name={formatBadgeName(currentBadge.name, communityName)}
+                  color={currentBadge.color}
+                  icon={currentBadge.icon}
+                  size="lg"
+                />
+              )}
+              {isAdmin && <AdminBadge size="lg" />}
+            </div>
+            
+            <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+              <Trophy className="h-5 w-5 text-primary" />
+              <div>
+                <span className="font-semibold text-lg">{points}</span>
+                <span className="text-muted-foreground ml-1">Activity Points</span>
+              </div>
+            </div>
+            
+            <BadgeProgress
+              currentPoints={points}
+              currentBadge={currentBadge}
+              nextBadge={nextBadge}
+            />
+          </CardContent>
         </Card>
 
         {/* Activity Insights Section */}
