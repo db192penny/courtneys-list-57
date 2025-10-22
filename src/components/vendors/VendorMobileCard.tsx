@@ -29,6 +29,7 @@ import type { CommunityVendorRow } from "@/components/vendors/CommunityVendorTab
 import React, { useState } from "react";
 import { GATracking } from "@/components/analytics/GoogleAnalytics";
 import { AccessGateModal } from "@/components/vendors/AccessGateModal";
+import { useAnalyticsTracking } from "@/contexts/AnalyticsContext";
 
 const isContactInfoPending = (contactInfo: string | null | undefined): boolean => {
   return !contactInfo || 
@@ -133,6 +134,7 @@ export default function VendorMobileCard({
   const [accessGateType, setAccessGateType] = useState<"rate" | "reviews" | "costs">("rate");
   const [neighborsModalOpen, setNeighborsModalOpen] = useState(false);
   const [addContactModalOpen, setAddContactModalOpen] = useState(false);
+  const { trackVendorClick, trackModalOpen } = useAnalyticsTracking();
 
   const handleCall = () => {
     window.location.href = `tel:${vendor.contact_info}`;
@@ -214,12 +216,18 @@ export default function VendorMobileCard({
             )}
           </div>
           <Button
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
               GATracking.trackButtonClick('rate_vendor', { 
                 vendor_id: vendor.id,
                 vendor_name: vendor.name 
               });
+              try {
+                await trackModalOpen('review', vendor.id);
+                await trackVendorClick(vendor.id, vendor.name, vendor.category);
+              } catch (error) {
+                console.warn('Analytics tracking failed:', error);
+              }
               if (isAuthenticated) {
                 onRate(vendor);
               } else {

@@ -26,6 +26,7 @@ import { handleSignupInvite } from "@/lib/handle-signup-invite";
 import { MagicLinkLoader } from "@/components/MagicLinkLoader";
 import { WelcomeBackModal } from "@/components/WelcomeBackModal";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import { useAnalyticsTracking } from "@/contexts/AnalyticsContext";
 
 const Auth = () => {
   const [name, setName] = useState("");
@@ -42,6 +43,7 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [params] = useSearchParams();
+  const { trackSignUpClick, trackEmailSubmit } = useAnalyticsTracking();
 
   const hasMagicLink = window.location.hash.includes("access_token=");
 
@@ -292,6 +294,9 @@ const Auth = () => {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    
+    // Track sign-up click
+    await trackSignUpClick();
 
     if (resident === "no") {
       toast({
@@ -345,6 +350,9 @@ const Auth = () => {
     localStorage.removeItem("selected_community");
 
     const targetEmail = email.trim().toLowerCase();
+    
+    // Track email submission
+    await trackEmailSubmit(targetEmail);
 
     try {
       const { data: emailStatus, error: statusError } = await supabase.rpc("get_email_status", {

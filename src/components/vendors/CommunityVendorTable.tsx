@@ -38,6 +38,7 @@ import { useUserCosts } from "@/hooks/useUserCosts";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { GATracking } from "@/components/analytics/GoogleAnalytics";
+import { useAnalyticsTracking } from "@/contexts/AnalyticsContext";
 
 import ReviewsHover from "@/components/vendors/ReviewsHover";
 import PreviewReviewsHover from "@/components/vendors/PreviewReviewsHover";
@@ -109,6 +110,7 @@ export default function CommunityVendorTable({
   const { isScrollingDown, hasScrolled } = useScrollDirection();
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [isBannerExiting, setIsBannerExiting] = useState(false);
+  const { trackCategoryClick } = useAnalyticsTracking();
 
   // Initialize category from URL parameter
   useEffect(() => {
@@ -268,8 +270,9 @@ export default function CommunityVendorTable({
   const [addVendorCategory, setAddVendorCategory] = useState<string>('');
 
 
-  const handleCategoryChange = (newCategory: string) => {
+  const handleCategoryChange = async (newCategory: string) => {
     GATracking.trackCategoryChange(category, newCategory);
+    await trackCategoryClick(newCategory);
     setCategory(newCategory);
     // Update URL parameter
     const newSearchParams = new URLSearchParams(searchParams);

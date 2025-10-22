@@ -148,6 +148,28 @@ export function useAnalytics() {
         metadata: { initialLoad: true }
       });
 
+      // Track first visit with referrer and UTM params
+      const isFirstVisit = !localStorage.getItem('analytics_first_visit');
+      if (isFirstVisit) {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        await trackEvent({
+          eventType: 'page_view',
+          eventName: 'first_visit',
+          metadata: {
+            landing_page: window.location.pathname,
+            referrer: document.referrer || 'direct',
+            utm_source: urlParams.get('utm_source'),
+            utm_medium: urlParams.get('utm_medium'),
+            utm_campaign: urlParams.get('utm_campaign'),
+            timestamp: new Date().toISOString()
+          }
+        });
+        
+        localStorage.setItem('analytics_first_visit', new Date().toISOString());
+        console.log('📊 Tracked first visit from:', document.referrer || 'direct');
+      }
+
     } catch (error) {
       console.warn('Analytics session initialization failed:', error);
     }

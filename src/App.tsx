@@ -50,6 +50,7 @@ import { AdminProtectedRoute } from "./components/AdminProtectedRoute";
 import { AnalyticsTracker } from "./components/AnalyticsTracker";
 import { useActivityTimeout } from "./hooks/useActivityTimeout";
 import GoogleAnalytics from "./components/analytics/GoogleAnalytics";
+import { AnalyticsProvider } from "@/contexts/AnalyticsContext";
 
 const queryClient = new QueryClient();
 
@@ -259,9 +260,11 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner position="top-center" />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
+        <AnalyticsProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </AnalyticsProvider>
       </TooltipProvider>
     </HelmetProvider>
   </QueryClientProvider>
