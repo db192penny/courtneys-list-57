@@ -45,8 +45,9 @@ const AdminUsers = () => {
   
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "verified" | "pending">("all");
-  const [sourceFilter, setSourceFilter] = useState<"all" | "community" | "regular">("all");
   const [communityFilter, setCommunityFilter] = useState<string>("all");
+  const [sortColumn, setSortColumn] = useState<"points" | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedUserForModal, setSelectedUserForModal] = useState<{
     id: string;
@@ -62,7 +63,7 @@ const AdminUsers = () => {
 
   // Fetch all users including orphaned ones
   const { data: users = [], isLoading, refetch } = useQuery({
-    queryKey: ["admin-all-users", statusFilter, sourceFilter],
+    queryKey: ["admin-all-users", statusFilter],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_list_all_users");
       if (error) throw error;
@@ -83,22 +84,27 @@ const AdminUsers = () => {
     },
   });
 
-  // Filter users based on search term, source, and community
-  const filteredUsers = (users as User[]).filter(user => {
-    const matchesSearch = !searchTerm || 
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.address?.toLowerCase().includes(searchTerm.toLowerCase());
+  // Filter and sort users
+  const filteredUsers = (users as User[])
+    .filter(user => {
+      const matchesSearch = !searchTerm || 
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.address?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesSource = sourceFilter === "all" || 
-      (sourceFilter === "community" && user.signup_source?.startsWith("community:")) ||
-      (sourceFilter === "regular" && !user.signup_source?.startsWith("community:"));
+      const matchesCommunity = communityFilter === "all" || 
+        user.hoa_name?.toLowerCase() === communityFilter.toLowerCase();
 
-    const matchesCommunity = communityFilter === "all" || 
-      user.hoa_name?.toLowerCase() === communityFilter.toLowerCase();
-
-    return matchesSearch && matchesSource && matchesCommunity;
-  });
+      return matchesSearch && matchesCommunity;
+    })
+    .sort((a, b) => {
+      if (sortColumn === "points") {
+        const aPoints = a.points || 0;
+        const bPoints = b.points || 0;
+        return sortDirection === "asc" ? aPoints - bPoints : bPoints - aPoints;
+      }
+      return 0;
+    });
 
   // Get unique communities for filter
   const communities = Array.from(
@@ -143,6 +149,15 @@ const AdminUsers = () => {
 
     fetchUserActivity();
   }, [selectedUser]);
+
+  const handleSort = () => {
+    if (sortColumn === "points") {
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn("points");
+      setSortDirection("desc");
+    }
+  };
 
   const handleUserAction = async (userId: string, action: "verify" | "unverify" | "delete" | "cleanup") => {
     setLoadingAction(prev => ({ ...prev, [userId]: action }));
@@ -298,16 +313,6 @@ const AdminUsers = () => {
                   <SelectItem value="pending">Pending</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={sourceFilter} onValueChange={(v: any) => setSourceFilter(v)}>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder="All sources" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Sources</SelectItem>
-                  <SelectItem value="community">Community Signups</SelectItem>
-                  <SelectItem value="regular">Regular Signups</SelectItem>
-                </SelectContent>
-              </Select>
               <Select value={communityFilter} onValueChange={setCommunityFilter}>
                 <SelectTrigger className="w-full md:w-48">
                   <SelectValue placeholder="All communities" />
@@ -378,7 +383,17 @@ const AdminUsers = () => {
                       <TableHead>Status</TableHead>
                       <TableHead>Signup Source</TableHead>
                       <TableHead>Community</TableHead>
-                      <TableHead>Points</TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-muted/50 transition-colors select-none"
+                        onClick={handleSort}
+                      >
+                        <div className="flex items-center gap-1">
+                          Points
+                          {sortColumn === "points" && (
+                            <span className="text-xs">{sortDirection === "asc" ? "↑" : "↓"}</span>
+                          )}
+                        </div>
+                      </TableHead>
                       <TableHead>Joined</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
