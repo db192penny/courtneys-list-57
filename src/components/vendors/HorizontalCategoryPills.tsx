@@ -87,7 +87,7 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
           >
             <div className="flex items-center gap-2">
               <span>💡</span>
-              <span>Can't find your category? Suggest one</span>
+              <span>{isMobile ? "Suggest a category" : "Can't find your category? Suggest one"}</span>
             </div>
           </SelectItem>
           <SelectScrollDownButton>
