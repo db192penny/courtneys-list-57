@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Monitor, Smartphone, Clock, MousePointerClick, Layers } from "lucide-react";
+import { Monitor, Smartphone, Clock } from "lucide-react";
 
 interface UserActivity {
   id: string;
@@ -18,8 +18,6 @@ interface UserActivity {
   cost_count: number;
   vendor_count: number;
   community: string | null;
-  total_clicks: number;
-  categories_viewed: number;
 }
 
 interface ActivityCardProps {
@@ -90,24 +88,6 @@ export function ActivityCard({ activity }: ActivityCardProps) {
             <div className="flex items-center gap-1 text-muted-foreground">
               <Clock className="h-3 w-3" />
               <span>{formatDuration(activity.duration_seconds)}</span>
-            </div>
-          </div>
-
-          {/* Engagement Stats */}
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t">
-            <div className="flex items-center gap-2 p-2 rounded-md bg-primary/5">
-              <MousePointerClick className="h-4 w-4 text-primary" />
-              <div>
-                <div className="text-xs text-muted-foreground">Clicks</div>
-                <div className="font-bold text-primary">{activity.total_clicks}</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 p-2 rounded-md bg-secondary/10">
-              <Layers className="h-4 w-4 text-secondary-foreground" />
-              <div>
-                <div className="text-xs text-muted-foreground">Categories</div>
-                <div className="font-bold text-secondary-foreground">{activity.categories_viewed}</div>
-              </div>
             </div>
           </div>
 

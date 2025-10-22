@@ -1,7 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Monitor, Smartphone, AlertCircle } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Monitor, Smartphone } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ActivityCard } from './ActivityCard';
 
@@ -21,8 +20,6 @@ interface UserActivity {
   cost_count: number;
   vendor_count: number;
   community: string | null;
-  total_clicks: number;
-  categories_viewed: number;
 }
 
 interface UserActivityTableProps {
@@ -47,44 +44,6 @@ export function UserActivityTable({ activities }: UserActivityTableProps) {
     };
   };
 
-  const renderClickCount = (count: number) => {
-    if (count === 0) {
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center justify-center gap-1 text-muted-foreground cursor-help">
-              <span className="text-sm">0</span>
-              <AlertCircle className="h-3 w-3" />
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>No interaction events tracked yet</p>
-          </TooltipContent>
-        </Tooltip>
-      );
-    }
-    return <div className="font-semibold text-primary">{count}</div>;
-  };
-
-  const renderCategoryCount = (count: number) => {
-    if (count === 0) {
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center justify-center gap-1 text-muted-foreground cursor-help">
-              <span className="text-sm">0</span>
-              <AlertCircle className="h-3 w-3" />
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>No categories viewed yet</p>
-          </TooltipContent>
-        </Tooltip>
-      );
-    }
-    return <div className="font-semibold text-secondary-foreground">{count}</div>;
-  };
-
   if (isMobile) {
     return (
       <div className="space-y-3">
@@ -104,8 +63,6 @@ export function UserActivityTable({ activities }: UserActivityTableProps) {
             <TableHead>User</TableHead>
             <TableHead>Community</TableHead>
             <TableHead>Type</TableHead>
-            <TableHead className="text-center">Clicks</TableHead>
-            <TableHead className="text-center">Categories</TableHead>
             <TableHead>Device</TableHead>
             <TableHead>Duration</TableHead>
             <TableHead>Actions</TableHead>
@@ -144,12 +101,6 @@ export function UserActivityTable({ activities }: UserActivityTableProps) {
                     {activity.is_returning_user ? 'Returning' : 'New'}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-center">
-                  {renderClickCount(activity.total_clicks)}
-                </TableCell>
-                <TableCell className="text-center">
-                  {renderCategoryCount(activity.categories_viewed)}
-                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2 whitespace-nowrap">
                     {activity.device_type === 'Mobile' ? (
@@ -187,17 +138,6 @@ export function UserActivityTable({ activities }: UserActivityTableProps) {
           })}
         </TableBody>
       </Table>
-      {activities.length > 0 && activities.every(a => a.total_clicks === 0) && (
-        <div className="p-4 bg-muted/50 border-t flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
-          <div className="text-sm">
-            <p className="font-medium mb-1">Interaction tracking is now active!</p>
-            <p className="text-muted-foreground">
-              New sessions will show click counts and category views. Existing sessions show zeros because tracking wasn't enabled when they visited.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

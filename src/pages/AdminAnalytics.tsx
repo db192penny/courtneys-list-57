@@ -23,8 +23,6 @@ interface UserActivity {
   cost_count: number;
   vendor_count: number;
   community: string | null;
-  total_clicks: number;
-  categories_viewed: number;
 }
 
 // Helper function to deduplicate sessions by user and time window
@@ -111,10 +109,6 @@ export function AdminAnalytics() {
       switch (sortBy) {
         case 'date':
           return new Date(b.session_start).getTime() - new Date(a.session_start).getTime();
-        case 'clicks':
-          return b.total_clicks - a.total_clicks;
-        case 'categories':
-          return b.categories_viewed - a.categories_viewed;
         case 'community':
           return (a.community || '').localeCompare(b.community || '');
         default:
@@ -169,7 +163,6 @@ export function AdminAnalytics() {
           let userData = null;
           let activityCounts = { review_count: 0, cost_count: 0, vendor_count: 0 };
           let sessionActivityCounts = { session_review_count: 0, session_cost_count: 0, session_vendor_count: 0 };
-          let analyticsData = { total_clicks: 0, categories_viewed: 0 };
 
           if (session.user_id) {
             try {
@@ -191,17 +184,6 @@ export function AdminAnalytics() {
               // Get session time boundaries
               const sessionStart = new Date(session.session_start);
               const sessionEnd = session.session_end ? new Date(session.session_end) : new Date();
-
-              // Get analytics data (clicks and categories) for this session
-              const { data: analyticsEvents } = await supabase
-                .from('user_analytics')
-                .select('id, category')
-                .eq('session_id', session.id);
-
-              analyticsData = {
-                total_clicks: analyticsEvents?.length || 0,
-                categories_viewed: new Set(analyticsEvents?.map(e => e.category).filter(Boolean)).size
-              };
 
               // Get activity counts for this user (lifetime totals and session-specific)
               const [
@@ -277,9 +259,7 @@ export function AdminAnalytics() {
             review_count: activityCounts.review_count,
             cost_count: activityCounts.cost_count,
             vendor_count: activityCounts.vendor_count,
-            community: session.community,
-            total_clicks: analyticsData.total_clicks,
-            categories_viewed: analyticsData.categories_viewed
+            community: session.community
           };
         })
       );
@@ -383,8 +363,6 @@ export function AdminAnalytics() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="date">Date (Newest)</SelectItem>
-                <SelectItem value="clicks">Most Clicks</SelectItem>
-                <SelectItem value="categories">Most Categories</SelectItem>
                 <SelectItem value="community">Community</SelectItem>
               </SelectContent>
             </Select>
@@ -397,7 +375,7 @@ export function AdminAnalytics() {
             Unique User Sessions ({filteredActivities.length} of {userActivities.length})
           </h3>
           <p className="text-sm text-muted-foreground">
-            Deduplicated non-admin user sessions with clicks, categories, and activity totals
+            Session duration and contribution tracking (reviews, costs, vendors)
           </p>
         </div>
         <UserActivityTable activities={filteredActivities} />
