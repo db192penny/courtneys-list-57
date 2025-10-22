@@ -36,27 +36,32 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
   ];
 
   const getDisplayValue = () => {
-    if (selectedCategory === "all") {
-      return `${getCategoryEmoji("all")} All Categories`;
-    }
-    return `${getCategoryEmoji(selectedCategory)} ${selectedCategory}`;
+    const emoji = selectedCategory === "all" ? getCategoryEmoji("all") : getCategoryEmoji(selectedCategory);
+    const text = selectedCategory === "all" ? "All Categories" : selectedCategory;
+    
+    return (
+      <>
+        <span className={isMobile ? "text-xl" : "text-base"}>{emoji}</span>
+        <span className={isMobile ? "text-base font-medium" : "text-base"}>{text}</span>
+      </>
+    );
   };
 
   return (
     <div>
-      <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-2 block">
+      <label className={`${isMobile ? "text-sm font-semibold" : "text-xs font-medium"} text-foreground uppercase tracking-wide mb-2 block`}>
         Choose Category
       </label>
       
       <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-        <SelectTrigger className={`${isMobile ? "w-full h-11 text-left text-sm" : "w-full h-12 text-left"} ${isBannerVisible ? "ring-2 ring-ring ring-offset-2" : ""}`}>
+        <SelectTrigger className={`${isMobile ? "w-full h-14 text-left text-base font-medium border-2 border-primary/40 shadow-md bg-primary/5 hover:bg-primary/10 focus:border-primary focus:ring-2 focus:ring-primary/20" : "w-full h-12 text-left"} ${isBannerVisible ? "ring-2 ring-ring ring-offset-2" : ""}`}>
           <SelectValue>
-            <span className="flex items-center gap-2">
+            <span className={`flex items-center ${isMobile ? "gap-3" : "gap-2"}`}>
               {getDisplayValue()}
             </span>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className={isMobile ? "max-h-[60vh]" : "max-h-[70vh]"}>
+        <SelectContent className={isMobile ? "max-h-[60vh] py-2" : "max-h-[70vh]"}>
           <SelectScrollUpButton>
             <ChevronUp className="h-4 w-4" />
           </SelectScrollUpButton>
@@ -68,11 +73,11 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
               <SelectItem 
                 key={category} 
                 value={category} 
-                className={isMobile ? "h-10 cursor-pointer" : "h-11 cursor-pointer"}
+                className={isMobile ? "h-14 cursor-pointer py-3" : "h-11 cursor-pointer"}
               >
-                <span className="flex items-center gap-2">
-                  <span className={isMobile ? "text-base" : "text-lg"}>{emoji}</span>
-                  <span className={isMobile ? "text-sm" : "text-base"}>{displayName}</span>
+                <span className={`flex items-center ${isMobile ? "gap-3" : "gap-2"}`}>
+                  <span className={isMobile ? "text-xl" : "text-lg"}>{emoji}</span>
+                  <span className={isMobile ? "text-base font-medium" : "text-base"}>{displayName}</span>
                 </span>
               </SelectItem>
             );
@@ -82,11 +87,11 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
             value="__suggest__" 
             className={`
               text-primary font-medium
-              ${isMobile ? 'min-h-[48px] text-base' : 'min-h-[36px]'}
+              ${isMobile ? 'h-14 py-3 text-base' : 'min-h-[36px]'}
             `}
           >
-            <div className="flex items-center gap-2">
-              <span>💡</span>
+            <div className={`flex items-center ${isMobile ? "gap-3" : "gap-2"}`}>
+              <span className={isMobile ? "text-xl" : "text-base"}>💡</span>
               <span>{isMobile ? "Suggest a category" : "Can't find your category? Suggest one"}</span>
             </div>
           </SelectItem>
