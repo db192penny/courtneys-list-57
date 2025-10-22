@@ -36,15 +36,10 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
   ];
 
   const getDisplayValue = () => {
-    const emoji = selectedCategory === "all" ? getCategoryEmoji("all") : getCategoryEmoji(selectedCategory);
-    const text = selectedCategory === "all" ? "All Categories" : selectedCategory;
-    
-    return (
-      <>
-        <span className={isMobile ? "text-xl" : "text-base"}>{emoji}</span>
-        <span className={isMobile ? "text-base font-medium" : "text-base"}>{text}</span>
-      </>
-    );
+    if (selectedCategory === "all") {
+      return `${getCategoryEmoji("all")} All Categories`;
+    }
+    return `${getCategoryEmoji(selectedCategory)} ${selectedCategory}`;
   };
 
   return (
