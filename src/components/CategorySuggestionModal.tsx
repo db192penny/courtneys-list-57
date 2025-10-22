@@ -82,7 +82,7 @@ export default function CategorySuggestionModal({ open, onOpenChange }: Category
 
       toast({
         title: "Suggestion submitted!",
-        description: `Thanks! We'll review your suggestion for ${displayCommunityName}.`,
+        description: "Thanks! We'll review your suggestion.",
       });
 
       // Reset form and close modal
