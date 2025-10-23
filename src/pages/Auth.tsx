@@ -27,6 +27,7 @@ import { handleSignupInvite } from "@/lib/handle-signup-invite";
 import { MagicLinkLoader } from "@/components/MagicLinkLoader";
 import { WelcomeBackModal } from "@/components/WelcomeBackModal";
 import { TermsModal } from "@/components/TermsModal";
+import { PrivacyModal } from "@/components/PrivacyModal";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { useAnalyticsTracking } from "@/contexts/AnalyticsContext";
 
@@ -45,6 +46,7 @@ const Auth = () => {
   const [justSignedUp, setJustSignedUp] = useState(false);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("plain-english");
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -759,7 +761,7 @@ const Auth = () => {
                     type="button"
                     onClick={(e) => {
                       e.preventDefault();
-                      window.open("/privacy", "_blank");
+                      setPrivacyModalOpen(true);
                     }}
                     className="underline text-primary hover:text-primary/80"
                   >
@@ -887,6 +889,10 @@ const Auth = () => {
         open={termsModalOpen}
         onOpenChange={setTermsModalOpen}
         variant={termsModalVariant}
+      />
+      <PrivacyModal
+        open={privacyModalOpen}
+        onOpenChange={setPrivacyModalOpen}
       />
     </main>
   );

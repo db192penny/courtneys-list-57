@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import SEO from "@/components/SEO";
 import { WelcomeBackModal } from "@/components/WelcomeBackModal";
 import { TermsModal } from "@/components/TermsModal";
+import { PrivacyModal } from "@/components/PrivacyModal";
 import { toast } from "@/hooks/use-toast";
 import { toSlug } from "@/utils/slug";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -25,6 +26,7 @@ const SignIn = () => {
   const [modalShown, setModalShown] = useState(false);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("plain-english");
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
   const community = searchParams.get("community");
 
@@ -295,7 +297,7 @@ const SignIn = () => {
                 {' '}and{' '}
                 <button
                   type="button"
-                  onClick={() => window.open("/privacy", "_blank")}
+                  onClick={() => setPrivacyModalOpen(true)}
                   className="underline hover:text-primary"
                 >
                   Privacy Policy
@@ -340,6 +342,10 @@ const SignIn = () => {
         open={termsModalOpen}
         onOpenChange={setTermsModalOpen}
         variant={termsModalVariant}
+      />
+      <PrivacyModal
+        open={privacyModalOpen}
+        onOpenChange={setPrivacyModalOpen}
       />
     </main>
   );

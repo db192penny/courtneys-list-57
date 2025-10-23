@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { PrivacyModal } from "@/components/PrivacyModal";
+import { TermsModal } from "@/components/TermsModal";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -24,6 +26,9 @@ export function UnifiedAuthModal({
 }: UnifiedAuthModalProps) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("plain-english");
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
   const handleGoogleAuth = async () => {
     setLoading(true);
@@ -129,7 +134,10 @@ export function UnifiedAuthModal({
             By continuing, you agree to our{' '}
             <button 
               type="button"
-              onClick={() => window.open("/terms", "_blank")}
+              onClick={() => {
+                setTermsModalVariant("plain-english");
+                setTermsModalOpen(true);
+              }}
               className="underline hover:text-primary"
             >
               Terms
@@ -137,13 +145,23 @@ export function UnifiedAuthModal({
             {' '}and{' '}
             <button 
               type="button"
-              onClick={() => window.open("/privacy", "_blank")}
+              onClick={() => setPrivacyModalOpen(true)}
               className="underline hover:text-primary"
             >
               Privacy Policy
             </button>
           </p>
         </div>
+
+        <TermsModal
+          open={termsModalOpen}
+          onOpenChange={setTermsModalOpen}
+          variant={termsModalVariant}
+        />
+        <PrivacyModal
+          open={privacyModalOpen}
+          onOpenChange={setPrivacyModalOpen}
+        />
       </DialogContent>
     </Dialog>
   );
