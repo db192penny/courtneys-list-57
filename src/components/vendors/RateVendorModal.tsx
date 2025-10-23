@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -7,6 +8,7 @@ import { TrackingButton } from "@/components/analytics/TrackingButton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StarRating } from "@/components/ui/star-rating";
 import { useToast } from "@/hooks/use-toast";
+import SubmitCostModal from "@/components/vendors/SubmitCostModal";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useUserData } from "@/hooks/useUserData";
@@ -35,8 +37,12 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
   const [showNameInReview, setShowNameInReview] = useState<boolean>(true);
   const [useForHome, setUseForHome] = useState<boolean>(true);
   const [currentUserPoints, setCurrentUserPoints] = useState<number>(0);
-  
   const [loading, setLoading] = useState(false);
+  
+  // Cost prompt states
+  const [showCostConfirm, setShowCostConfirm] = useState(false);
+  const [showCostModal, setShowCostModal] = useState(false);
+  const [submittedVendorId, setSubmittedVendorId] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -48,6 +54,9 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
         setComments("");
         setShowNameInReview(true);
         setUseForHome(true);
+        setShowCostConfirm(false);
+        setShowCostModal(false);
+        setSubmittedVendorId(null);
         return;
       }
 
@@ -306,8 +315,10 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
         className: "bg-green-50 border-green-500 border-2 text-green-900"
       });
       
+      // Instead of closing immediately, show cost prompt
+      setSubmittedVendorId(vendor.id);
       onOpenChange(false);
-      onSuccess?.();
+      setShowCostConfirm(true);
     } catch (e: any) {
       console.error("[RateVendorModal] Submit error:", e);
       toast({ title: "Error", description: e?.message || "Please try again.", variant: "destructive" });
@@ -316,7 +327,25 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
     }
   };
 
+  const handleSkipCosts = () => {
+    setShowCostConfirm(false);
+    setSubmittedVendorId(null);
+    onSuccess?.();
+  };
+
+  const handleAddCosts = () => {
+    setShowCostConfirm(false);
+    setShowCostModal(true);
+  };
+
+  const handleCostSuccess = () => {
+    setShowCostModal(false);
+    setSubmittedVendorId(null);
+    onSuccess?.();
+  };
+
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent style={{ touchAction: 'manipulation' }}>
         <DialogHeader>
@@ -402,5 +431,38 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
         )}
       </DialogContent>
     </Dialog>
+
+    {/* Cost Confirmation Dialog */}
+    <AlertDialog open={showCostConfirm} onOpenChange={setShowCostConfirm}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>💰 Add Cost Information?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Would you like to add cost information to help your neighbors budget for {vendor?.name}?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={handleSkipCosts}>
+            No Thanks
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={handleAddCosts}>
+            Yes, Add Costs
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+    {/* Cost Modal */}
+    {submittedVendorId && vendor && (
+      <SubmitCostModal
+        open={showCostModal}
+        onOpenChange={setShowCostModal}
+        vendorId={submittedVendorId}
+        vendorName={vendor.name}
+        category={vendor.category}
+        onSuccess={handleCostSuccess}
+      />
+    )}
+    </>
   );
 }

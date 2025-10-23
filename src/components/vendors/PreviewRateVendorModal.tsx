@@ -141,6 +141,7 @@ export default function PreviewRateVendorModal({ open, onOpenChange, vendor, onS
         description: "Thank you for sharing your experience!",
       });
 
+      onOpenChange(false);
       onSuccess?.();
     } catch (error) {
       console.error("Failed to save review:", error);
