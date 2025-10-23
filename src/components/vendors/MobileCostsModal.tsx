@@ -7,6 +7,8 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 
 type Props = {
   vendorId: string;
+  userHasCosts?: boolean;
+  onEditCosts?: () => void;
 };
 
 type CostData = {
@@ -37,7 +39,7 @@ const formatCost = (amount: number | null, unit?: string | null, period?: string
   return `$${formattedAmount}${unitDisplay}`;
 };
 
-export function MobileCostsModal({ vendorId }: Props) {
+export function MobileCostsModal({ vendorId, userHasCosts, onEditCosts }: Props) {
   const { data: profile } = useUserProfile();
   const navigate = useNavigate();
   const isVerified = !!profile?.isVerified;
@@ -87,6 +89,21 @@ export function MobileCostsModal({ vendorId }: Props) {
 
   return (
     <div className="max-h-96 overflow-y-auto space-y-3 p-4">
+      {userHasCosts && onEditCosts && (
+        <div className="mb-4 pb-3 border-b border-gray-200">
+          <Button
+            onClick={onEditCosts}
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            size="sm"
+          >
+            ✏️ Edit My Costs
+          </Button>
+          <p className="text-xs text-gray-500 mt-2 text-center">
+            You've already shared cost info for this vendor
+          </p>
+        </div>
+      )}
+      
       <h4 className="font-medium text-gray-700">What neighbors are paying:</h4>
       <div className="space-y-3">
         {uniqueCosts.map((cost) => (

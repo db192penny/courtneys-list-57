@@ -343,37 +343,20 @@ export default function VendorMobileCard({
                 : ''
             }`}
             onClick={() => {
-              GATracking.trackModalOpen(
-                userHasCosts ? 'edit_costs_modal' : 'cost_details_modal',
-                { vendor_id: vendor.id, vendor_name: vendor.name }
-              );
+              GATracking.trackModalOpen('cost_details_modal', { 
+                vendor_id: vendor.id,
+                vendor_name: vendor.name 
+              });
               
               if (isAuthenticated) {
-                if (userHasCosts) {
-                  // User has costs - let them edit via cost management modal
-                  setSelectedVendorForCostEdit({
-                    id: vendor.id,
-                    name: vendor.name,
-                    category: vendor.category
-                  });
-                  setCostManagementModalOpen(true);
-                } else {
-                  // User doesn't have costs - show neighbor costs
-                  setCostModalOpen(true);
-                }
+                setCostModalOpen(true);
               } else {
                 setAccessGateType("costs");
                 setAccessGateOpen(true);
               }
             }}
           >
-            💰 {(() => {
-              // If user has submitted costs, show "My Costs"
-              if (userHasCosts) {
-                return 'My Costs';
-              }
-              
-              // Otherwise show price range or generic "Costs"
+            {userHasCosts && '✓ '}💰 {(() => {
               const costsWithAmounts = vendorCosts?.filter(c => 
                 c.amount !== null && 
                 c.amount !== undefined && 
@@ -512,7 +495,24 @@ export default function VendorMobileCard({
           <DialogHeader>
             <DialogTitle>Cost Details</DialogTitle>
           </DialogHeader>
-          <MobileCostsModal vendorId={vendor.id} />
+          <MobileCostsModal 
+            vendorId={vendor.id}
+            userHasCosts={userHasCosts}
+            onEditCosts={() => {
+              setCostModalOpen(false);
+              setSelectedVendorForCostEdit({
+                id: vendor.id,
+                name: vendor.name,
+                category: vendor.category
+              });
+              setCostManagementModalOpen(true);
+              GATracking.trackModalOpen('edit_costs_modal', { 
+                vendor_id: vendor.id,
+                vendor_name: vendor.name,
+                source: 'costs_modal'
+              });
+            }}
+          />
         </DialogContent>
       </Dialog>
     )}
