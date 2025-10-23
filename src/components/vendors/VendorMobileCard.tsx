@@ -30,6 +30,7 @@ import React, { useState } from "react";
 import { GATracking } from "@/components/analytics/GoogleAnalytics";
 import { AccessGateModal } from "@/components/vendors/AccessGateModal";
 import { useAnalyticsTracking } from "@/contexts/AnalyticsContext";
+import CostManagementModalWrapper from "@/components/vendors/CostManagementModalWrapper";
 
 const isContactInfoPending = (contactInfo: string | null | undefined): boolean => {
   return !contactInfo || 
@@ -134,7 +135,15 @@ export default function VendorMobileCard({
   const [accessGateType, setAccessGateType] = useState<"rate" | "reviews" | "costs">("rate");
   const [neighborsModalOpen, setNeighborsModalOpen] = useState(false);
   const [addContactModalOpen, setAddContactModalOpen] = useState(false);
+  const [costManagementModalOpen, setCostManagementModalOpen] = useState(false);
+  const [selectedVendorForCostEdit, setSelectedVendorForCostEdit] = useState<{
+    id: string;
+    name: string;
+    category: string;
+  } | null>(null);
   const { trackVendorClick, trackModalOpen, trackContactAction } = useAnalyticsTracking();
+
+  const userHasCosts = userCosts?.has(vendor.id) || false;
 
   const handleCall = () => {
     trackContactAction('call_clicked', vendor.id, vendor.name, vendor.contact_info || undefined);
@@ -328,14 +337,30 @@ export default function VendorMobileCard({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 text-xs"
+            className={`flex-1 text-xs ${
+              userHasCosts 
+                ? 'border-green-500 text-green-700 hover:bg-green-50' 
+                : ''
+            }`}
             onClick={() => {
-              GATracking.trackModalOpen('cost_details_modal', { 
-                vendor_id: vendor.id,
-                vendor_name: vendor.name 
-              });
+              GATracking.trackModalOpen(
+                userHasCosts ? 'edit_costs_modal' : 'cost_details_modal',
+                { vendor_id: vendor.id, vendor_name: vendor.name }
+              );
+              
               if (isAuthenticated) {
-                setCostModalOpen(true);
+                if (userHasCosts) {
+                  // User has costs - let them edit via cost management modal
+                  setSelectedVendorForCostEdit({
+                    id: vendor.id,
+                    name: vendor.name,
+                    category: vendor.category
+                  });
+                  setCostManagementModalOpen(true);
+                } else {
+                  // User doesn't have costs - show neighbor costs
+                  setCostModalOpen(true);
+                }
               } else {
                 setAccessGateType("costs");
                 setAccessGateOpen(true);
@@ -343,6 +368,12 @@ export default function VendorMobileCard({
             }}
           >
             💰 {(() => {
+              // If user has submitted costs, show "My Costs"
+              if (userHasCosts) {
+                return 'My Costs';
+              }
+              
+              // Otherwise show price range or generic "Costs"
               const costsWithAmounts = vendorCosts?.filter(c => 
                 c.amount !== null && 
                 c.amount !== undefined && 
@@ -531,6 +562,20 @@ export default function VendorMobileCard({
         window.location.reload();
       }}
     />
+
+    {/* Cost Management Modal - For editing user's own costs */}
+    {isAuthenticated && (
+      <CostManagementModalWrapper
+        open={costManagementModalOpen}
+        onOpenChange={setCostManagementModalOpen}
+        vendor={selectedVendorForCostEdit}
+        onSuccess={() => {
+          setCostManagementModalOpen(false);
+          setSelectedVendorForCostEdit(null);
+        }}
+        isPreviewMode={false}
+      />
+    )}
   </>
   );
 }
