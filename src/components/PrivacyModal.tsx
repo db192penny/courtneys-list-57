@@ -38,7 +38,8 @@ export function PrivacyModal({ open, onOpenChange }: PrivacyModalProps) {
                 <div className="p-4 bg-muted/50 rounded-lg mb-3">
                   <p className="text-sm mb-2"><strong>Public Display:</strong></p>
                   <ul className="space-y-1 text-sm">
-                    <li>✅ Your first name and street name (e.g., "Sarah on Palm Court")</li>
+                    <li>✅ Your first name, last initial, and street name (e.g., "Sarah L. on Palm Court")</li>
+                    <li>✅ Or "Neighbor on Palm Court" if you choose anonymous display</li>
                     <li>✅ Your reviews and ratings</li>
                   </ul>
                   <p className="text-sm mb-2 mt-3"><strong>Never Shown Publicly:</strong></p>
