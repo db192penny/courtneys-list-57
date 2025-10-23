@@ -8,6 +8,7 @@ interface AnalyticsContextType {
   trackFilterChange: (filterType: string, filterValue: string) => Promise<void>;
   trackSignUpClick: () => Promise<void>;
   trackEmailSubmit: (email: string) => Promise<void>;
+  trackContactAction: (action: 'contact_opened' | 'call_clicked' | 'text_clicked' | 'copy_clicked' | 'add_contact_clicked', vendorId: string, vendorName: string, phoneNumber?: string) => Promise<void>;
 }
 
 const AnalyticsContext = createContext<AnalyticsContextType | undefined>(undefined);
@@ -143,6 +144,36 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
     console.log('📊 Tracked email submission');
   };
 
+  const trackContactAction = async (
+    action: 'contact_opened' | 'call_clicked' | 'text_clicked' | 'copy_clicked' | 'add_contact_clicked',
+    vendorId: string,
+    vendorName: string,
+    phoneNumber?: string
+  ) => {
+    await trackEvent({
+      eventType: 'button_click',
+      eventName: action,
+      vendorId: vendorId,
+      metadata: { 
+        vendor_name: vendorName,
+        phone_number: phoneNumber ? 'provided' : 'missing',
+        timestamp: new Date().toISOString() 
+      }
+    });
+    
+    // Also track in Google Analytics
+    if (window.gtag) {
+      window.gtag('event', 'contact_interaction', {
+        action: action,
+        vendor_id: vendorId,
+        vendor_name: vendorName,
+        page_path: window.location.pathname
+      });
+    }
+    
+    console.log('📊 Tracked contact action:', action, vendorName);
+  };
+
   return (
     <AnalyticsContext.Provider
       value={{
@@ -152,6 +183,7 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
         trackFilterChange,
         trackSignUpClick,
         trackEmailSubmit,
+        trackContactAction,
       }}
     >
       {children}

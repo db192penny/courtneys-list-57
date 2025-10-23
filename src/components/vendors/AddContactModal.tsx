@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface AddContactModalProps {
   open: boolean;
@@ -24,6 +25,7 @@ export function AddContactModal({
   const [phone, setPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { trackEvent } = useAnalytics();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +48,17 @@ export function AddContactModal({
         .eq("id", vendorId);
 
       if (error) throw error;
+
+      // Track successful contact info submission
+      await trackEvent({
+        eventType: 'form_submit',
+        eventName: 'contact_info_added',
+        vendorId: vendorId,
+        metadata: {
+          vendor_name: vendorName,
+          timestamp: new Date().toISOString()
+        }
+      });
 
       toast({
         title: "Success!",

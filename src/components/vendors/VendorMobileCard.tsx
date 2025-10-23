@@ -134,19 +134,22 @@ export default function VendorMobileCard({
   const [accessGateType, setAccessGateType] = useState<"rate" | "reviews" | "costs">("rate");
   const [neighborsModalOpen, setNeighborsModalOpen] = useState(false);
   const [addContactModalOpen, setAddContactModalOpen] = useState(false);
-  const { trackVendorClick, trackModalOpen } = useAnalyticsTracking();
+  const { trackVendorClick, trackModalOpen, trackContactAction } = useAnalyticsTracking();
 
   const handleCall = () => {
+    trackContactAction('call_clicked', vendor.id, vendor.name, vendor.contact_info || undefined);
     window.location.href = `tel:${vendor.contact_info}`;
     setContactPopoverOpen(false);
   };
 
   const handleText = () => {
+    trackContactAction('text_clicked', vendor.id, vendor.name, vendor.contact_info || undefined);
     window.location.href = `sms:${vendor.contact_info}`;
     setContactPopoverOpen(false);
   };
 
   const handleCopyNumber = async () => {
+    trackContactAction('copy_clicked', vendor.id, vendor.name, vendor.contact_info || undefined);
     try {
       await navigator.clipboard.writeText(vendor.contact_info || '');
       toast({
@@ -358,7 +361,15 @@ export default function VendorMobileCard({
 
           {/* Contact Button */}
           {showContact && (
-            <Popover open={contactPopoverOpen} onOpenChange={setContactPopoverOpen}>
+            <Popover 
+              open={contactPopoverOpen} 
+              onOpenChange={(open) => {
+                setContactPopoverOpen(open);
+                if (open) {
+                  trackContactAction('contact_opened', vendor.id, vendor.name, vendor.contact_info || undefined);
+                }
+              }}
+            >
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -383,6 +394,7 @@ export default function VendorMobileCard({
                         variant="default"
                         size="sm"
                         onClick={() => {
+                          trackContactAction('add_contact_clicked', vendor.id, vendor.name);
                           setContactPopoverOpen(false);
                           setAddContactModalOpen(true);
                         }}
