@@ -15,12 +15,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Info } from "lucide-react";
 import { TermsModal } from "@/components/TermsModal";
 import { PrivacyModal } from "@/components/PrivacyModal";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const CompleteProfile = () => {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [resident, setResident] = useState<"yes" | "no">("yes");
-  const [errors, setErrors] = useState<{ name?: boolean; address?: boolean; resident?: boolean }>({});
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [errors, setErrors] = useState<{ name?: boolean; address?: boolean; resident?: boolean; terms?: boolean }>({});
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -131,11 +133,22 @@ const CompleteProfile = () => {
       name: !name.trim(),
       address: !address.trim() || !/^\d+/.test(address.trim()),
       resident: !resident,
+      terms: !termsAccepted,
     };
 
     const missingKeys = (Object.keys(fieldErrors) as Array<keyof typeof fieldErrors>).filter((k) => fieldErrors[k]);
     if (missingKeys.length > 0) {
       setErrors(fieldErrors);
+
+      // Show specific error for missing terms acceptance
+      if (!termsAccepted) {
+        toast({
+          title: "Agreement required",
+          description: "Please accept the Terms of Service and Privacy Policy to continue",
+          variant: "destructive",
+        });
+        return;
+      }
 
       // Show specific error for missing street number
       if (!address.trim()) {
@@ -374,31 +387,43 @@ const CompleteProfile = () => {
                 </Select>
               </div>
 
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  id="terms"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                  className={errors.terms ? "border-destructive" : undefined}
+                />
+                <Label htmlFor="terms" className="text-sm font-normal leading-relaxed cursor-pointer">
+                  I agree to the{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTermsModalVariant("plain-english");
+                      setTermsModalOpen(true);
+                    }}
+                    className="underline text-primary hover:text-primary/80"
+                  >
+                    Terms of Service
+                  </button>
+                  {" "}and{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPrivacyModalOpen(true);
+                    }}
+                    className="underline text-primary hover:text-primary/80"
+                  >
+                    Privacy Policy
+                  </button>
+                </Label>
+              </div>
+
               <Button type="submit" size="lg" className="w-full" disabled={loading}>
                 {loading ? "Completing..." : "Complete Profile"}
               </Button>
-
-              <p className="text-xs text-muted-foreground text-center">
-                By completing your profile, you agree to our{' '}
-                <button 
-                  type="button"
-                  onClick={() => {
-                    setTermsModalVariant("plain-english");
-                    setTermsModalOpen(true);
-                  }}
-                  className="underline hover:text-primary"
-                >
-                  Terms of Service
-                </button>
-                {' '}and{' '}
-                <button 
-                  type="button"
-                  onClick={() => setPrivacyModalOpen(true)}
-                  className="underline hover:text-primary"
-                >
-                  Privacy Policy
-                </button>
-              </p>
 
               <p className="text-xs text-muted-foreground text-center">* Required fields</p>
             </form>
