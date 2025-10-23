@@ -13,6 +13,8 @@ import AddressInput, { AddressSelectedPayload } from "@/components/AddressInput"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
+import { TermsModal } from "@/components/TermsModal";
+import { PrivacyModal } from "@/components/PrivacyModal";
 
 const CompleteProfile = () => {
   const [name, setName] = useState("");
@@ -23,6 +25,9 @@ const CompleteProfile = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("plain-english");
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
   const getCommunityDisplayName = (slug: string): string => {
     const normalized = slug.toLowerCase();
@@ -373,11 +378,43 @@ const CompleteProfile = () => {
                 {loading ? "Completing..." : "Complete Profile"}
               </Button>
 
+              <p className="text-xs text-muted-foreground text-center">
+                By completing your profile, you agree to our{' '}
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setTermsModalVariant("plain-english");
+                    setTermsModalOpen(true);
+                  }}
+                  className="underline hover:text-primary"
+                >
+                  Terms of Service
+                </button>
+                {' '}and{' '}
+                <button 
+                  type="button"
+                  onClick={() => setPrivacyModalOpen(true)}
+                  className="underline hover:text-primary"
+                >
+                  Privacy Policy
+                </button>
+              </p>
+
               <p className="text-xs text-muted-foreground text-center">* Required fields</p>
             </form>
           </CardContent>
         </Card>
       </section>
+
+      <TermsModal
+        open={termsModalOpen}
+        onOpenChange={setTermsModalOpen}
+        variant={termsModalVariant}
+      />
+      <PrivacyModal
+        open={privacyModalOpen}
+        onOpenChange={setPrivacyModalOpen}
+      />
     </main>
   );
 };
