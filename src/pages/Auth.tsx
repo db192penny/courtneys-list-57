@@ -26,6 +26,7 @@ import { Info, Crown, PartyPopper, ArrowLeft, Mail, AlertTriangle, Loader2, Spar
 import { handleSignupInvite } from "@/lib/handle-signup-invite";
 import { MagicLinkLoader } from "@/components/MagicLinkLoader";
 import { WelcomeBackModal } from "@/components/WelcomeBackModal";
+import { TermsModal } from "@/components/TermsModal";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { useAnalyticsTracking } from "@/contexts/AnalyticsContext";
 
@@ -42,6 +43,8 @@ const Auth = () => {
   const [showWelcomeBackModal, setShowWelcomeBackModal] = useState(false);
   const [detectedCommunity, setDetectedCommunity] = useState<string>("");
   const [justSignedUp, setJustSignedUp] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("full");
   const { toast } = useToast();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -740,23 +743,28 @@ const Auth = () => {
                 />
                 <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
                   I agree to the{" "}
-                  <Link
-                    to="/terms"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setTermsModalVariant("full");
+                      setTermsModalOpen(true);
+                    }}
                     className="underline text-primary hover:text-primary/80"
                   >
                     Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    to="/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  </button>
+                  {" "}and{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open("/privacy", "_blank");
+                    }}
                     className="underline text-primary hover:text-primary/80"
                   >
                     Privacy Policy
-                  </Link>
+                  </button>
                 </Label>
               </div>
 
@@ -873,6 +881,12 @@ const Auth = () => {
         onOpenChange={setShowWelcomeBackModal}
         email={email}
         communityName={communityName}
+      />
+
+      <TermsModal
+        open={termsModalOpen}
+        onOpenChange={setTermsModalOpen}
+        variant={termsModalVariant}
       />
     </main>
   );

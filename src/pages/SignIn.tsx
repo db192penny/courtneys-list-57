@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import SEO from "@/components/SEO";
 import { WelcomeBackModal } from "@/components/WelcomeBackModal";
+import { TermsModal } from "@/components/TermsModal";
 import { toast } from "@/hooks/use-toast";
 import { toSlug } from "@/utils/slug";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -22,6 +23,8 @@ const SignIn = () => {
   const [message, setMessage] = useState("");
   const [showWelcomeBackModal, setShowWelcomeBackModal] = useState(false);
   const [modalShown, setModalShown] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("full");
 
   const community = searchParams.get("community");
 
@@ -279,13 +282,24 @@ const SignIn = () => {
 
               <p className="text-xs text-muted-foreground text-center mt-4">
                 By signing in, you agree to our{' '}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTermsModalVariant("full");
+                    setTermsModalOpen(true);
+                  }}
+                  className="underline hover:text-primary"
+                >
                   Terms of Service
-                </a>
+                </button>
                 {' '}and{' '}
-                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                <button
+                  type="button"
+                  onClick={() => window.open("/privacy", "_blank")}
+                  className="underline hover:text-primary"
+                >
                   Privacy Policy
-                </a>
+                </button>
               </p>
 
               <div className="text-sm text-muted-foreground">
@@ -320,6 +334,12 @@ const SignIn = () => {
         }}
         email={email}
         communityName={communityName || undefined}
+      />
+
+      <TermsModal
+        open={termsModalOpen}
+        onOpenChange={setTermsModalOpen}
+        variant={termsModalVariant}
       />
     </main>
   );

@@ -124,6 +124,25 @@ export function UnifiedAuthModal({
               Already a member? Log in here
             </button>
           </div>
+
+          <p className="text-xs text-muted-foreground text-center pt-3">
+            By continuing, you agree to our{' '}
+            <button 
+              type="button"
+              onClick={() => window.open("/terms", "_blank")}
+              className="underline hover:text-primary"
+            >
+              Terms
+            </button>
+            {' '}and{' '}
+            <button 
+              type="button"
+              onClick={() => window.open("/privacy", "_blank")}
+              className="underline hover:text-primary"
+            >
+              Privacy Policy
+            </button>
+          </p>
         </div>
       </DialogContent>
     </Dialog>
