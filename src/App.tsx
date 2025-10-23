@@ -25,6 +25,7 @@ import NeighborhoodCred from "./pages/NeighborhoodCred";
 import Settings from "./pages/Settings";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import TermsPlainEnglish from "./pages/TermsPlainEnglish";
 import Contact from "./pages/Contact";
 import CommunityRequest from "./pages/CommunityRequest";
 import Household from "./pages/Household";
@@ -239,6 +240,7 @@ function AppContent() {
         <Route path="/admin/message-board" element={<AdminProtectedRoute><MessageBoardHelper /></AdminProtectedRoute>} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/terms/plain-english" element={<TermsPlainEnglish />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/community-request" element={<CommunityRequest />} />
         <Route path="/communities/:slug" element={<Community />} />
