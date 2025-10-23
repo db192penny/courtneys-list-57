@@ -66,6 +66,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "service_call", amount: null, unit: "visit", notes: null },
     ];
   }
+
+  // Masseuse: Hourly Rate + Session
+  if (c === "masseuse") {
+    return [
+      { cost_kind: "hourly", amount: null, unit: "hour", notes: null },
+      { cost_kind: "service_call", amount: null, unit: "session", notes: null },
+    ];
+  }
   
   // Handyman: Hourly Rate
   if (c === "handyman") {
