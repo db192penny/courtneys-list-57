@@ -291,8 +291,19 @@ const Header = () => {
                         </Link>
                       </Button>
                     ))}
+                    
+                    <div className="border-t my-4" />
+                    <div className="flex flex-col gap-2">
+                      <Button asChild variant="ghost" className="justify-start text-xs text-muted-foreground">
+                        <Link to="/terms">Terms of Service</Link>
+                      </Button>
+                      <Button asChild variant="ghost" className="justify-start text-xs text-muted-foreground">
+                        <Link to="/privacy">Privacy Policy</Link>
+                      </Button>
+                    </div>
+                    
                     <Button 
-                      variant="ghost" 
+                      variant="ghost"
                       onClick={() => {
                         handleSignOut();
                         setMobileMenuOpen(false);
