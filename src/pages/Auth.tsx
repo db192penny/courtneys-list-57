@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { extractStreetName } from "@/utils/address";
@@ -33,8 +34,9 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [resident, setResident] = useState<"yes" | "no">("yes");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ name?: boolean; email?: boolean; address?: boolean; resident?: boolean }>({});
+  const [errors, setErrors] = useState<{ name?: boolean; email?: boolean; address?: boolean; resident?: boolean; terms?: boolean }>({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showMagicLinkModal, setShowMagicLinkModal] = useState(false);
   const [showWelcomeBackModal, setShowWelcomeBackModal] = useState(false);
@@ -312,6 +314,7 @@ const Auth = () => {
       email: !email.trim(),
       address: !address.trim(),
       resident: !resident,
+      terms: !termsAccepted,
     };
     const missingKeys = (Object.keys(fieldErrors) as Array<keyof typeof fieldErrors>).filter((k) => fieldErrors[k]);
     if (missingKeys.length > 0) {
@@ -330,6 +333,7 @@ const Auth = () => {
           email: "Email",
           address: "Full Address",
           resident: "Resident status",
+          terms: "Terms of Service",
         };
         const missingLabels = missingKeys.map((k) => labelMap[k as string]);
         toast({
@@ -725,6 +729,35 @@ const Auth = () => {
                     <SelectItem value="no">No, I'm not a resident</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="terms"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                  className={errors.terms ? "border-destructive" : undefined}
+                />
+                <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
+                  I agree to the{" "}
+                  <Link
+                    to="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary hover:text-primary/80"
+                  >
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    to="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary hover:text-primary/80"
+                  >
+                    Privacy Policy
+                  </Link>
+                </Label>
               </div>
 
               <Button
