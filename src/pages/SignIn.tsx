@@ -277,6 +277,17 @@ const SignIn = () => {
                 {loading ? "Checking..." : "Log In"}
               </Button>
 
+              <p className="text-xs text-muted-foreground text-center mt-4">
+                By signing in, you agree to our{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                  Terms of Service
+                </a>
+                {' '}and{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                  Privacy Policy
+                </a>
+              </p>
+
               <div className="text-sm text-muted-foreground">
                 {status !== "idle" && (
                   <p role="status" aria-live="polite">{message}</p>
