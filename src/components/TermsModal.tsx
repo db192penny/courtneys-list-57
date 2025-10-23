@@ -143,13 +143,27 @@ function FullTermsContent() {
           <li>Continue using your content even if you delete your account</li>
         </ul>
 
+        <p className="mb-2 text-sm"><strong>What This Covers:</strong></p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>If we sell or transfer Courtney's List, your content comes with it</li>
+          <li>If we partner with other platforms, we can share your reviews</li>
+          <li>If we create reports or analytics, we can include your data</li>
+        </ul>
+
         <h3 className="text-lg font-semibold mb-2">3.3 Display of Your Information</h3>
         <p className="mb-2 text-sm"><strong>Public Display:</strong></p>
         <ul className="mb-3 space-y-1 text-sm">
-          <li><strong>Standard:</strong> Reviews show as "[First Name] on [Street Name]"</li>
-          <li><strong>Anonymous:</strong> Reviews show as "Neighbor on [Street Name]"</li>
+          <li><strong>Standard:</strong> Reviews show as "[First Name] on [Street Name]" (e.g., "Hope on Palm Court")</li>
+          <li><strong>Anonymous:</strong> Reviews show as "Neighbor on [Street Name]" (you choose this option)</li>
           <li>We NEVER display your full address publicly</li>
           <li>We NEVER display your email publicly</li>
+        </ul>
+
+        <p className="mb-2 text-sm"><strong>When Shared with Vendors:</strong></p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Names are ALWAYS anonymized</li>
+          <li>Reviews show only as "Resident in [Community Name]" or "Neighbor on [Street Name]"</li>
+          <li>Cost data may be shared in aggregate only</li>
         </ul>
 
         <h3 className="text-lg font-semibold mb-2">3.4 No Compensation</h3>
@@ -160,24 +174,355 @@ function FullTermsContent() {
           <li>No equity or ownership interest</li>
           <li>No retroactive payments if we monetize or sell the Service</li>
         </ul>
+        <p className="text-sm">Your reviews are <strong>voluntary contributions</strong> to help your community.</p>
       </section>
 
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">4. Disclaimers and Limitations</h2>
-        <p className="mb-2 text-sm">THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND.</p>
+        <h2 className="text-xl font-semibold mb-3">4. Our Rights and Content</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">4.1 Platform Content</h3>
+        <p className="mb-2 text-sm">Courtney's List owns all:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Website design, code, and features</li>
+          <li>Logos, trademarks, and branding</li>
+          <li>Aggregate data and analytics</li>
+          <li>Vendor databases and categories</li>
+          <li>Algorithms and rating systems</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">4.2 Our Right to Moderate</h3>
+        <p className="mb-2 text-sm">We may, but are not obligated to:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Review, edit, or remove any content</li>
+          <li>Suspend or ban users who violate these Terms</li>
+          <li>Remove reviews that appear fake, fraudulent, or misleading</li>
+          <li>Verify or flag vendor information</li>
+          <li>Display "pending" or "unverified" labels on content</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">4.3 No Endorsement</h3>
+        <ul className="space-y-1 text-sm">
+          <li>Reviews reflect individual user opinions only</li>
+          <li>We don't endorse or guarantee any vendor</li>
+          <li>We don't verify all vendor information</li>
+          <li>Users should conduct their own due diligence</li>
+        </ul>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">5. Vendor Services and Monetization</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">5.1 Future Paid Services</h3>
+        <p className="mb-2 text-sm">We reserve the right to offer paid services, including but not limited to:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Vendor advertising and promoted listings</li>
+          <li>Lead generation and referral fees</li>
+          <li>Premium vendor profiles</li>
+          <li>Featured placements</li>
+          <li>Data and analytics subscriptions</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">5.2 No Influence on Reviews</h3>
+        <p className="mb-2 text-sm"><strong>IMPORTANT:</strong> Vendors who purchase services will NOT receive:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Ability to remove or edit negative reviews</li>
+          <li>Preferential treatment in search results or ratings</li>
+          <li>Access to reviewer identities (beyond anonymous data)</li>
+          <li>Control over review content or display</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">5.3 Vendor Data Sharing</h3>
+        <p className="mb-2 text-sm">We may share with vendors:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li><strong>Anonymized reviews</strong> ("Resident in Boca Bridges rated you 4 stars")</li>
+          <li><strong>Aggregate statistics</strong> (average rating, total reviews, cost ranges)</li>
+          <li><strong>Lead information</strong> if a user requests contact (with user's explicit consent)</li>
+        </ul>
+
+        <p className="mb-2 text-sm">We will NOT share:</p>
+        <ul className="space-y-1 text-sm">
+          <li>Reviewer names or identities (unless user explicitly opts in)</li>
+          <li>Full addresses or contact information</li>
+          <li>Individual user data without consent</li>
+        </ul>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">6. Privacy and Data Protection</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">6.1 Information We Collect</h3>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Account info (name, email, address)</li>
+          <li>Reviews, ratings, and comments</li>
+          <li>Usage data (pages visited, features used)</li>
+          <li>Device and browser information</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">6.2 How We Use Your Data</h3>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Operate and improve the Service</li>
+          <li>Verify community membership</li>
+          <li>Send notifications and newsletters</li>
+          <li>Generate community reports and analytics</li>
+          <li>Comply with legal obligations</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">6.3 Data Sharing</h3>
+        <p className="mb-2 text-sm">We may share your data with:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Community HOA boards (anonymized or aggregate data)</li>
+          <li>Vendors (anonymized reviews only)</li>
+          <li>Service providers (email, hosting, analytics)</li>
+          <li>Law enforcement (if required by law)</li>
+          <li>Acquirers (if we sell the company - see Section 7)</li>
+        </ul>
+        <p className="text-sm"><strong>See our separate Privacy Policy for complete details.</strong></p>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">7. Transfer of Rights (Company Sale)</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">7.1 Business Transfer</h3>
+        <p className="mb-2 text-sm">If Courtney's List is sold, merged, or acquired:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>These Terms and all licenses you granted transfer to the new owner</li>
+          <li>Your Content and data may be transferred as part of the transaction</li>
+          <li>The new owner may continue using your reviews under these Terms</li>
+          <li>We will notify you of any ownership change</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">7.2 Your Options After Transfer</h3>
+        <ul className="space-y-1 text-sm">
+          <li>You may delete your account after notification</li>
+          <li>Content posted before deletion remains under the license you granted</li>
+          <li>New owner must honor your anonymity preferences</li>
+        </ul>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">8. User Responsibilities and Warranties</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">8.1 You Represent and Warrant That:</h3>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Your reviews are based on your genuine personal experience</li>
+          <li>You have no financial relationship with reviewed vendors (unless disclosed)</li>
+          <li>Your content is accurate and not misleading</li>
+          <li>You own or have rights to any photos or content you submit</li>
+          <li>You're not violating any confidentiality agreements</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">8.2 Prohibited Content</h3>
+        <p className="mb-2 text-sm">You may NOT post:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Fake or fraudulent reviews</li>
+          <li>Reviews of businesses where you have undisclosed financial interest</li>
+          <li>Defamatory, harassing, or threatening content</li>
+          <li>Copyrighted material without permission</li>
+          <li>Private or confidential information</li>
+          <li>Spam or promotional content</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">8.3 Vendor Disputes</h3>
+        <p className="mb-2 text-sm">If a vendor disputes your review:</p>
+        <ul className="space-y-1 text-sm">
+          <li>We may investigate but are not required to</li>
+          <li>We may request additional information from you</li>
+          <li>We may remove content that violates these Terms</li>
+          <li>Final decision on content removal is at our sole discretion</li>
+        </ul>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">9. Disclaimers and Limitations of Liability</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">9.1 Service "AS IS"</h3>
+        <p className="mb-3 text-sm">THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND.</p>
         <p className="mb-2 text-sm"><strong>We do NOT guarantee:</strong></p>
         <ul className="mb-3 space-y-1 text-sm">
           <li>Accuracy of reviews or vendor information</li>
           <li>Quality or reliability of vendors listed</li>
           <li>Continuous or error-free service operation</li>
+          <li>Security of your data (though we use reasonable measures)</li>
         </ul>
-        <p className="text-sm"><strong>Maximum Liability:</strong> Limited to $100 or amounts you paid us.</p>
+
+        <h3 className="text-lg font-semibold mb-2">9.2 Limitation of Liability</h3>
+        <p className="mb-3 text-sm"><strong>TO THE MAXIMUM EXTENT PERMITTED BY LAW:</strong></p>
+        <p className="mb-2 text-sm">Courtney's List is NOT liable for:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Indirect, incidental, or consequential damages</li>
+          <li>Lost profits or business opportunities</li>
+          <li>Poor service from vendors you hire</li>
+          <li>Inaccurate reviews or information</li>
+          <li>Data breaches or security incidents</li>
+          <li>Service interruptions or data loss</li>
+        </ul>
+        <p className="mb-3 text-sm"><strong>Maximum Liability:</strong> If we are found liable, our total liability is limited to the greater of:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>(a) $100, or</li>
+          <li>(b) Amounts you paid us in the past 12 months (if any)</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">9.3 Third-Party Vendors</h3>
+        <ul className="space-y-1 text-sm">
+          <li>We are NOT responsible for vendors' actions or services</li>
+          <li>Your relationship with vendors is separate from Courtney's List</li>
+          <li>You hire vendors at your own risk</li>
+          <li>Vendors are independent businesses, not our employees or partners</li>
+        </ul>
       </section>
 
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">5. Contact</h2>
-        <p className="text-sm">Questions? Email: help@courtneys-list.com</p>
+        <h2 className="text-xl font-semibold mb-3">10. Indemnification</h2>
+        <p className="mb-2 text-sm">You agree to indemnify and hold harmless Courtney's List and its owners, employees, and partners from:</p>
+        <ul className="space-y-1 text-sm">
+          <li>Claims arising from Your Content</li>
+          <li>Your violation of these Terms</li>
+          <li>Your violation of any third-party rights</li>
+          <li>Your interactions with vendors</li>
+          <li>Your use of the Service</li>
+        </ul>
       </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">11. Dispute Resolution</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">11.1 Informal Resolution</h3>
+        <p className="mb-3 text-sm">Before filing any legal claim, you agree to contact us at help@courtneys-list.com to resolve the dispute informally.</p>
+
+        <h3 className="text-lg font-semibold mb-2">11.2 Arbitration Agreement (For US Users)</h3>
+        <p className="mb-2 text-sm"><strong>YOU AND COURTNEY'S LIST AGREE:</strong></p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Most disputes will be resolved through binding arbitration</li>
+          <li>You waive the right to a jury trial</li>
+          <li>You waive the right to participate in class actions</li>
+          <li>Arbitration will be conducted by the American Arbitration Association (AAA)</li>
+        </ul>
+        <p className="mb-2 text-sm"><strong>Exceptions (Can Be Brought in Court):</strong></p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Small claims court disputes</li>
+          <li>Intellectual property disputes</li>
+          <li>Violations of Section 8 (User Responsibilities)</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">11.3 Governing Law</h3>
+        <ul className="space-y-1 text-sm">
+          <li>These Terms are governed by the laws of Florida</li>
+          <li>Any court proceedings must be in Palm Beach County, Florida</li>
+        </ul>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">12. Changes to Terms</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">12.1 Modifications</h3>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>We may modify these Terms at any time</li>
+          <li>We'll notify you by email or Service notice</li>
+          <li>Continued use after changes means you accept the new Terms</li>
+          <li>Material changes become effective 30 days after notice</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">12.2 Reviewing Terms</h3>
+        <p className="text-sm">You should review these Terms regularly at courtneys-list.com/terms</p>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">13. Termination</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">13.1 Your Right to Terminate</h3>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>You may delete your account anytime</li>
+          <li>Some data may remain in backups or as required by law</li>
+          <li>Content you posted remains under the license you granted</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">13.2 Our Right to Terminate</h3>
+        <p className="mb-2 text-sm">We may suspend or terminate your account if:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>You violate these Terms</li>
+          <li>You post fraudulent or fake reviews</li>
+          <li>You engage in prohibited conduct</li>
+          <li>We discontinue the Service</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">13.3 Effect of Termination</h3>
+        <p className="mb-2 text-sm">Upon termination:</p>
+        <ul className="space-y-1 text-sm">
+          <li>Your license to use the Service ends immediately</li>
+          <li>Our license to use Your Content continues (Section 3.2)</li>
+          <li>Sections 3, 8-12 survive termination</li>
+        </ul>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">14. General Terms</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">14.1 Entire Agreement</h3>
+        <p className="mb-3 text-sm">These Terms constitute the entire agreement between you and Courtney's List.</p>
+
+        <h3 className="text-lg font-semibold mb-2">14.2 Severability</h3>
+        <p className="mb-3 text-sm">If any provision is found invalid, the rest of the Terms remain in effect.</p>
+
+        <h3 className="text-lg font-semibold mb-2">14.3 No Waiver</h3>
+        <p className="mb-3 text-sm">Our failure to enforce any right doesn't waive that right.</p>
+
+        <h3 className="text-lg font-semibold mb-2">14.4 Assignment</h3>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>You cannot transfer your rights under these Terms</li>
+          <li>We may transfer our rights (e.g., in a sale) without your consent</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">14.5 Contact Information</h3>
+        <p className="mb-2 text-sm">Questions about these Terms? Contact us at:</p>
+        <ul className="space-y-1 text-sm">
+          <li>Email: help@courtneys-list.com</li>
+        </ul>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-3">15. Special Provisions for Community Focus</h2>
+        
+        <h3 className="text-lg font-semibold mb-2">15.1 Community Standards</h3>
+        <p className="mb-2 text-sm">Courtney's List is designed to help neighbors help neighbors:</p>
+        <ul className="mb-3 space-y-1 text-sm">
+          <li>Be respectful and constructive in reviews</li>
+          <li>Focus on helping community members make informed decisions</li>
+          <li>Remember vendors are often small businesses run by individuals</li>
+          <li>Balance honest feedback with community spirit</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mb-2">15.2 HOA and Community Management</h3>
+        <ul className="space-y-1 text-sm">
+          <li>We may share aggregate data with HOA boards</li>
+          <li>Individual reviews may be included in community reports</li>
+          <li>Your community may have additional guidelines we enforce</li>
+        </ul>
+      </section>
+
+      <div className="border-t pt-6 mt-8">
+        <p className="text-center font-semibold mb-3 text-sm">
+          By using Courtney's List, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
+        </p>
+        <p className="text-center mb-6 text-sm">
+          <strong>Questions?</strong> Contact us at help@courtneys-list.com
+        </p>
+      </div>
+
+      <section className="mb-6 bg-muted/30 p-4 rounded-lg">
+        <h2 className="text-xl font-semibold mb-3">Appendix: Key Definitions</h2>
+        <ul className="space-y-2 text-sm">
+          <li><strong>Your Content:</strong> Reviews, ratings, comments, photos, and other materials you submit</li>
+          <li><strong>Service:</strong> The Courtney's List website, mobile apps, and all related services</li>
+          <li><strong>Vendor:</strong> Any service provider, business, or professional listed on the Service</li>
+          <li><strong>Community:</strong> A residential neighborhood, HOA, or community we serve</li>
+          <li><strong>Anonymized:</strong> Data that doesn't identify you personally (shows only "Neighbor on [Street]")</li>
+        </ul>
+      </section>
+
+      <div className="text-center text-xs text-muted-foreground mt-8">
+        <p><strong>Last Updated:</strong> 10.23.25</p>
+        <p><strong>Version:</strong> 1.0</p>
+      </div>
     </article>
   );
 }

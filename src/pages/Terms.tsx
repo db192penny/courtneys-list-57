@@ -351,7 +351,7 @@ const Terms = () => {
           <h2 className="text-2xl font-semibold mb-4">11. Dispute Resolution</h2>
           
           <h3 className="text-xl font-semibold mb-3">11.1 Informal Resolution</h3>
-          <p className="mb-4">Before filing any legal claim, you agree to contact us at [contact email] to resolve the dispute informally.</p>
+          <p className="mb-4">Before filing any legal claim, you agree to contact us at help@courtneys-list.com to resolve the dispute informally.</p>
 
           <h3 className="text-xl font-semibold mb-3">11.2 Arbitration Agreement (For US Users)</h3>
           <p className="mb-2"><strong>YOU AND COURTNEY'S LIST AGREE:</strong></p>
@@ -370,8 +370,8 @@ const Terms = () => {
 
           <h3 className="text-xl font-semibold mb-3">11.3 Governing Law</h3>
           <ul className="space-y-1">
-            <li>These Terms are governed by the laws of [Your State]</li>
-            <li>Any court proceedings must be in [Your County/City]</li>
+            <li>These Terms are governed by the laws of Florida</li>
+            <li>Any court proceedings must be in Palm Beach County, Florida</li>
           </ul>
         </section>
 
@@ -387,7 +387,7 @@ const Terms = () => {
           </ul>
 
           <h3 className="text-xl font-semibold mb-3">12.2 Reviewing Terms</h3>
-          <p>You should review these Terms regularly at [URL]</p>
+          <p>You should review these Terms regularly at courtneys-list.com/terms</p>
         </section>
 
         <section className="mb-8">
@@ -439,8 +439,7 @@ const Terms = () => {
           <h3 className="text-xl font-semibold mb-3">14.5 Contact Information</h3>
           <p>Questions about these Terms? Contact us at:</p>
           <ul className="space-y-1">
-            <li>Email: [contact email]</li>
-            <li>Address: [business address]</li>
+            <li>Email: help@courtneys-list.com</li>
           </ul>
         </section>
 
@@ -469,7 +468,7 @@ const Terms = () => {
             By using Courtney's List, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
           </p>
           <p className="text-center mb-8">
-            <strong>Questions?</strong> Contact us at [contact email]
+            <strong>Questions?</strong> Contact us at help@courtneys-list.com
           </p>
         </div>
 
