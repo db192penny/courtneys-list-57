@@ -153,7 +153,7 @@ function FullTermsContent() {
         <h3 className="text-lg font-semibold mb-2">3.3 Display of Your Information</h3>
         <p className="mb-2 text-sm"><strong>Public Display:</strong></p>
         <ul className="mb-3 space-y-1 text-sm">
-          <li><strong>Standard:</strong> Reviews show as "[First Name] on [Street Name]" (e.g., "Hope on Palm Court")</li>
+          <li><strong>Standard:</strong> Reviews show as "[First Name] [Last Initial]. on [Street Name]" (e.g., "Hope L. on Palm Court")</li>
           <li><strong>Anonymous:</strong> Reviews show as "Neighbor on [Street Name]" (you choose this option)</li>
           <li>We NEVER display your full address publicly</li>
           <li>We NEVER display your email publicly</li>
@@ -566,7 +566,7 @@ function PlainEnglishContent() {
         <h3 className="text-lg font-semibold mb-2">What We Show Publicly</h3>
         <div className="mb-3 p-3 bg-muted/30 rounded text-sm">
           <p className="mb-2"><strong>Standard Review:</strong></p>
-          <p className="mb-3">"Hope on Palm Court gave EZ Pool 5 stars"</p>
+          <p className="mb-3">"Hope L. on Palm Court gave EZ Pool 5 stars"</p>
           <p className="mb-2"><strong>Anonymous Review:</strong></p>
           <p>"Neighbor on Palm Court gave EZ Pool 5 stars"</p>
         </div>

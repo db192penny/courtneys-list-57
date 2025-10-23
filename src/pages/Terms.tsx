@@ -117,7 +117,7 @@ const Terms = () => {
           <h3 className="text-xl font-semibold mb-3">3.3 Display of Your Information</h3>
           <p className="mb-2"><strong>Public Display:</strong></p>
           <ul className="mb-4 space-y-1">
-            <li><strong>Standard:</strong> Reviews show as "[First Name] on [Street Name]" (e.g., "Hope on Palm Court")</li>
+            <li><strong>Standard:</strong> Reviews show as "[First Name] [Last Initial]. on [Street Name]" (e.g., "Hope L. on Palm Court")</li>
             <li><strong>Anonymous:</strong> Reviews show as "Neighbor on [Street Name]" (you choose this option)</li>
             <li>We NEVER display your full address publicly</li>
             <li>We NEVER display your email publicly</li>
