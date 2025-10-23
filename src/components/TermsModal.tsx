@@ -9,7 +9,7 @@ interface TermsModalProps {
   variant?: "full" | "plain-english";
 }
 
-export function TermsModal({ open, onOpenChange, variant: initialVariant = "full" }: TermsModalProps) {
+export function TermsModal({ open, onOpenChange, variant: initialVariant = "plain-english" }: TermsModalProps) {
   const [variant, setVariant] = useState<"full" | "plain-english">(initialVariant);
 
   return (
@@ -21,24 +21,26 @@ export function TermsModal({ open, onOpenChange, variant: initialVariant = "full
           </DialogTitle>
           <div className="flex gap-2 pt-3">
             <Button
-              variant={variant === "full" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setVariant("full")}
-            >
-              Full Legal Terms
-            </Button>
-            <Button
               variant={variant === "plain-english" ? "default" : "outline"}
               size="sm"
               onClick={() => setVariant("plain-english")}
             >
               Plain English
             </Button>
+            <Button
+              variant={variant === "full" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setVariant("full")}
+            >
+              Full Legal Terms
+            </Button>
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-6 pb-6">
-          {variant === "full" ? <FullTermsContent /> : <PlainEnglishContent />}
+        <ScrollArea className="flex-1 px-6 pb-6 overflow-y-auto">
+          <div className="pr-4">
+            {variant === "full" ? <FullTermsContent /> : <PlainEnglishContent />}
+          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>

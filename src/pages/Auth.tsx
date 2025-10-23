@@ -44,7 +44,7 @@ const Auth = () => {
   const [detectedCommunity, setDetectedCommunity] = useState<string>("");
   const [justSignedUp, setJustSignedUp] = useState(false);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
-  const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("full");
+  const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("plain-english");
   const { toast } = useToast();
   const navigate = useNavigate();
   const [params] = useSearchParams();

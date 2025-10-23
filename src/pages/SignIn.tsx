@@ -24,7 +24,7 @@ const SignIn = () => {
   const [showWelcomeBackModal, setShowWelcomeBackModal] = useState(false);
   const [modalShown, setModalShown] = useState(false);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
-  const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("full");
+  const [termsModalVariant, setTermsModalVariant] = useState<"full" | "plain-english">("plain-english");
 
   const community = searchParams.get("community");
 
