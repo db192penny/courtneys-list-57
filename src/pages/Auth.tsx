@@ -395,20 +395,6 @@ const Auth = () => {
             variant: "destructive",
           });
         } else {
-          // Track continued acceptance on sign-in
-          try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user?.id) {
-              await supabase.rpc('update_terms_acceptance' as any, {
-                user_id: user.id,
-                terms_version: '1.0'
-              });
-            }
-          } catch (error) {
-            console.error('Failed to update sign-in timestamp:', error);
-            // Don't block sign-in if tracking fails
-          }
-          
           // Show welcome back modal instead of toast + redirect
           setShowWelcomeBackModal(true);
         }
@@ -602,17 +588,6 @@ const Auth = () => {
       toast({ title: "Signup failed", description: "Could not create user account", variant: "destructive" });
       setLoading(false);
       return;
-    }
-
-    // Track terms acceptance on signup
-    try {
-      await supabase.rpc('update_terms_acceptance' as any, {
-        user_id: userId,
-        terms_version: '1.0'
-      });
-    } catch (error) {
-      console.error('Failed to track terms acceptance:', error);
-      // Don't block signup if tracking fails
     }
 
     try {

@@ -52,7 +52,6 @@ import { AnalyticsTracker } from "./components/AnalyticsTracker";
 import { useActivityTimeout } from "./hooks/useActivityTimeout";
 import GoogleAnalytics from "./components/analytics/GoogleAnalytics";
 import { AnalyticsProvider } from "@/contexts/AnalyticsContext";
-import { LegacyUserTermsModal } from "./components/auth/LegacyUserTermsModal";
 
 const queryClient = new QueryClient();
 
@@ -178,33 +177,7 @@ function ActivityTimeoutManager() {
 function AppContent() {
   const { isProcessingMagicLink, user } = useAuth();
   const location = useLocation();
-  const [showLegacyTerms, setShowLegacyTerms] = useState(false);
-  const [termsChecked, setTermsChecked] = useState(false);
   
-  // Check if authenticated user needs to accept terms
-  useEffect(() => {
-    if (!user || termsChecked) return;
-
-    const checkTermsAcceptance = async () => {
-      try {
-        // Use RPC to check terms acceptance (bypasses TypeScript types)
-        const { data, error } = await supabase.rpc('check_terms_acceptance' as any, {
-          user_id: user.id
-        });
-
-        if (!error && data === false) {
-          setShowLegacyTerms(true);
-        }
-        setTermsChecked(true);
-      } catch (error) {
-        console.error('Failed to check terms acceptance:', error);
-        setTermsChecked(true);
-      }
-    };
-
-    checkTermsAcceptance();
-  }, [user, termsChecked]);
-
   // Extract community name from URL path
   const getCommunityName = () => {
     const path = location.pathname;
@@ -226,13 +199,6 @@ function AppContent() {
 
   return (
     <>
-      {showLegacyTerms && user && (
-        <LegacyUserTermsModal
-          userId={user.id}
-          onAccepted={() => setShowLegacyTerms(false)}
-        />
-      )}
-      
       <DynamicMetaTags />
       <AuthWatcher />
       <AnalyticsTracker />
