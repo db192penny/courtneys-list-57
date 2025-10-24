@@ -217,6 +217,18 @@ const CompleteProfile = () => {
         return;
       }
 
+      // Track terms acceptance on Google OAuth signup
+      try {
+        await supabase.from('users').update({
+          terms_accepted_at: new Date().toISOString(),
+          privacy_accepted_at: new Date().toISOString(),
+          terms_version: '1.0'
+        } as any).eq('id', user.id);
+        console.log('✅ Terms tracked: Google signup');
+      } catch (error) {
+        console.error('Failed to track terms on Google signup:', error);
+      }
+
       // Log the signup bonus points to history
       // This is needed because Google OAuth bypasses the normal trigger
       const { error: pointHistoryError } = await supabase.from("user_point_history").insert({

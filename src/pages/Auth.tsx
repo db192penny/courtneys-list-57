@@ -590,6 +590,18 @@ const Auth = () => {
       return;
     }
 
+    // Track terms acceptance on email signup (immediate, no magic link)
+    try {
+      await supabase.from('users').update({
+        terms_accepted_at: new Date().toISOString(),
+        privacy_accepted_at: new Date().toISOString(),
+        terms_version: '1.0'
+      } as any).eq('id', userId);
+      console.log('✅ Terms tracked: Email signup');
+    } catch (error) {
+      console.error('Failed to track terms on signup:', error);
+    }
+
     try {
       await supabase.functions.invoke("send-admin-notification", {
         body: {

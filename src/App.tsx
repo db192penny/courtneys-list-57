@@ -52,6 +52,7 @@ import { AnalyticsTracker } from "./components/AnalyticsTracker";
 import { useActivityTimeout } from "./hooks/useActivityTimeout";
 import GoogleAnalytics from "./components/analytics/GoogleAnalytics";
 import { AnalyticsProvider } from "@/contexts/AnalyticsContext";
+import { LegacyUserTermsModal } from "@/components/auth/LegacyUserTermsModal";
 
 const queryClient = new QueryClient();
 
@@ -177,6 +178,8 @@ function ActivityTimeoutManager() {
 function AppContent() {
   const { isProcessingMagicLink, user } = useAuth();
   const location = useLocation();
+  const [showLegacyTerms, setShowLegacyTerms] = useState(false);
+  const [checkingTerms, setCheckingTerms] = useState(true);
   
   // Extract community name from URL path
   const getCommunityName = () => {
@@ -191,10 +194,55 @@ function AppContent() {
     }
     return undefined;
   };
+
+  // Check if authenticated user needs to accept terms
+  useEffect(() => {
+    const checkTermsAcceptance = async () => {
+      if (!user) {
+        setCheckingTerms(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('terms_accepted_at')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Failed to check terms acceptance:', error);
+          setCheckingTerms(false);
+          return;
+        }
+
+        if (!(data as any)?.terms_accepted_at) {
+          console.log('⚠️ User needs to accept terms');
+          setShowLegacyTerms(true);
+        }
+      } catch (error) {
+        console.error('Failed to check terms acceptance:', error);
+      } finally {
+        setCheckingTerms(false);
+      }
+    };
+
+    checkTermsAcceptance();
+  }, [user]);
   
-  // Show the loader while processing magic link
-  if (isProcessingMagicLink) {
+  // Show the loader while processing magic link or checking terms
+  if (isProcessingMagicLink || (user && checkingTerms)) {
     return <MagicLinkLoader communityName={getCommunityName()} />;
+  }
+
+  // Show legacy terms modal if user needs to accept
+  if (showLegacyTerms && user) {
+    return (
+      <LegacyUserTermsModal
+        userId={user.id}
+        onAccepted={() => setShowLegacyTerms(false)}
+      />
+    );
   }
 
   return (

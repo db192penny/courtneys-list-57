@@ -170,6 +170,19 @@ const AuthCallback = () => {
         // SMART REDIRECT LOGIC - NEW CODE STARTS HERE
         // ============================================
 
+        // Track continued acceptance on sign-in (both email magic link and Google OAuth)
+        if (session?.user?.id && existingUser) {
+          // Only update if user already has a profile (this is a sign-in, not sign-up)
+          try {
+            await supabase.from('users').update({
+              terms_accepted_at: new Date().toISOString()
+            } as any).eq('id', session.user.id);
+            console.log('✅ Terms tracked: Sign-in');
+          } catch (error) {
+            console.error('Failed to update terms timestamp on sign-in:', error);
+          }
+        }
+
         // Get the stored return path
         const returnPath = getAuthReturnPath();
         clearAuthReturnPath(); // Clean up immediately
