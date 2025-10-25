@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MagicLinkLoaderProps {
   communityName?: string;
@@ -7,22 +9,47 @@ interface MagicLinkLoaderProps {
 
 export function MagicLinkLoader({ communityName: propsCommunityName }: MagicLinkLoaderProps = {}) {
   const [searchParams] = useSearchParams();
+  const [displayName, setDisplayName] = useState<string>("");
   
-  // Extract from URL as fallback
-  const contextFromUrl = searchParams.get("context") || searchParams.get("community");
-  const urlCommunityName = contextFromUrl ? 
-    contextFromUrl.split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ') 
-    : "";
-  
-  // Use props first, then URL extraction, then default
-  const displayName = propsCommunityName || urlCommunityName || "Good Looking";
-  
-  console.log("🎯 MagicLinkLoader Debug:");
-  console.log("- Props community name:", propsCommunityName);
-  console.log("- URL community name:", urlCommunityName);
-  console.log("- Final display name:", displayName);
+  useEffect(() => {
+    const fetchUserCommunity = async () => {
+      try {
+        // Try to get authenticated user's actual community from database
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('signup_source')
+            .eq('id', user.id)
+            .maybeSingle();
+          
+          if (userData?.signup_source?.startsWith('community:')) {
+            const userCommunity = userData.signup_source.replace('community:', '');
+            setDisplayName(userCommunity);
+            console.log("🎯 MagicLinkLoader: Using user's community from database:", userCommunity);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("MagicLinkLoader: Error fetching user community:", error);
+      }
+      
+      // Fallback to URL or props
+      const contextFromUrl = searchParams.get("context") || searchParams.get("community");
+      const urlCommunityName = contextFromUrl ? 
+        contextFromUrl.split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ') 
+        : "";
+      
+      const fallbackName = propsCommunityName || urlCommunityName || "Good Looking";
+      setDisplayName(fallbackName);
+      console.log("🎯 MagicLinkLoader: Using fallback display name:", fallbackName);
+    };
+    
+    fetchUserCommunity();
+  }, [propsCommunityName, searchParams]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-background">

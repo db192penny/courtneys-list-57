@@ -378,8 +378,26 @@ const Auth = () => {
       }
 
       if (emailStatus === "approved") {
+        // Look up user's actual community BEFORE generating magic link
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('signup_source')
+          .eq('email', targetEmail)
+          .maybeSingle();
+
+        let redirectCommunity = communityName;
+
+        if (existingUser?.signup_source?.startsWith('community:')) {
+          // Existing user - use THEIR community
+          redirectCommunity = existingUser.signup_source.replace('community:', '');
+          console.log("✅ [AUTH] Existing user, redirecting to:", redirectCommunity);
+        } else {
+          // New user or no signup_source - use current page community
+          console.log("ℹ️ [AUTH] New user, using page community:", redirectCommunity);
+        }
+
         // Send magic link automatically for existing user
-        const communitySlug = communityName ? toSlug(communityName) : "boca-bridges";
+        const communitySlug = redirectCommunity ? toSlug(redirectCommunity) : "boca-bridges";
         const redirectUrl = `${window.location.origin}/communities/${communitySlug}?welcome=true`;
 
         const { error: signInError } = await supabase.auth.signInWithOtp({
