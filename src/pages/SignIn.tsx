@@ -179,11 +179,12 @@ const SignIn = () => {
         console.log('[SignIn] Status is approved, querying database for user');
         
         // CRITICAL FIX: Look up user's community BEFORE generating magic link
-        const { data: existingUser } = await supabase
-          .from('users')
-          .select('signup_source')
-          .eq('email', targetEmail)
-          .maybeSingle();
+        const { data: userSignupSource, error: sourceError } = await supabase
+          .rpc('get_user_signup_source' as any, { _email: targetEmail });
+
+        console.log('[SignIn] RPC result:', userSignupSource, 'Error:', sourceError);
+
+        const existingUser = userSignupSource ? { signup_source: userSignupSource as string } : null;
         
         console.log('[SignIn] Database result:', existingUser);
         console.log('[SignIn] signup_source:', existingUser?.signup_source);
