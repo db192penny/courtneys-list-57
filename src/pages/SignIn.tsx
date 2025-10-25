@@ -164,6 +164,8 @@ const SignIn = () => {
       const { data: statusResult, error: statusError } = await supabase.rpc("get_email_status", {
         _email: targetEmail,
       });
+      
+      console.log('[SignIn] Email status:', statusResult);
 
       if (statusError) {
         console.error("[SignIn] get_email_status error", statusError);
@@ -174,12 +176,17 @@ const SignIn = () => {
       }
 
       if (statusResult === "approved") {
+        console.log('[SignIn] Status is approved, querying database for user');
+        
         // CRITICAL FIX: Look up user's community BEFORE generating magic link
         const { data: existingUser } = await supabase
           .from('users')
           .select('signup_source')
           .eq('email', targetEmail)
           .maybeSingle();
+        
+        console.log('[SignIn] Database result:', existingUser);
+        console.log('[SignIn] signup_source:', existingUser?.signup_source);
 
         // Determine which community to redirect to
         let targetCommunity = community; // Start with current page community
@@ -189,6 +196,8 @@ const SignIn = () => {
           targetCommunity = existingUser.signup_source.replace('community:', '');
           console.log('[SignIn] Existing user, redirecting to their community:', targetCommunity);
         }
+        
+        console.log('[SignIn] Target community determined:', targetCommunity);
 
         const returnPath = searchParams.get("returnPath");
         const category = searchParams.get("category");
