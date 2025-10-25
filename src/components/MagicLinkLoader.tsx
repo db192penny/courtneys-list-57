@@ -9,54 +9,54 @@ interface MagicLinkLoaderProps {
 
 export function MagicLinkLoader({ communityName: propsCommunityName }: MagicLinkLoaderProps = {}) {
   const [searchParams] = useSearchParams();
-  const [displayName, setDisplayName] = useState<string>("");
+  
+  // Initialize displayName with prop if available
+  const [displayName, setDisplayName] = useState<string>(propsCommunityName || "");
   
   useEffect(() => {
+    // If community name provided via props, use it and don't fetch
+    if (propsCommunityName) {
+      console.log('[MagicLinkLoader] Using community from props:', propsCommunityName);
+      setDisplayName(propsCommunityName);
+      return; // Skip database fetch
+    }
+    
+    // Only fetch if no props provided
     const fetchUserCommunity = async () => {
+      console.log('[MagicLinkLoader] No props, fetching from database');
+      
       try {
-        // Try to get authenticated user's actual community from database
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          const { data: userData } = await supabase
-            .from('users')
-            .select('signup_source')
-            .eq('id', user.id)
-            .maybeSingle();
+          const { data: userSignupSource } = await (supabase as any)
+            .rpc('get_user_signup_source', { _email: user.email });
           
-          if (userData?.signup_source?.startsWith('community:')) {
-            const userCommunitySlug = userData.signup_source.replace('community:', '');
-            // Format slug to display name
-            const formattedCommunity = userCommunitySlug.split('-')
+          if (userSignupSource?.startsWith('community:')) {
+            const communitySlug = userSignupSource.replace('community:', '');
+            const communityDisplay = communitySlug
+              .split('-')
               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
               .join(' ');
-            setDisplayName(formattedCommunity);
-            console.log("🎯 MagicLinkLoader: Using user's community from database:", formattedCommunity);
+            setDisplayName(communityDisplay);
+            console.log('[MagicLinkLoader] Fetched community:', communityDisplay);
             return;
           }
         }
       } catch (error) {
-        console.error("MagicLinkLoader: Error fetching user community:", error);
+        console.error('[MagicLinkLoader] Error fetching community:', error);
       }
       
-      // Fallback to URL or props
+      // Fallback to URL params
       const contextFromUrl = searchParams.get("context") || searchParams.get("community");
       const urlCommunityName = contextFromUrl ? 
         contextFromUrl.split('-')
           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ') 
-        : "";
+        : "Good Looking";
       
-      // Format props if it's a slug
-      const formattedPropsCommunity = propsCommunityName?.includes('-') 
-        ? propsCommunityName.split('-')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')
-        : propsCommunityName;
-      
-      const fallbackName = formattedPropsCommunity || urlCommunityName || "Good Looking";
-      setDisplayName(fallbackName);
-      console.log("🎯 MagicLinkLoader: Using fallback display name:", fallbackName);
+      setDisplayName(urlCommunityName);
+      console.log('[MagicLinkLoader] Using URL fallback:', urlCommunityName);
     };
     
     fetchUserCommunity();
