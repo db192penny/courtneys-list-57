@@ -174,22 +174,18 @@ const SignIn = () => {
       }
 
       if (statusResult === "approved") {
-        // Look up user's actual community BEFORE generating magic link
+        // ✅ Look up user's actual community BEFORE generating magic link
         const { data: existingUser } = await supabase
           .from('users')
           .select('signup_source')
           .eq('email', targetEmail)
           .maybeSingle();
 
-        let redirectCommunity = community;
+        let userCommunitySlug = community; // Default to current page
 
         if (existingUser?.signup_source?.startsWith('community:')) {
-          // Existing user - use THEIR community
-          redirectCommunity = existingUser.signup_source.replace('community:', '');
-          console.log("✅ [LOGIN] Existing user, redirecting to:", redirectCommunity);
-        } else {
-          // New user or no signup_source - use current page community
-          console.log("ℹ️ [LOGIN] New user, using page community:", redirectCommunity);
+          userCommunitySlug = existingUser.signup_source.replace('community:', '');
+          console.log("✅ [SignIn] Using user's actual community:", userCommunitySlug);
         }
 
         // Check for returnPath with category
@@ -204,13 +200,13 @@ const SignIn = () => {
             const hasQuery = finalDestination.includes('?');
             finalDestination += `${hasQuery ? '&' : '?'}category=${category}`;
           }
-          const communitySlug = redirectCommunity || 'boca-bridges';
+          const communitySlug = userCommunitySlug ? toSlug(userCommunitySlug) : 'boca-bridges';
           if (!finalDestination.includes('community=')) {
             finalDestination += `${finalDestination.includes('?') ? '&' : '?'}community=${communitySlug}`;
           }
           redirectUrl = `${window.location.origin}${finalDestination}`;
         } else {
-          const communitySlug = redirectCommunity ? toSlug(redirectCommunity) : 'boca-bridges';
+          const communitySlug = userCommunitySlug ? toSlug(userCommunitySlug) : 'boca-bridges';
           redirectUrl = `${window.location.origin}/communities/${communitySlug}?welcome=true`;
         }
         

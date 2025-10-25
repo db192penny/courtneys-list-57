@@ -25,9 +25,13 @@ export function MagicLinkLoader({ communityName: propsCommunityName }: MagicLink
             .maybeSingle();
           
           if (userData?.signup_source?.startsWith('community:')) {
-            const userCommunity = userData.signup_source.replace('community:', '');
-            setDisplayName(userCommunity);
-            console.log("🎯 MagicLinkLoader: Using user's community from database:", userCommunity);
+            const userCommunitySlug = userData.signup_source.replace('community:', '');
+            // Format slug to display name
+            const formattedCommunity = userCommunitySlug.split('-')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
+            setDisplayName(formattedCommunity);
+            console.log("🎯 MagicLinkLoader: Using user's community from database:", formattedCommunity);
             return;
           }
         }
@@ -43,7 +47,14 @@ export function MagicLinkLoader({ communityName: propsCommunityName }: MagicLink
           .join(' ') 
         : "";
       
-      const fallbackName = propsCommunityName || urlCommunityName || "Good Looking";
+      // Format props if it's a slug
+      const formattedPropsCommunity = propsCommunityName?.includes('-') 
+        ? propsCommunityName.split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+        : propsCommunityName;
+      
+      const fallbackName = formattedPropsCommunity || urlCommunityName || "Good Looking";
       setDisplayName(fallbackName);
       console.log("🎯 MagicLinkLoader: Using fallback display name:", fallbackName);
     };
