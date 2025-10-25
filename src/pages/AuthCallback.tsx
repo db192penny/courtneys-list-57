@@ -194,6 +194,14 @@ const AuthCallback = () => {
           userCommunity = communityName.toLowerCase().replace(/\s+/g, "-");
         }
 
+        // Format community slug to display name
+        const userCommunityDisplay = userCommunity
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+
+        console.log('[AuthCallback] User community display name:', userCommunityDisplay);
+
         // If we have a valid return path, check if communities match
         if (returnPath && isValidReturnPath(returnPath)) {
           const returnCommunity = extractCommunityFromPath(returnPath);
@@ -201,14 +209,12 @@ const AuthCallback = () => {
           if (returnCommunity === userCommunity) {
             // ✅ Same community - return to exact page they were on (including category)
             console.log("✅ Returning to original page:", returnPath);
-            setCommunityName(existingUser.signup_source?.replace("community:", "") || communityName);
+            setCommunityName(userCommunityDisplay);
             navigate(returnPath + (returnPath.includes("?") ? "&" : "?") + "welcome=true", { replace: true });
             return;
           } else {
             // ⚠️ Different community - redirect to their community's default page
             console.log("⚠️ Community mismatch. User:", userCommunity, "Attempted:", returnCommunity);
-
-            const userCommunityDisplay = existingUser.signup_source?.replace("community:", "") || "your community";
 
             toast({
               title: "Redirected to your community",
@@ -223,7 +229,7 @@ const AuthCallback = () => {
         }
 
         // No return path - go to their community's default page
-        setCommunityName(existingUser.signup_source?.replace("community:", "") || "Boca Bridges");
+        setCommunityName(userCommunityDisplay);
         navigate(`/communities/${userCommunity}?welcome=true`, { replace: true });
       } catch (error) {
         console.error("Callback error:", error);
