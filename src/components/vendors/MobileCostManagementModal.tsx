@@ -249,9 +249,18 @@ export default function MobileCostManagementModal({ open, onOpenChange, vendor, 
       });
       await queryClient.invalidateQueries({ queryKey: ["user-costs"] });
       
-      // Force immediate refetch for this specific vendor
-      await queryClient.refetchQueries({ queryKey: ["vendor-costs", vendor.id] });
-      await queryClient.refetchQueries({ queryKey: ["vendor-costs-combined", vendor.id] });
+      // Force immediate refetch for this specific vendor and WAIT for it
+      await queryClient.refetchQueries({ 
+        queryKey: ["vendor-costs", vendor.id],
+        type: 'active'
+      });
+      await queryClient.refetchQueries({ 
+        queryKey: ["vendor-costs-combined", vendor.id],
+        type: 'active'
+      });
+      
+      // Wait for UI to update before closing modal
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       toast({ title: "Saved", description: "Cost information updated successfully!" });
       onOpenChange(false);
