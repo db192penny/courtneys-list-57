@@ -235,32 +235,25 @@ export default function MobileCostManagementModal({ open, onOpenChange, vendor, 
         }
       }
 
-      // Invalidate ALL cost-related queries to ensure immediate refresh
-      await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === "community-stats"
-      });
-      await queryClient.invalidateQueries({
+      // Clear ALL cost caches completely
+      queryClient.removeQueries({ 
         predicate: (query) => {
-          const key = query.queryKey[0];
-          return key === "vendor-costs" ||
-                 key === "preview-vendor-costs" ||
-                 key === "vendor-costs-combined";
+          const key = String(query.queryKey[0]);
+          return key.includes('cost') || key.includes('vendor') || key === 'community-stats';
         }
       });
+
+      // Wait for database trigger to complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Force fresh fetch
+      await queryClient.invalidateQueries({ 
+        queryKey: ["vendor-costs-combined", vendor.id] 
+      });
+      await queryClient.invalidateQueries({ 
+        queryKey: ["vendor-costs", vendor.id] 
+      });
       await queryClient.invalidateQueries({ queryKey: ["user-costs"] });
-      
-      // Force immediate refetch for this specific vendor and WAIT for it
-      await queryClient.refetchQueries({ 
-        queryKey: ["vendor-costs", vendor.id],
-        type: 'active'
-      });
-      await queryClient.refetchQueries({ 
-        queryKey: ["vendor-costs-combined", vendor.id],
-        type: 'active'
-      });
-      
-      // Wait for UI to update before closing modal
-      await new Promise(resolve => setTimeout(resolve, 300));
       
       toast({ title: "Saved", description: "Cost information updated successfully!" });
       onOpenChange(false);

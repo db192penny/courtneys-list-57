@@ -21,5 +21,8 @@ export function useVendorCosts(vendorId) {
       return data || [];
     },
     enabled: isVerified && !!vendorId,
+    staleTime: 0,  // Always fetch fresh data
+    gcTime: 0,  // Don't cache results (replaces deprecated cacheTime)
+    refetchOnMount: true,  // Refetch when component mounts
   });
 }

@@ -65,7 +65,8 @@ export default function CostsHover({ vendorId, children }: Props) {
     enabled: isVerified && !!vendorId,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    staleTime: 0,
+    staleTime: 0,  // Always fetch fresh data
+    gcTime: 0,  // Don't cache results (replaces deprecated cacheTime)
   });
 
   return (
