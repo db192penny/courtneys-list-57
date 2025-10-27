@@ -40,6 +40,7 @@ import {
   Trash2,
   HardHat,
   Hand,
+  Baby,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -95,6 +96,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Window Treatment": Square,
   "Masseuse": Hand,
   "General Contractor": HardHat,
+  "Babysitting": Baby,
 };
 
 export function getCategoryIcon(category: Category): LucideIcon {
