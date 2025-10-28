@@ -5,6 +5,7 @@ import { Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserData } from "@/hooks/useUserData";
 import { ReviewSourceIcon } from "./ReviewSourceIcon";
 import { RatingStars } from "@/components/ui/rating-stars";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,8 +21,18 @@ interface Review {
 
 export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
   const { data: profile } = useUserProfile();
+  const { data: userData } = useUserData();
   const navigate = useNavigate();
   const isVerified = !!profile?.isVerified;
+  
+  // Get user's actual home community
+  const { data: userHomeCommunity } = useQuery({
+    queryKey: ["user-home-community"],
+    queryFn: async () => {
+      const { data } = await supabase.rpc("get_my_hoa");
+      return data?.[0]?.hoa_name || null;
+    },
+  });
   
   const { data, isLoading, error } = useQuery<Review[]>({
     queryKey: ["mobile-reviews", vendor?.id],
@@ -94,7 +105,15 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-2">
                     <div className="text-xs text-blue-600 font-medium">
-                      {r.author_label}
+                      {(() => {
+                        const isDifferentCommunity = userHomeCommunity && vendor?.community && userHomeCommunity !== vendor.community;
+                        if (isDifferentCommunity) {
+                          const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
+                          const streetPart = r.author_label?.includes('|') ? r.author_label.split('|')[1]?.trim() : '';
+                          return `${displayCommunity} Resident${streetPart ? ' on ' + streetPart : ''}`;
+                        }
+                        return r.author_label;
+                      })()}
                     </div>
                     {r.is_pending && (
                       <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 border-orange-200">
@@ -119,7 +138,15 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                     <div className="flex justify-end">
                       <div className="text-right">
                         <p className="text-sm font-semibold text-blue-700 mb-1">
-                          — {r.author_label}
+                          — {(() => {
+                            const isDifferentCommunity = userHomeCommunity && vendor?.community && userHomeCommunity !== vendor.community;
+                            if (isDifferentCommunity) {
+                              const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
+                              const streetPart = r.author_label?.includes('|') ? r.author_label.split('|')[1]?.trim() : '';
+                              return `${displayCommunity} Resident${streetPart ? ' on ' + streetPart : ''}`;
+                            }
+                            return r.author_label;
+                          })()}
                         </p>
                         <RatingStars rating={r.rating} size="sm" showValue className="justify-end" />
                       </div>
@@ -129,7 +156,15 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                   /* Rating-only display when no comment */
                   <div className="bg-white/60 rounded-lg p-3 border border-blue-100 text-center">
                     <div className="text-sm text-blue-600 mb-2">
-                      {r.author_label}
+                      {(() => {
+                        const isDifferentCommunity = userHomeCommunity && vendor?.community && userHomeCommunity !== vendor.community;
+                        if (isDifferentCommunity) {
+                          const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
+                          const streetPart = r.author_label?.includes('|') ? r.author_label.split('|')[1]?.trim() : '';
+                          return `${displayCommunity} Resident${streetPart ? ' on ' + streetPart : ''}`;
+                        }
+                        return r.author_label;
+                      })()}
                     </div>
                     <RatingStars rating={r.rating} size="md" showValue className="justify-center" />
                   </div>
