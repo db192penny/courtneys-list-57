@@ -122,7 +122,7 @@ const Header = () => {
   }, [location.pathname]);
 
   // Determine if we're on homepage to set default community context
-  const isHomepage = location.pathname === "/";
+  const isHomepage = location.pathname === "/" || location.pathname === "/homepage";
   const isAuthPage = location.pathname === "/auth" || location.pathname === "/signin";
   
   // Extract community from current URL path to preserve context
@@ -319,7 +319,7 @@ const Header = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-            ) : !isAuthPage ? (
+            ) : !isAuthPage && !isHomepage ? (
               <>
                 <Button 
                   variant="ghost" 
@@ -399,7 +399,7 @@ const Header = () => {
                   </Button>
                 </div>
               </div>
-            ) : !isAuthPage ? (
+            ) : !isAuthPage && !isHomepage ? (
               <>
                 <Button 
                   variant="ghost" 
