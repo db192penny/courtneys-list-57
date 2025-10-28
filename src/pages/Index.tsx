@@ -4,6 +4,8 @@ import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { TermsModal } from "@/components/TermsModal";
+import { PrivacyModal } from "@/components/PrivacyModal";
 
 import { ShieldCheck, Send, Search, CheckCircle } from "lucide-react";
 import { toSlug } from "@/utils/slug";
@@ -25,6 +27,8 @@ const getCommunitySlug = (communityName: string): string => {
 const Index = () => {
   const canonical = typeof window !== "undefined" ? window.location.href : undefined;
   const [hoa, setHoa] = useState("Boca Bridges");
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   
   const navigate = useNavigate();
 
@@ -112,13 +116,16 @@ const Index = () => {
       <footer className="border-t">
         <div className="container py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <nav className="flex items-center gap-4">
-            <a href="/privacy" className="hover:underline">Privacy Policy</a>
-            <a href="/terms" className="hover:underline">Terms of Service</a>
+            <button onClick={() => setPrivacyOpen(true)} className="hover:underline">Privacy Policy</button>
+            <button onClick={() => setTermsOpen(true)} className="hover:underline">Terms of Service</button>
             <a href="/contact" className="hover:underline">Contact Us</a>
           </nav>
           <p className="text-xs">© {new Date().getFullYear()} Courtney's List. All rights reserved.</p>
         </div>
       </footer>
+
+      <PrivacyModal open={privacyOpen} onOpenChange={setPrivacyOpen} />
+      <TermsModal open={termsOpen} onOpenChange={setTermsOpen} />
     </main>
   );
 };
