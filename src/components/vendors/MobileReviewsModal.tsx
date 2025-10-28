@@ -106,12 +106,16 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                   <div className="flex items-center gap-2">
                     <div className="text-xs text-blue-600 font-medium">
                       {(() => {
-                        const isDifferentCommunity = userHomeCommunity && vendor?.community && userHomeCommunity !== vendor.community;
+                        const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
+                        const isDifferentCommunity = userHomeCommunity && userHomeCommunity !== vendor.community;
+                        
                         if (isDifferentCommunity) {
-                          const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
-                          const streetPart = r.author_label?.includes('|') ? r.author_label.split('|')[1]?.trim() : '';
-                          return `${displayCommunity} Resident${streetPart ? ' on ' + streetPart : ''}`;
+                          const streetPart = r.author_label?.includes(' on ') 
+                            ? ' on ' + r.author_label.split(' on ')[1] 
+                            : '';
+                          return `${displayCommunity} Resident${streetPart}`;
                         }
+                        
                         return r.author_label;
                       })()}
                     </div>
@@ -139,12 +143,16 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                       <div className="text-right">
                         <p className="text-sm font-semibold text-blue-700 mb-1">
                           — {(() => {
-                            const isDifferentCommunity = userHomeCommunity && vendor?.community && userHomeCommunity !== vendor.community;
+                            const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
+                            const isDifferentCommunity = userHomeCommunity && userHomeCommunity !== vendor.community;
+                            
                             if (isDifferentCommunity) {
-                              const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
-                              const streetPart = r.author_label?.includes('|') ? r.author_label.split('|')[1]?.trim() : '';
-                              return `${displayCommunity} Resident${streetPart ? ' on ' + streetPart : ''}`;
+                              const streetPart = r.author_label?.includes(' on ') 
+                                ? ' on ' + r.author_label.split(' on ')[1] 
+                                : '';
+                              return `${displayCommunity} Resident${streetPart}`;
                             }
+                            
                             return r.author_label;
                           })()}
                         </p>
@@ -157,12 +165,16 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                   <div className="bg-white/60 rounded-lg p-3 border border-blue-100 text-center">
                     <div className="text-sm text-blue-600 mb-2">
                       {(() => {
-                        const isDifferentCommunity = userHomeCommunity && vendor?.community && userHomeCommunity !== vendor.community;
+                        const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
+                        const isDifferentCommunity = userHomeCommunity && userHomeCommunity !== vendor.community;
+                        
                         if (isDifferentCommunity) {
-                          const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
-                          const streetPart = r.author_label?.includes('|') ? r.author_label.split('|')[1]?.trim() : '';
-                          return `${displayCommunity} Resident${streetPart ? ' on ' + streetPart : ''}`;
+                          const streetPart = r.author_label?.includes(' on ') 
+                            ? ' on ' + r.author_label.split(' on ')[1] 
+                            : '';
+                          return `${displayCommunity} Resident${streetPart}`;
                         }
+                        
                         return r.author_label;
                       })()}
                     </div>
