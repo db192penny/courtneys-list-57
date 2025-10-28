@@ -64,7 +64,7 @@ const Index = () => {
           aria-hidden="true"
         />
         <div className="relative z-10 w-full h-full flex flex-col">
-          <div className="flex-1 flex items-center justify-center px-4 md:px-6 pt-20 pb-12 md:py-0">
+          <div className="flex-1 flex items-start md:items-center justify-center px-4 md:px-6 pt-20 pb-12 md:py-0">
             <div className="max-w-3xl w-full text-center space-y-6 md:space-y-6">
               <div className="flex flex-col items-center space-y-3">
                 <div className="flex items-center gap-2">
