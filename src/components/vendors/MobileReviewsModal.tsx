@@ -106,10 +106,10 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                   <div className="flex items-center gap-2">
                     <div className="text-xs text-blue-600 font-medium">
                       {(() => {
-                        const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
-                        const isDifferentCommunity = userHomeCommunity && userHomeCommunity !== vendor.community;
+                        const vendorCommunity = vendor?.community || 'Community';
+                        const displayCommunity = vendorCommunity.replace(/^The\s+/i, '');
                         
-                        if (isDifferentCommunity) {
+                        if (userHomeCommunity && userHomeCommunity !== vendorCommunity) {
                           const streetPart = r.author_label?.includes(' on ') 
                             ? ' on ' + r.author_label.split(' on ')[1] 
                             : '';
@@ -143,10 +143,10 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                       <div className="text-right">
                         <p className="text-sm font-semibold text-blue-700 mb-1">
                           — {(() => {
-                            const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
-                            const isDifferentCommunity = userHomeCommunity && userHomeCommunity !== vendor.community;
+                            const vendorCommunity = vendor?.community || 'Community';
+                            const displayCommunity = vendorCommunity.replace(/^The\s+/i, '');
                             
-                            if (isDifferentCommunity) {
+                            if (userHomeCommunity && userHomeCommunity !== vendorCommunity) {
                               const streetPart = r.author_label?.includes(' on ') 
                                 ? ' on ' + r.author_label.split(' on ')[1] 
                                 : '';
@@ -165,10 +165,10 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                   <div className="bg-white/60 rounded-lg p-3 border border-blue-100 text-center">
                     <div className="text-sm text-blue-600 mb-2">
                       {(() => {
-                        const displayCommunity = (vendor.community || 'Community').replace(/^The\s+/i, '');
-                        const isDifferentCommunity = userHomeCommunity && userHomeCommunity !== vendor.community;
+                        const vendorCommunity = vendor?.community || 'Community';
+                        const displayCommunity = vendorCommunity.replace(/^The\s+/i, '');
                         
-                        if (isDifferentCommunity) {
+                        if (userHomeCommunity && userHomeCommunity !== vendorCommunity) {
                           const streetPart = r.author_label?.includes(' on ') 
                             ? ' on ' + r.author_label.split(' on ')[1] 
                             : '';
