@@ -25,53 +25,6 @@ interface NeighborsModalProps {
   communityName?: string;
 }
 
-const getPrivacyAwareDisplay = (
-  authorLabel: string,
-  isLoggedIn: boolean,
-  viewerCommunity: string | undefined,
-  vendorCommunity: string
-) => {
-  const [name, street] = authorLabel.split('|').map(s => s.trim());
-  
-  // DEBUG LOGGING
-  console.log('🔴 Privacy Check:', {
-    authorLabel,
-    isLoggedIn,
-    viewerCommunity,
-    vendorCommunity,
-    name,
-    street
-  });
-  
-  // Rule 1: Logged out users NEVER see real names
-  if (!isLoggedIn) {
-    console.log('🟡 User is LOGGED OUT - should hide name');
-    return `${vendorCommunity} Resident${street ? ' on ' + street : ''}`;
-  }
-  
-  console.log('🟢 User is LOGGED IN - checking community match');
-  
-  // Rule 2: Different community users don't see names
-  if (viewerCommunity && viewerCommunity !== vendorCommunity) {
-    return `${vendorCommunity} Resident${street ? ' on ' + street : ''}`;
-  }
-  
-  // Rule 3: Same community - show what database sent
-  if (name === 'Neighbor' || !name) {
-    return `Neighbor${street ? ' on ' + street : ''}`;
-  }
-  
-  // Rule 4: Format real names with last initial
-  const nameParts = name.split(' ');
-  if (nameParts.length > 1) {
-    const firstName = nameParts[0];
-    const lastInitial = nameParts[nameParts.length - 1][0];
-    return `${firstName} ${lastInitial}.${street ? ' on ' + street : ''}`;
-  }
-  
-  return `${name}${street ? ' on ' + street : ''}`;
-};
-
 export function NeighborsModal({
   open,
   onOpenChange,
@@ -196,18 +149,7 @@ export function NeighborsModal({
               {/* Reviews List */}
               <div className="space-y-3">
                 {reviews.map((review) => {
-                  console.log('📊 userData check:', {
-                    userData,
-                    isAuthenticated: userData?.isAuthenticated,
-                    authCheck: !!userData?.isAuthenticated
-                  });
-                  
-                  const displayName = getPrivacyAwareDisplay(
-                    review.author_label,
-                    !!userData?.isAuthenticated,
-                    userData?.communityName,
-                    communityName
-                  );
+                  const { name, street } = formatAuthorDisplay(review.author_label);
                   
                   return (
                     <div 
@@ -218,7 +160,19 @@ export function NeighborsModal({
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-sm">{displayName}</span>
+                            <span className="font-semibold text-sm">
+                              {(() => {
+                                // Check if viewing different community
+                                const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
+                                const isDifferentCommunity = userData?.communityName && userData.communityName !== communityName;
+                                
+                                if (isDifferentCommunity) {
+                                  return `${displayCommunity} Resident`;
+                                }
+                                return name;
+                              })()}
+                              {street && ` on ${street}`}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <RatingStars rating={review.rating} />
