@@ -36,32 +36,12 @@ export function NeighborsModal({
   const { data: userData } = useUserData();
   
   const { data: reviews, isLoading, error } = useQuery({
-    queryKey: ["neighbors-reviews", vendorId, userData?.communityName],
+    queryKey: ["neighbors-reviews", vendorId],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("list_vendor_reviews", { 
         _vendor_id: vendorId 
       });
       if (error) throw error;
-      
-      // PRIVACY FILTER: Modify author_label for cross-community viewers
-      const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
-      const isDifferentCommunity = userData?.communityName && userData.communityName !== communityName;
-      
-      if (isDifferentCommunity && data) {
-        // Replace names with community resident for cross-community viewing
-        return data.map((review: any) => {
-          const parts = review.author_label?.split('|') || [];
-          if (parts.length === 2) {
-            // Keep the street, replace the name
-            const street = parts[1].trim();
-            review.author_label = `${displayCommunity} Resident|${street}`;
-          } else {
-            review.author_label = `${displayCommunity} Resident|`;
-          }
-          return review;
-        });
-      }
-      
       return data as Review[];
     },
     enabled: !!vendorId && open,
@@ -75,22 +55,6 @@ export function NeighborsModal({
     const cleanStreet = street ? extractStreetName(street) : "";
     const formattedStreet = cleanStreet ? capitalizeStreetName(cleanStreet) : "";
     
-    // Remove "The" from community name
-    const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
-    
-    // Check if viewer is from a different community
-    const viewerCommunity = userData?.communityName;
-    const isDifferentCommunity = viewerCommunity && viewerCommunity !== communityName;
-    
-    // PRIVACY: Hide names for cross-community viewers
-    if (isDifferentCommunity) {
-      return { 
-        name: `${displayCommunity} Resident`, 
-        street: formattedStreet 
-      };
-    }
-    
-    // Same community or no user data - show real names
     if (nameOrNeighbor === 'Neighbor' || nameOrNeighbor === '') {
       return { name: 'Neighbor', street: formattedStreet };
     }
@@ -181,7 +145,15 @@ export function NeighborsModal({
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-sm">
-                              {name}
+                              {(() => {
+                                const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
+                                const isDifferentCommunity = userData?.communityName && userData.communityName !== communityName;
+                                
+                                if (isDifferentCommunity) {
+                                  return `${displayCommunity} Resident`;
+                                }
+                                return name;
+                              })()}
                               {street && ` on ${street}`}
                             </span>
                           </div>
