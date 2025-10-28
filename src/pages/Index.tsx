@@ -34,7 +34,7 @@ const Index = () => {
     try {
       const communitySlug = getCommunitySlug(hoa);
       console.log("Index: Navigating to community:", communitySlug);
-      navigate(`/communities/${communitySlug}`);
+      navigate(`/communities/${communitySlug}?welcome=true`);
     } catch (e) {
       console.error("[Index] submit error:", e);
     }
