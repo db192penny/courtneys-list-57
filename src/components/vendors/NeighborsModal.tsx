@@ -35,6 +35,18 @@ export function NeighborsModal({
 }: NeighborsModalProps) {
   const { data: userData } = useUserData();
   
+  // Get user's actual home community from their HOA mapping
+  const { data: userHomeCommunity } = useQuery({
+    queryKey: ["user-home-community"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data } = await supabase.rpc("get_my_hoa");
+      return data?.[0]?.hoa_name || null;
+    },
+  });
+  
   const { data: reviews, isLoading, error } = useQuery({
     queryKey: ["neighbors-reviews", vendorId],
     queryFn: async () => {
@@ -155,11 +167,14 @@ export function NeighborsModal({
                             <span className="font-semibold text-sm">
                               {(() => {
                                 const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
-                                const isDifferentCommunity = userData?.communityName && userData.communityName !== communityName;
+                                
+                                // Check if viewing different community than their home
+                                const isDifferentCommunity = userHomeCommunity && userHomeCommunity !== communityName;
                                 
                                 if (isDifferentCommunity) {
                                   return `${displayCommunity} Resident`;
                                 }
+                                
                                 return name;
                               })()}
                               {street && ` on ${street}`}
