@@ -64,24 +64,24 @@ const Index = () => {
           aria-hidden="true"
         />
         <div className="relative z-10 w-full h-full flex flex-col">
-          <div className="flex-1 flex items-center justify-center px-4 md:px-6 py-12 md:py-0">
-            <div className="max-w-3xl w-full text-center space-y-4 md:space-y-6">
-              <div className="flex flex-col items-center mb-3 md:mb-4">
+          <div className="flex-1 flex items-center justify-center px-4 md:px-6 pt-20 pb-12 md:py-0">
+            <div className="max-w-3xl w-full text-center space-y-6 md:space-y-6">
+              <div className="flex flex-col items-center space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl md:text-4xl">🏘️</span>
-                  <span className="font-bold text-xl md:text-4xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <span className="text-3xl md:text-4xl">🏘️</span>
+                  <span className="font-bold text-2xl md:text-4xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     Courtney's List
                   </span>
                 </div>
-                <p className="text-xs md:text-sm text-foreground/70 mt-1.5 md:mt-2">Your neighborhood's trusted service providers</p>
+                <p className="text-sm md:text-base text-foreground/70 max-w-md">Your neighborhood's trusted service providers</p>
               </div>
-              <p className="text-base md:text-lg lg:text-xl text-foreground/90 font-medium px-2" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Say goodbye to "Could you recommend a plumber?" Facebook posts</p>
+              <p className="text-sm md:text-lg lg:text-xl text-foreground/60 md:text-foreground/90 font-normal md:font-medium px-4 max-w-xl mx-auto" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Say goodbye to "Could you recommend a plumber?" Facebook posts</p>
           
-          <div className="mx-auto mt-4 md:mt-6 w-full max-w-2xl px-2">
-            <p className="text-center text-base md:text-lg font-semibold mb-2 md:mb-3">Choose your community</p>
-            <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-2 md:gap-3 items-center justify-center">
+          <div className="mx-auto w-full max-w-2xl px-2 pt-2">
+            <p className="text-center text-lg md:text-xl font-semibold mb-4">Choose your community</p>
+            <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3 items-center justify-center">
               <Select value={hoa} onValueChange={setHoa}>
-                <SelectTrigger className="w-full sm:w-64 bg-background/95 backdrop-blur h-11 md:h-10">
+                <SelectTrigger className="w-full sm:w-64 bg-background/95 backdrop-blur h-12 md:h-11 text-base">
                   <SelectValue placeholder="Select your community" />
                 </SelectTrigger>
                 <SelectContent>
@@ -97,7 +97,7 @@ const Index = () => {
               <Button 
                 type="submit" 
                 size="lg"
-                className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 hover:from-blue-600 hover:to-purple-700 h-11 md:h-10"
+                className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 hover:from-blue-600 hover:to-purple-700 h-12 md:h-11 text-base font-semibold"
               >
                 See Providers
               </Button>
