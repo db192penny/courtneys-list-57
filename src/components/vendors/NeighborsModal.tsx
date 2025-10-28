@@ -135,6 +135,14 @@ export function NeighborsModal({
                 {reviews.map((review) => {
                   const { name, street } = formatAuthorDisplay(review.author_label);
                   
+                  console.log('🔍 Privacy Check:', {
+                    userCommunity: userData?.communityName,
+                    vendorCommunity: communityName,
+                    isDifferent: userData?.communityName && userData.communityName !== communityName,
+                    authorLabel: review.author_label,
+                    name: name
+                  });
+                  
                   return (
                     <div 
                       key={review.id}
