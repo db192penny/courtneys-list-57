@@ -195,7 +195,7 @@ export function NeighborReviewPreview({
     if (authorLabel.includes(' on ')) {
       const onIndex = authorLabel.indexOf(' on ');
       nameOrNeighbor = authorLabel.substring(0, onIndex).trim();
-      streetPart = authorLabel.substring(onIndex).trim(); // Keep " on Street" part
+      streetPart = authorLabel.substring(onIndex); // Keep " on Street" part with leading space
     }
     // Parse pipe format if present
     else if (authorLabel.includes('|')) {
