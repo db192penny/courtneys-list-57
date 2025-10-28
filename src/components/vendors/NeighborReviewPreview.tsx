@@ -185,76 +185,52 @@ export function NeighborReviewPreview({
   };
 
   const formatAuthorDisplay = (authorLabel: string): string => {
-    // Parse the author label
-    const parts = String(authorLabel).split('|');
-    let nameOrNeighbor = '';
-    let locationPart = '';
+    if (!authorLabel) return 'Community Resident';
     
-    if (parts.length === 2) {
+    // Remove "The" from community names
+    const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
+    
+    // Extract name and street from the incoming format
+    let nameOrNeighbor = '';
+    let streetPart = '';
+    
+    // Parse "Name on Street" format (from database)
+    if (authorLabel.includes(' on ')) {
+      const onIndex = authorLabel.indexOf(' on ');
+      nameOrNeighbor = authorLabel.substring(0, onIndex).trim();
+      streetPart = authorLabel.substring(onIndex).trim(); // Keep " on Street" part
+    }
+    // Parse pipe format if present
+    else if (authorLabel.includes('|')) {
+      const parts = authorLabel.split('|');
       nameOrNeighbor = parts[0].trim();
-      locationPart = parts[1].trim();
-    } else {
-      // Handle legacy format or single string
+      streetPart = parts[1] ? ' on ' + extractStreetName(parts[1].trim()) : '';
+    }
+    // Parse "in The Bridges" format
+    else if (authorLabel.includes(' in ')) {
+      const inIndex = authorLabel.indexOf(' in ');
+      nameOrNeighbor = authorLabel.substring(0, inIndex).trim();
+      // No street for survey format, just return community
+    }
+    else {
       nameOrNeighbor = authorLabel;
     }
     
-    // Extract street name from location part
-    let streetName = '';
-    if (locationPart) {
-      if (locationPart.includes('on ')) {
-        // Format: "on Rosella Rd"
-        streetName = locationPart.replace('on ', '').trim();
-      } else if (locationPart.includes('in The Bridges') || locationPart.includes('in Bridges')) {
-        // Survey format: "in The Bridges" - no street available
-        streetName = '';
-      } else {
-        // Just the street name
-        streetName = extractStreetName(locationPart);
+    // Apply privacy rules
+    
+    // Logged out OR different community: Hide name, keep street
+    if (!isAuthenticated || (userData?.communityName && communityName && userData.communityName !== communityName)) {
+      // Replace the NAME part but KEEP the street part
+      if (authorLabel.includes(' in ')) {
+        // Survey format - no street
+        return `${displayCommunity} Resident`;
       }
+      // Has street - preserve it!
+      return `${displayCommunity} Resident${streetPart}`;
     }
     
-    // Format the street for display
-    const formattedStreet = streetName ? capitalizeStreetName(streetName) : '';
-    
-    // Determine community name (remove "The" prefix)
-    const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
-    
-    // PRIVACY CHECK: Logged out users never see names
-    if (!isAuthenticated) {
-      if (locationPart?.includes('Bridges')) {
-        // Survey reviews from The Bridges
-        return formattedStreet ? `Bridges Resident on ${formattedStreet}` : 'Bridges Resident';
-      }
-      // Regular reviews - show community and street
-      return formattedStreet ? `${displayCommunity} Resident on ${formattedStreet}` : `${displayCommunity} Resident`;
-    }
-    
-    // CROSS-COMMUNITY CHECK: Different community users don't see names
-    if (userData?.communityName && communityName && userData.communityName !== communityName) {
-      if (locationPart?.includes('Bridges')) {
-        // Survey reviews from The Bridges
-        return formattedStreet ? `Bridges Resident on ${formattedStreet}` : 'Bridges Resident';
-      }
-      // Regular reviews - show community and street
-      return formattedStreet ? `${displayCommunity} Resident on ${formattedStreet}` : `${displayCommunity} Resident`;
-    }
-    
-    // SAME COMMUNITY: Show actual names
-    if (nameOrNeighbor === 'Neighbor' || nameOrNeighbor === '') {
-      // Anonymous review
-      return formattedStreet ? `Neighbor on ${formattedStreet}` : 'Neighbor';
-    }
-    
-    // Show real name with formatting
-    const formattedName = formatNameWithLastInitial(nameOrNeighbor);
-    
-    // For survey reviews that say "in The Bridges"
-    if (locationPart?.includes('Bridges')) {
-      return `${formattedName} in Bridges`;
-    }
-    
-    // Regular reviews with street
-    return formattedStreet ? `${formattedName} on ${formattedStreet}` : formattedName;
+    // Same community: Show as-is from database
+    return authorLabel;
   };
 
   const truncateComment = (comment: string) => {
