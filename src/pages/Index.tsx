@@ -64,15 +64,16 @@ const Index = () => {
           aria-hidden="true"
         />
         <div className="relative z-10 w-full h-full flex flex-col">
-          <div className="flex-1 flex items-center justify-center px-4 md:px-6 py-8 md:py-0">
-            <div className="max-w-3xl w-full text-center space-y-3 md:space-y-6">
-              <div className="hidden md:flex flex-col items-center mb-4">
+          <div className="flex-1 flex items-center justify-center px-4 md:px-6 py-12 md:py-0">
+            <div className="max-w-3xl w-full text-center space-y-4 md:space-y-6">
+              <div className="flex flex-col items-center mb-3 md:mb-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-3xl md:text-4xl">🏘️</span>
-                  <span className="font-bold text-2xl md:text-4xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <span className="text-2xl md:text-4xl">🏘️</span>
+                  <span className="font-bold text-xl md:text-4xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     Courtney's List
                   </span>
                 </div>
+                <p className="text-xs md:text-sm text-foreground/70 mt-1.5 md:mt-2">Your neighborhood's trusted service providers</p>
               </div>
               <p className="text-base md:text-lg lg:text-xl text-foreground/90 font-medium px-2" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Say goodbye to "Could you recommend a plumber?" Facebook posts</p>
           
