@@ -102,6 +102,22 @@ export function NeighborsModal({
     const cleanStreet = street ? extractStreetName(street) : "";
     const formattedStreet = cleanStreet ? capitalizeStreetName(cleanStreet) : "";
     
+    // Remove "The" from community name
+    const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
+    
+    // Check if viewer is from a different community
+    const viewerCommunity = userData?.communityName;
+    const isDifferentCommunity = viewerCommunity && viewerCommunity !== communityName;
+    
+    // PRIVACY: Hide names for cross-community viewers
+    if (isDifferentCommunity) {
+      return { 
+        name: `${displayCommunity} Resident`, 
+        street: formattedStreet 
+      };
+    }
+    
+    // Same community or no user data - show real names
     if (nameOrNeighbor === 'Neighbor' || nameOrNeighbor === '') {
       return { name: 'Neighbor', street: formattedStreet };
     }
