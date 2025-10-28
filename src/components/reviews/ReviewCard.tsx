@@ -34,37 +34,52 @@ const getReviewerDisplay = (review: any, currentUser: any, currentCommunity: str
     show_name_public
   } = review;
   
+  console.log('ReviewCard Debug:', { 
+    hasUser: !!currentUser, 
+    userName: user_name,
+    anonymous,
+    vendor_community,
+    currentCommunity 
+  });
+  
   // Not verified - always show generic
   if (!is_verified) {
-    return `${vendor_community} Resident`;
+    return `${vendor_community || currentCommunity} Resident`;
   }
   
-  // Logged out - show community name
+  // CRITICAL: Logged out users NEVER see names
   if (!currentUser) {
-    return `${vendor_community} Resident${user_street ? ' on ' + user_street : ''}`;
+    const streetPart = user_street ? ` on ${user_street}` : '';
+    return `${vendor_community || currentCommunity} Resident${streetPart}`;
   }
   
-  // Different community - show community name
+  // Get user's community
   const userCommunity = currentUser.community || currentUser.signup_source?.split(':')[1];
-  if (userCommunity !== vendor_community) {
-    return `${vendor_community} Resident${user_street ? ' on ' + user_street : ''}`;
+  
+  // Different community - hide names
+  if (userCommunity !== (vendor_community || currentCommunity)) {
+    const streetPart = user_street ? ` on ${user_street}` : '';
+    return `${vendor_community || currentCommunity} Resident${streetPart}`;
   }
   
-  // Same community + anonymous
+  // Same community + anonymous = Neighbor
   if (anonymous) {
-    return `Neighbor${user_street ? ' on ' + user_street : ''}`;
+    const streetPart = user_street ? ` on ${user_street}` : '';
+    return `Neighbor${streetPart}`;
   }
   
-  // Same community + show name
+  // Same community + show name = Show partial name
   if (show_name_public && user_name) {
     const names = user_name.split(' ');
     const firstName = names[0];
     const lastInitial = names[names.length - 1]?.[0] || '';
-    return `${firstName} ${lastInitial}.${user_street ? ' on ' + user_street : ''}`;
+    const streetPart = user_street ? ` on ${user_street}` : '';
+    return `${firstName} ${lastInitial}.${streetPart}`;
   }
   
-  // Same community but hiding name
-  return `Neighbor${user_street ? ' on ' + user_street : ''}`;
+  // Default: Same community but hiding name = Neighbor
+  const streetPart = user_street ? ` on ${user_street}` : '';
+  return `Neighbor${streetPart}`;
 };
 
 export function ReviewCard({ review, currentUser, currentCommunity }: ReviewCardProps) {
