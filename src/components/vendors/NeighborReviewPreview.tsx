@@ -226,7 +226,7 @@ export function NeighborReviewPreview({
         return `${displayCommunity} Resident`;
       }
       // Has street - preserve it!
-      return `${displayCommunity} Resident${streetPart}`;
+      return `${displayCommunity} Resident${streetPart ? ' ' + streetPart.trim() : ''}`;
     }
     
     // Same community: Show as-is from database
