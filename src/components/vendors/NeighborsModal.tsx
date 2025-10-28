@@ -166,13 +166,11 @@ export function NeighborsModal({
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-sm">
                               {(() => {
-                                const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
-                                
                                 // Check if viewing different community than their home
                                 const isDifferentCommunity = userHomeCommunity && userHomeCommunity !== communityName;
                                 
                                 if (isDifferentCommunity) {
-                                  return `${displayCommunity} Resident`;
+                                  return 'Neighbor';
                                 }
                                 
                                 return name;

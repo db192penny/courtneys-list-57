@@ -107,13 +107,13 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                     <div className="text-xs text-blue-600 font-medium">
                       {(() => {
                         const vendorCommunity = vendor?.community || 'Community';
-                        const displayCommunity = vendorCommunity.replace(/^The\s+/i, '');
                         
                         if (userHomeCommunity && userHomeCommunity !== vendorCommunity) {
+                          // Cross-community: show "Neighbor on [Street]"
                           const streetPart = r.author_label?.includes(' on ') 
                             ? ' on ' + r.author_label.split(' on ')[1] 
                             : '';
-                          return `${displayCommunity} Resident${streetPart}`;
+                          return `Neighbor${streetPart}`;
                         }
                         
                         return r.author_label;
@@ -144,13 +144,13 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                         <p className="text-sm font-semibold text-blue-700 mb-1">
                           — {(() => {
                             const vendorCommunity = vendor?.community || 'Community';
-                            const displayCommunity = vendorCommunity.replace(/^The\s+/i, '');
                             
                             if (userHomeCommunity && userHomeCommunity !== vendorCommunity) {
+                              // Cross-community: show "Neighbor on [Street]"
                               const streetPart = r.author_label?.includes(' on ') 
                                 ? ' on ' + r.author_label.split(' on ')[1] 
                                 : '';
-                              return `${displayCommunity} Resident${streetPart}`;
+                              return `Neighbor${streetPart}`;
                             }
                             
                             return r.author_label;
@@ -166,13 +166,13 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                     <div className="text-sm text-blue-600 mb-2">
                       {(() => {
                         const vendorCommunity = vendor?.community || 'Community';
-                        const displayCommunity = vendorCommunity.replace(/^The\s+/i, '');
                         
                         if (userHomeCommunity && userHomeCommunity !== vendorCommunity) {
+                          // Cross-community: show "Neighbor on [Street]"
                           const streetPart = r.author_label?.includes(' on ') 
                             ? ' on ' + r.author_label.split(' on ')[1] 
                             : '';
-                          return `${displayCommunity} Resident${streetPart}`;
+                          return `Neighbor${streetPart}`;
                         }
                         
                         return r.author_label;

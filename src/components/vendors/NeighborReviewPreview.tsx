@@ -185,10 +185,7 @@ export function NeighborReviewPreview({
   };
 
   const formatAuthorDisplay = (authorLabel: string): string => {
-    if (!authorLabel) return 'Community Resident';
-    
-    // Remove "The" from community names
-    const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
+    if (!authorLabel) return 'Neighbor';
     
     // Extract name and street from the incoming format
     let nameOrNeighbor = '';
@@ -218,15 +215,13 @@ export function NeighborReviewPreview({
     
     // Apply privacy rules
     
-    // Logged out OR different community: Hide name, keep street
+    // Logged out OR different community: Show "Neighbor on [Street]"
     if (!isAuthenticated || (userData?.communityName && communityName && userData.communityName !== communityName)) {
-      // Replace the NAME part but KEEP the street part
-      if (authorLabel.includes(' in ')) {
-        // Survey format - no street
-        return `${displayCommunity} Resident`;
+      // Simply show "Neighbor on [Street]"
+      if (streetPart) {
+        return `Neighbor${streetPart}`;
       }
-      // Has street - preserve it!
-      return `${displayCommunity} Resident${streetPart ? ' ' + streetPart.trim() : ''}`;
+      return 'Neighbor';
     }
     
     // Same community: Show as-is from database
