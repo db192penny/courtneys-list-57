@@ -33,10 +33,23 @@ const getPrivacyAwareDisplay = (
 ) => {
   const [name, street] = authorLabel.split('|').map(s => s.trim());
   
+  // DEBUG LOGGING
+  console.log('🔴 Privacy Check:', {
+    authorLabel,
+    isLoggedIn,
+    viewerCommunity,
+    vendorCommunity,
+    name,
+    street
+  });
+  
   // Rule 1: Logged out users NEVER see real names
   if (!isLoggedIn) {
+    console.log('🟡 User is LOGGED OUT - should hide name');
     return `${vendorCommunity} Resident${street ? ' on ' + street : ''}`;
   }
+  
+  console.log('🟢 User is LOGGED IN - checking community match');
   
   // Rule 2: Different community users don't see names
   if (viewerCommunity && viewerCommunity !== vendorCommunity) {
@@ -167,6 +180,12 @@ export function NeighborsModal({
               {/* Reviews List */}
               <div className="space-y-3">
                 {reviews.map((review) => {
+                  console.log('📊 userData check:', {
+                    userData,
+                    isAuthenticated: userData?.isAuthenticated,
+                    authCheck: !!userData?.isAuthenticated
+                  });
+                  
                   const displayName = getPrivacyAwareDisplay(
                     review.author_label,
                     !!userData?.isAuthenticated,
