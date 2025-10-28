@@ -132,19 +132,25 @@ export function NeighborsModal({
 
               {/* Reviews List */}
               <div className="space-y-3">
-                {reviews.map((review) => {
+              {reviews.map((review) => {
                   // Parse author_label to extract data
-                  const [user_name, user_street] = review.author_label.split('|').map(s => s.trim());
+                  const [nameOrNeighbor, user_street] = review.author_label.split('|').map(s => s.trim());
+                  
+                  // Determine if this is showing a name or "Neighbor"
+                  const isAnonymous = nameOrNeighbor === 'Neighbor' || nameOrNeighbor === '';
+                  const show_name_public = !isAnonymous && nameOrNeighbor !== 'Neighbor';
                   
                   return (
                     <ReviewCard
                       key={review.id}
                       review={{
                         ...review,
-                        user_name,
+                        user_name: isAnonymous ? null : nameOrNeighbor,
                         user_street,
                         vendor_community: communityName,
                         is_verified: true,
+                        anonymous: isAnonymous,
+                        show_name_public: show_name_public,
                       }}
                       currentUser={userData?.isAuthenticated ? {
                         community: userData?.communityName,
