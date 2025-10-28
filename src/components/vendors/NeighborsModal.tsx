@@ -36,12 +36,32 @@ export function NeighborsModal({
   const { data: userData } = useUserData();
   
   const { data: reviews, isLoading, error } = useQuery({
-    queryKey: ["neighbors-reviews", vendorId],
+    queryKey: ["neighbors-reviews", vendorId, userData?.communityName],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("list_vendor_reviews", { 
         _vendor_id: vendorId 
       });
       if (error) throw error;
+      
+      // PRIVACY FILTER: Modify author_label for cross-community viewers
+      const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
+      const isDifferentCommunity = userData?.communityName && userData.communityName !== communityName;
+      
+      if (isDifferentCommunity && data) {
+        // Replace names with community resident for cross-community viewing
+        return data.map((review: any) => {
+          const parts = review.author_label?.split('|') || [];
+          if (parts.length === 2) {
+            // Keep the street, replace the name
+            const street = parts[1].trim();
+            review.author_label = `${displayCommunity} Resident|${street}`;
+          } else {
+            review.author_label = `${displayCommunity} Resident|`;
+          }
+          return review;
+        });
+      }
+      
       return data as Review[];
     },
     enabled: !!vendorId && open,
@@ -161,16 +181,7 @@ export function NeighborsModal({
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-sm">
-                              {(() => {
-                                // Check if viewing different community
-                                const displayCommunity = (communityName || 'Community').replace(/^The\s+/i, '');
-                                const isDifferentCommunity = userData?.communityName && userData.communityName !== communityName;
-                                
-                                if (isDifferentCommunity) {
-                                  return `${displayCommunity} Resident`;
-                                }
-                                return name;
-                              })()}
+                              {name}
                               {street && ` on ${street}`}
                             </span>
                           </div>
