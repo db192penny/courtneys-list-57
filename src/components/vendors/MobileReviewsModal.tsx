@@ -5,9 +5,11 @@ import { Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserData } from "@/hooks/useUserData";
 import { ReviewSourceIcon } from "./ReviewSourceIcon";
 import { RatingStars } from "@/components/ui/rating-stars";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ReviewCard } from "@/components/reviews/ReviewCard";
 
 interface Review {
   id: string;
@@ -20,8 +22,10 @@ interface Review {
 
 export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
   const { data: profile } = useUserProfile();
+  const { data: userData } = useUserData();
   const navigate = useNavigate();
   const isVerified = !!profile?.isVerified;
+  const vendorCommunity = vendor?.community || 'Boca Bridges';
   
   const { data, isLoading, error } = useQuery<Review[]>({
     queryKey: ["mobile-reviews", vendor?.id],
@@ -88,54 +92,28 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
         
         <TabsContent value="neighbor" className="mt-0">
           <div className="flex-1 max-h-96 overflow-y-auto space-y-4 p-4">
-            {data.map((r) => (
-              <div key={r.id} className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4">
-                {/* Header with neighbor info and date */}
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="text-xs text-blue-600 font-medium">
-                      {r.author_label}
-                    </div>
-                    {r.is_pending && (
-                      <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 border-orange-200">
-                        Pending
-                      </Badge>
-                    )}
-                  </div>
-                  {r.created_at && (
-                    <div className="text-xs text-blue-600">
-                      {new Date(r.created_at).toLocaleDateString()}
-                    </div>
-                  )}
-                </div>
-                
-                {/* Comment with elegant styling to match preview */}
-                {r.comments && r.comments.trim() ? (
-                  <div className="bg-white/60 rounded-lg p-3 border border-blue-100">
-                    <p className="text-base text-blue-800 font-medium leading-snug mb-3 italic">
-                      "{r.comments}"
-                    </p>
-                    {/* Right-aligned attribution with rating below */}
-                    <div className="flex justify-end">
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-blue-700 mb-1">
-                          — {r.author_label}
-                        </p>
-                        <RatingStars rating={r.rating} size="sm" showValue className="justify-end" />
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* Rating-only display when no comment */
-                  <div className="bg-white/60 rounded-lg p-3 border border-blue-100 text-center">
-                    <div className="text-sm text-blue-600 mb-2">
-                      {r.author_label}
-                    </div>
-                    <RatingStars rating={r.rating} size="md" showValue className="justify-center" />
-                  </div>
-                )}
-              </div>
-            ))}
+            {data.map((r) => {
+              // Parse author_label to extract data
+              const [user_name, user_street] = r.author_label.split('|').map(s => s.trim());
+              
+              return (
+                <ReviewCard
+                  key={r.id}
+                  review={{
+                    ...r,
+                    user_name,
+                    user_street,
+                    vendor_community: vendorCommunity,
+                    is_verified: true,
+                  }}
+                  currentUser={userData?.isAuthenticated ? {
+                    community: userData?.communityName,
+                    signup_source: undefined
+                  } : null}
+                  currentCommunity={vendorCommunity}
+                />
+              );
+            })}
           </div>
         </TabsContent>
 

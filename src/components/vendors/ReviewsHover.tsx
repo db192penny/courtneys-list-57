@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserData } from "@/hooks/useUserData";
+import { ReviewCard } from "@/components/reviews/ReviewCard";
 
 interface Review {
   id: string;
@@ -15,8 +17,15 @@ interface Review {
   is_pending?: boolean;
 }
 
-export default function ReviewsHover({ vendorId, children }) {
+interface ReviewsHoverProps {
+  vendorId: string;
+  children: ReactNode;
+  vendorCommunity?: string;
+}
+
+export default function ReviewsHover({ vendorId, children, vendorCommunity = "Boca Bridges" }: ReviewsHoverProps) {
   const { data: profile } = useUserProfile();
+  const { data: userData } = useUserData();
   const isVerified = !!profile?.isVerified;
   
   const { data, isLoading, error } = useQuery<Review[]>({
@@ -54,34 +63,28 @@ export default function ReviewsHover({ vendorId, children }) {
         )}
         {data && data.length > 0 && (
           <div className="max-h-64 overflow-y-auto space-y-3">
-            {data.map((r) => (
-              <div key={r.id} className="border rounded-md p-2">
-                <div className="text-xs text-foreground flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                      <span className="font-medium">{r.rating}/5</span>
-                    </div>
-                    <Badge variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
-                      {r.author_label}
-                    </Badge>
-                    {r.is_pending && (
-                      <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 border-orange-200">
-                        Pending
-                      </Badge>
-                    )}
-                  </div>
-                  {r.created_at && (
-                    <div className="text-[10px] text-muted-foreground">
-                      {new Date(r.created_at).toLocaleDateString()}
-                    </div>
-                  )}
-                </div>
-                {r.comments && (
-                  <p className="text-sm text-muted-foreground mt-1">{r.comments}</p>
-                )}
-              </div>
-            ))}
+            {data.map((r) => {
+              // Parse author_label to extract data
+              const [user_name, user_street] = r.author_label.split('|').map(s => s.trim());
+              
+              return (
+                <ReviewCard
+                  key={r.id}
+                  review={{
+                    ...r,
+                    user_name,
+                    user_street,
+                    vendor_community: vendorCommunity,
+                    is_verified: true, // Reviews from list_vendor_reviews are verified
+                  }}
+                  currentUser={userData?.isAuthenticated ? {
+                    community: userData?.communityName,
+                    signup_source: undefined
+                  } : null}
+                  currentCommunity={vendorCommunity}
+                />
+              );
+            })}
             {!isVerified && (
               <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-md text-center">
                 <p className="text-xs text-blue-700">

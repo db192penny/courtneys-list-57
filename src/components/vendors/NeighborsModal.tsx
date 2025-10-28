@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Users, Star } from "lucide-react";
 import { formatNameWithLastInitial } from "@/utils/nameFormatting";
 import { extractStreetName, capitalizeStreetName } from "@/utils/address";
+import { useUserData } from "@/hooks/useUserData";
+import { ReviewCard } from "@/components/reviews/ReviewCard";
 
 interface Review {
   id: string;
@@ -32,6 +34,7 @@ export function NeighborsModal({
   homesServiced,
   communityName = "Boca Bridges"
 }: NeighborsModalProps) {
+  const { data: userData } = useUserData();
   const { data: reviews, isLoading, error } = useQuery({
     queryKey: ["neighbors-reviews", vendorId],
     queryFn: async () => {
@@ -130,43 +133,25 @@ export function NeighborsModal({
               {/* Reviews List */}
               <div className="space-y-3">
                 {reviews.map((review) => {
-                  const { name, street } = formatAuthorDisplay(review.author_label);
+                  // Parse author_label to extract data
+                  const [user_name, user_street] = review.author_label.split('|').map(s => s.trim());
+                  
                   return (
-                    <div 
+                    <ReviewCard
                       key={review.id}
-                      className="border rounded-lg p-4 bg-card hover:bg-accent/5 transition-colors"
-                    >
-                      {/* Header */}
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-sm">{name}</span>
-                            {street && (
-                              <Badge variant="outline" className="text-xs">
-                                {street}
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <RatingStars rating={review.rating} />
-                            <span className="text-xs text-muted-foreground">
-                              {formatDate(review.created_at)}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1 text-yellow-400 font-bold">
-                          <Star className="h-4 w-4 fill-current" />
-                          <span>{review.rating}</span>
-                        </div>
-                      </div>
-
-                      {/* Comments */}
-                      {review.comments && review.comments.trim() && (
-                        <div className="text-sm text-muted-foreground leading-relaxed">
-                          "{review.comments}"
-                        </div>
-                      )}
-                    </div>
+                      review={{
+                        ...review,
+                        user_name,
+                        user_street,
+                        vendor_community: communityName,
+                        is_verified: true,
+                      }}
+                      currentUser={userData?.isAuthenticated ? {
+                        community: userData?.communityName,
+                        signup_source: undefined
+                      } : null}
+                      currentCommunity={communityName}
+                    />
                   );
                 })}
               </div>
