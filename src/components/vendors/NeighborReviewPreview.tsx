@@ -9,6 +9,7 @@ import { extractStreetName, capitalizeStreetName } from "@/utils/address";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useUserData } from "@/hooks/useUserData";
 
 interface NeighborReviewPreviewProps {
   vendorId: string;
@@ -47,6 +48,7 @@ export function NeighborReviewPreview({
 }: NeighborReviewPreviewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { data: userData } = useUserData();
   const { data: reviews, isLoading, error } = useQuery({
     queryKey: ["vendor-reviews", vendorId],
     queryFn: async () => {
@@ -183,7 +185,40 @@ export function NeighborReviewPreview({
   };
 
   const formatAuthorDisplay = (authorLabel: string): string => {
-    // Handle pipe-separated format: "Name|Street" or "Neighbor|Street"
+    // PRIVACY CHECK: Logged out users never see names
+    if (!isAuthenticated) {
+      // For pending/survey reviews that say "in The Bridges"
+      if (authorLabel?.includes('in The Bridges')) {
+        return 'The Bridges Resident';
+      }
+      // For regular reviews with street names
+      const parts = String(authorLabel).split('|');
+      if (parts.length === 2 && parts[1]) {
+        const street = extractStreetName(parts[1]);
+        if (street && !street.includes('Bridges')) {
+          return `${communityName || 'Community'} Resident on ${capitalizeStreetName(street)}`;
+        }
+      }
+      return `${communityName || 'Community'} Resident`;
+    }
+    
+    // CROSS-COMMUNITY CHECK: Different community users don't see names
+    if (userData?.communityName && communityName && userData.communityName !== communityName) {
+      // Same logic as logged out
+      if (authorLabel?.includes('in The Bridges')) {
+        return 'The Bridges Resident';
+      }
+      const parts = String(authorLabel).split('|');
+      if (parts.length === 2 && parts[1]) {
+        const street = extractStreetName(parts[1]);
+        if (street && !street.includes('Bridges')) {
+          return `${communityName || 'Community'} Resident on ${capitalizeStreetName(street)}`;
+        }
+      }
+      return `${communityName || 'Community'} Resident`;
+    }
+    
+    // SAME COMMUNITY: Show original formatting
     const parts = String(authorLabel).split('|');
     if (parts.length !== 2) return authorLabel;
     
@@ -191,12 +226,10 @@ export function NeighborReviewPreview({
     const cleanStreet = street ? extractStreetName(street) : "";
     const formattedStreet = cleanStreet ? capitalizeStreetName(cleanStreet) : "";
     
-    // Check if anonymous (already says "Neighbor")
     if (nameOrNeighbor === 'Neighbor' || nameOrNeighbor === '') {
       return formattedStreet ? `Neighbor on ${formattedStreet}` : 'Neighbor';
     }
     
-    // Format real name as "FirstName L."
     const formattedName = formatNameWithLastInitial(nameOrNeighbor);
     return formattedStreet ? `${formattedName} on ${formattedStreet}` : formattedName;
   };
