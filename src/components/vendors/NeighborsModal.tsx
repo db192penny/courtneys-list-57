@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, Star } from "lucide-react";
 import { formatNameWithLastInitial } from "@/utils/nameFormatting";
 import { extractStreetName, capitalizeStreetName } from "@/utils/address";
+import { useUserData } from "@/hooks/useUserData";
 
 interface Review {
   id: string;
@@ -24,6 +25,40 @@ interface NeighborsModalProps {
   communityName?: string;
 }
 
+const getPrivacyAwareDisplay = (
+  authorLabel: string,
+  isLoggedIn: boolean,
+  viewerCommunity: string | undefined,
+  vendorCommunity: string
+) => {
+  const [name, street] = authorLabel.split('|').map(s => s.trim());
+  
+  // Rule 1: Logged out users NEVER see real names
+  if (!isLoggedIn) {
+    return `${vendorCommunity} Resident${street ? ' on ' + street : ''}`;
+  }
+  
+  // Rule 2: Different community users don't see names
+  if (viewerCommunity && viewerCommunity !== vendorCommunity) {
+    return `${vendorCommunity} Resident${street ? ' on ' + street : ''}`;
+  }
+  
+  // Rule 3: Same community - show what database sent
+  if (name === 'Neighbor' || !name) {
+    return `Neighbor${street ? ' on ' + street : ''}`;
+  }
+  
+  // Rule 4: Format real names with last initial
+  const nameParts = name.split(' ');
+  if (nameParts.length > 1) {
+    const firstName = nameParts[0];
+    const lastInitial = nameParts[nameParts.length - 1][0];
+    return `${firstName} ${lastInitial}.${street ? ' on ' + street : ''}`;
+  }
+  
+  return `${name}${street ? ' on ' + street : ''}`;
+};
+
 export function NeighborsModal({
   open,
   onOpenChange,
@@ -32,6 +67,8 @@ export function NeighborsModal({
   homesServiced,
   communityName = "Boca Bridges"
 }: NeighborsModalProps) {
+  const { data: userData } = useUserData();
+  
   const { data: reviews, isLoading, error } = useQuery({
     queryKey: ["neighbors-reviews", vendorId],
     queryFn: async () => {
@@ -130,7 +167,13 @@ export function NeighborsModal({
               {/* Reviews List */}
               <div className="space-y-3">
                 {reviews.map((review) => {
-                  const { name, street } = formatAuthorDisplay(review.author_label);
+                  const displayName = getPrivacyAwareDisplay(
+                    review.author_label,
+                    !!userData?.isAuthenticated,
+                    userData?.communityName,
+                    communityName
+                  );
+                  
                   return (
                     <div 
                       key={review.id}
@@ -140,12 +183,7 @@ export function NeighborsModal({
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-sm">{name}</span>
-                            {street && (
-                              <Badge variant="outline" className="text-xs">
-                                {street}
-                              </Badge>
-                            )}
+                            <span className="font-semibold text-sm">{displayName}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <RatingStars rating={review.rating} />
