@@ -64,9 +64,8 @@ const SubmitVendor = () => {
   useEffect(() => {
     if (userData?.communityName && communityParam && userData.communityName !== communityParam) {
       toast({
-        title: "Cannot add provider",
-        description: `You can only add providers to ${userData.communityName}. Redirecting to your community...`,
-        variant: "destructive",
+        title: "Let's get you to the right place",
+        description: `Taking you to your ${userData.communityName} page now...`,
       });
       // Redirect to user's community submit page
       setTimeout(() => {

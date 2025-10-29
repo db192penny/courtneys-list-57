@@ -316,9 +316,8 @@ export default function CommunityVendorTable({
     // Check if user is trying to rate a vendor from a different community
     if (userData?.communityName && userData.communityName !== communityName) {
       toast({
-        title: "Cannot rate vendor",
-        description: `You can only rate vendors in ${userData.communityName}. This vendor is in ${communityName}.`,
-        variant: "destructive",
+        title: "Rate vendors in your community",
+        description: `You can rate and review vendors in ${userData.communityName}. Visit your community page to share your experience!`,
       });
       return;
     }
@@ -331,9 +330,8 @@ export default function CommunityVendorTable({
     // Check if user is trying to add costs for a vendor from a different community
     if (userData?.communityName && userData.communityName !== communityName) {
       toast({
-        title: "Cannot add costs",
-        description: `You can only add costs for vendors in ${userData.communityName}. This vendor is in ${communityName}.`,
-        variant: "destructive",
+        title: "Add costs in your community",
+        description: `You can add cost information for vendors in ${userData.communityName}. Visit your community page to contribute!`,
       });
       return;
     }
