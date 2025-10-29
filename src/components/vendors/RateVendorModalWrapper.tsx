@@ -41,6 +41,7 @@ export default function RateVendorModalWrapper({
         onOpenChange={onOpenChange}
         vendor={vendor}
         onSuccess={onSuccess}
+        vendorCommunity={communityName}
       />
     );
   }
@@ -51,6 +52,7 @@ export default function RateVendorModalWrapper({
       onOpenChange={onOpenChange}
       vendor={vendor}
       onSuccess={onSuccess}
+      vendorCommunity={communityName}
     />
   );
 }

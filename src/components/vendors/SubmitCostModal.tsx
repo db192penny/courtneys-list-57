@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import CostInputs, { type CostEntry } from "./CostInputs";
+import { useUserData } from "@/hooks/useUserData";
 
 interface SubmitCostModalProps {
   open: boolean;
@@ -12,6 +13,7 @@ interface SubmitCostModalProps {
   vendorName: string;
   category: string;
   onSuccess: () => void;
+  vendorCommunity?: string;
 }
 
 export default function SubmitCostModal({
@@ -21,8 +23,10 @@ export default function SubmitCostModal({
   vendorName,
   category,
   onSuccess,
+  vendorCommunity,
 }: SubmitCostModalProps) {
   const { toast } = useToast();
+  const { data: userData } = useUserData();
   const [costEntries, setCostEntries] = useState<CostEntry[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -31,9 +35,20 @@ export default function SubmitCostModal({
 
     try {
       // Get user data
-      const { data: userData, error: userErr } = await supabase.auth.getUser();
-      if (userErr || !userData.user) {
+      const { data: authData, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !authData.user) {
         toast({ title: "Not signed in", variant: "destructive" });
+        setSubmitting(false);
+        return;
+      }
+      
+      // Cross-community validation
+      if (userData?.communityName && vendorCommunity && userData.communityName !== vendorCommunity) {
+        toast({
+          title: "Cannot add costs for providers in other communities",
+          description: `You can only add cost information for providers in ${userData.communityName}.`,
+          variant: "destructive"
+        });
         setSubmitting(false);
         return;
       }
@@ -42,7 +57,7 @@ export default function SubmitCostModal({
       const { data: userProfile } = await supabase
         .from("users")
         .select("address")
-        .eq("id", userData.user.id)
+        .eq("id", authData.user.id)
         .maybeSingle();
 
       const userAddress = userProfile?.address || "";
@@ -55,7 +70,7 @@ export default function SubmitCostModal({
       if (validCostEntries.length > 0) {
         const costInserts = validCostEntries.map((entry) => ({
           vendor_id: vendorId,
-          created_by: userData.user.id,
+          created_by: authData.user.id,
           household_address: userAddress,
           normalized_address: userAddress, // Will be processed by trigger
           amount: entry.amount,

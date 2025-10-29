@@ -25,9 +25,10 @@ type Props = {
   vendor: { id: string; name: string; category: string } | null;
   onSuccess?: () => void;
   isPreviewMode?: boolean;
+  vendorCommunity?: string;
 };
 
-export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess, isPreviewMode }: Props) {
+export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess, isPreviewMode, vendorCommunity }: Props) {
   const { toast } = useToast();
   const { data: userData } = useUserData();
   const queryClient = useQueryClient();
@@ -137,6 +138,17 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
       toast({ title: "Sign in required", description: "Please sign in to continue.", variant: "destructive" });
       return;
     }
+    
+    // Cross-community validation
+    if (userData?.communityName && vendorCommunity && userData.communityName !== vendorCommunity) {
+      toast({
+        title: "Cannot rate providers in other communities",
+        description: `You can only rate providers in ${userData.communityName}. Contact them to use their services!`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
     if (!rating || rating < 1 || rating > 5) {
       toast({ title: "Rating required", description: "Please select a rating from 1 to 5.", variant: "destructive" });
       return;
@@ -461,6 +473,7 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
         vendorName={vendor.name}
         category={vendor.category}
         onSuccess={handleCostSuccess}
+        vendorCommunity={vendorCommunity}
       />
     )}
     </>

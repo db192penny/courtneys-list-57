@@ -201,6 +201,17 @@ const SubmitVendor = () => {
     setSubmitting(true);
     console.log("[SubmitVendor] starting submission");
 
+    // Cross-community validation for new vendors
+    if (!vendorId && userData?.communityName && communityParam && userData.communityName !== communityParam) {
+      toast({
+        title: "Cannot add providers to other communities",
+        description: `You can only add providers to ${userData.communityName}. This form is for ${communityParam} residents.`,
+        variant: "destructive"
+      });
+      setSubmitting(false);
+      return;
+    }
+
     // Check for duplicate vendor before new submission
     if (!vendorId) {
       const { data: duplicates } = await supabase.rpc("check_vendor_duplicate", {
@@ -220,15 +231,15 @@ const SubmitVendor = () => {
       }
     }
 
-    const { data: userData, error: userErr } = await supabase.auth.getUser();
-    if (userErr || !userData.user) {
+    const { data: authData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !authData.user) {
       console.error("[SubmitVendor] auth error:", userErr);
       toast({ title: "Not signed in", description: "Please sign in to submit a vendor.", variant: "destructive" });
       setSubmitting(false);
       return;
     }
 
-    const userId = userData.user.id;
+    const userId = authData.user.id;
     
     // Update user's global show_name_public setting if they want to show their name
     if (showNameInReview) {
@@ -287,20 +298,17 @@ const SubmitVendor = () => {
             console.warn("[SubmitVendor] review update error (non-fatal):", reviewUpdateErr);
           }
         } else if (rating && !isAdminUser) {
-          const { data: userData2 } = await supabase.auth.getUser();
-          if (userData2?.user) {
-            const { error: reviewInsertErr } = await supabase.from("reviews").insert([
-              {
-                vendor_id: vendorId,
-                user_id: userData2.user.id,
-                rating: rating,
-                comments: comments.trim() || null,
-                anonymous: !showNameInReview,
-              },
-            ]);
-            if (reviewInsertErr) {
-              console.warn("[SubmitVendor] review insert error (non-fatal):", reviewInsertErr);
-            }
+          const { error: reviewInsertErr } = await supabase.from("reviews").insert([
+            {
+              vendor_id: vendorId,
+              user_id: authData.user.id,
+              rating: rating,
+              comments: comments.trim() || null,
+              anonymous: !showNameInReview,
+            },
+          ]);
+          if (reviewInsertErr) {
+            console.warn("[SubmitVendor] review insert error (non-fatal):", reviewInsertErr);
           }
         }
       }
