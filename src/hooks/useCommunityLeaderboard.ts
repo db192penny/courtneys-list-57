@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 export type LeaderboardEntry = {
   user_id?: string;
   name: string;
-  street?: string;
+  street_name?: string;
   points: number;
   rank_position?: number;
 };

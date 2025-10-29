@@ -57,12 +57,12 @@ const NeighborhoodCred = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       <SEO
-        title="Community Rewards — Courtney's List"
+        title="Points — Courtney's List"
         description="Track your community contributions, badges, and leaderboard position."
         canonical={canonical}
       />
       <section className="container max-w-4xl py-10">
-        <h1 className="text-2xl font-semibold mb-8">Community Rewards</h1>
+        <h1 className="text-2xl font-semibold mb-8">Points</h1>
 
         {/* Points & Badge Hero Card */}
         <Card className="mb-6 border-2 shadow-lg">

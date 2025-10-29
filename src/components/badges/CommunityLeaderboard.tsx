@@ -29,7 +29,7 @@ export default function CommunityLeaderboard({
 
   const formatLeaderboardName = (entry: any) => {
     const formattedName = formatNameWithLastInitial(entry.name);
-    const street = entry.street ? extractStreetName(entry.street) : "";
+    const street = entry.street_name ? extractStreetName(entry.street_name) : "";
     return street ? `${formattedName} on ${street}` : formattedName;
   };
 

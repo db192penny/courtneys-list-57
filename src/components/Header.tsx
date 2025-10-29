@@ -189,7 +189,7 @@ const Header = () => {
     switch (label) {
       case "Service Providers":
         return <Building2 className="h-4 w-4 text-blue-600" />;
-      case "Community Rewards":
+      case "Points":
         return <Trophy className="h-4 w-4 text-blue-600" />;
       case "Settings":
         return <Settings className="h-4 w-4 text-blue-600" />;
@@ -207,7 +207,7 @@ const Header = () => {
         : '/communities/the-bridges', 
       label: "Service Providers" 
     },
-    { to: "/neighborhood-cred", label: "Community Rewards" },
+    { to: "/neighborhood-cred", label: "Points" },
     { to: "/settings", label: "Settings" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
   ] : [];
