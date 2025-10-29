@@ -49,7 +49,7 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
       </label>
       
       <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-        <SelectTrigger className={`${isMobile ? "w-full h-14 text-left text-base font-medium border-2 border-primary/40 shadow-md bg-primary/5 hover:bg-primary/10 focus:border-primary focus:ring-2 focus:ring-primary/20" : "w-full h-12 text-left"} ${isBannerVisible ? "ring-2 ring-ring ring-offset-2" : ""}`}>
+        <SelectTrigger className={`w-full ${isMobile ? "h-14 text-base" : "h-12"} text-left font-medium border-2 border-primary/40 shadow-md bg-primary/5 hover:bg-primary/10 focus:border-primary focus:ring-2 focus:ring-primary/20 ${isBannerVisible ? "ring-2 ring-ring ring-offset-2" : ""}`}>
           <SelectValue>
             <span className={`flex items-center ${isMobile ? "gap-3" : "gap-2"}`}>
               {getDisplayValue()}
