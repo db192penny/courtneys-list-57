@@ -445,30 +445,6 @@ export default function CommunityVendorTable({
                 isBannerVisible={isMobile && isBannerVisible}
               />
             </div>
-            
-            {isMobile && !isBannerVisible && (
-              <div className="flex flex-col justify-end">
-                <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-2 block text-right sm:text-left">
-                  Info
-                </label>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleShowBanner}
-                      className="h-12 w-12 p-0 flex items-center justify-center"
-                    >
-                      <Building2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Show community info</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            )}
-            
             <div className="flex flex-col justify-end">
               <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-2 block text-right sm:text-left">
                 Share
