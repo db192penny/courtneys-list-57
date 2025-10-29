@@ -60,19 +60,39 @@ export function NeighborsModal({
   });
 
   const formatAuthorDisplay = (authorLabel: string): { name: string; street: string } => {
-    const parts = String(authorLabel).split('|');
-    if (parts.length !== 2) return { name: authorLabel, street: "" };
-    
-    const [nameOrNeighbor, street] = parts.map(p => p.trim());
-    const cleanStreet = street ? extractStreetName(street) : "";
-    const formattedStreet = cleanStreet ? capitalizeStreetName(cleanStreet) : "";
-    
-    if (nameOrNeighbor === 'Neighbor' || nameOrNeighbor === '') {
-      return { name: 'Neighbor', street: formattedStreet };
+    // Try pipe format first
+    if (authorLabel.includes('|')) {
+      const parts = String(authorLabel).split('|');
+      const [nameOrNeighbor, street] = parts.map(p => p.trim());
+      const cleanStreet = street ? extractStreetName(street) : "";
+      const formattedStreet = cleanStreet ? capitalizeStreetName(cleanStreet) : "";
+      
+      if (nameOrNeighbor === 'Neighbor' || nameOrNeighbor === '') {
+        return { name: 'Neighbor', street: formattedStreet };
+      }
+      
+      const formattedName = formatNameWithLastInitial(nameOrNeighbor);
+      return { name: formattedName, street: formattedStreet };
     }
     
-    const formattedName = formatNameWithLastInitial(nameOrNeighbor);
-    return { name: formattedName, street: formattedStreet };
+    // Try "on" format (e.g., "Amy W. on Rosella Rd")
+    if (authorLabel.includes(' on ')) {
+      const parts = authorLabel.split(' on ');
+      const nameOrNeighbor = parts[0].trim();
+      const street = parts[1]?.trim() || '';
+      const cleanStreet = street ? extractStreetName(street) : "";
+      const formattedStreet = cleanStreet ? capitalizeStreetName(cleanStreet) : "";
+      
+      if (nameOrNeighbor === 'Neighbor' || nameOrNeighbor === '') {
+        return { name: 'Neighbor', street: formattedStreet };
+      }
+      
+      const formattedName = formatNameWithLastInitial(nameOrNeighbor);
+      return { name: formattedName, street: formattedStreet };
+    }
+    
+    // Fallback: no street found
+    return { name: authorLabel, street: "" };
   };
 
   const formatDate = (dateString: string) => {
