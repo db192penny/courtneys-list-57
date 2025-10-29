@@ -182,6 +182,16 @@ export default function Community() {
           </Card>
         </div>
         
+        {/* Desktop Community Selector - Above hero card */}
+        <div className="hidden md:block mb-4">
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-semibold text-foreground">Community:</label>
+            <div className="w-64">
+              <CommunityDropdown />
+            </div>
+          </div>
+        </div>
+        
         {/* Hero Card - Desktop/Tablet Only */}
         <div className="hidden md:block mb-6">
           <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-none shadow-md">
