@@ -1,7 +1,7 @@
 import { useMemo, useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, UserPlus, Home, Star, TrendingUp, Users } from "lucide-react";
+import { Plus, UserPlus, Home, Star, TrendingUp, Users, Building2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { WelcomeToolbar } from "@/components/WelcomeToolbar";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { BackToTopButton } from "@/components/ui/BackToTopButton";
 import { CommunityNavigationNotice } from "@/components/CommunityNavigationNotice";
+import { CommunityDropdown } from "@/components/CommunityDropdown";
 import { storeAuthReturnPath } from "@/utils/authRedirect";
 
 function slugToName(slug: string) {
@@ -170,6 +171,19 @@ export default function Community() {
         
         {/* Welcome toolbar for new users */}
         <WelcomeToolbar communitySlug={slug} />
+        
+        {/* Mobile Community Selector - Prominent placement */}
+        <div className="md:hidden mb-4">
+          <Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <h2 className="text-sm font-semibold text-foreground">Switch Community</h2>
+              </div>
+              <CommunityDropdown fullWidth />
+            </CardContent>
+          </Card>
+        </div>
         
         {/* Hero Card - Desktop/Tablet Only */}
         <div className="hidden md:block mb-6">
