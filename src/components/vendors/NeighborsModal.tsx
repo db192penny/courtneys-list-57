@@ -166,13 +166,11 @@ export function NeighborsModal({
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-sm">
                               {(() => {
-                                // Check if viewing different community than their home
-                                const isDifferentCommunity = userHomeCommunity && userHomeCommunity !== communityName;
-                                
-                                if (isDifferentCommunity) {
+                                // ONLY hide if actually different communities
+                                if (userHomeCommunity && communityName && userHomeCommunity !== communityName) {
                                   return 'Neighbor';
                                 }
-                                
+                                // Same community: show the actual name
                                 return name;
                               })()}
                               {street && ` on ${street}`}
