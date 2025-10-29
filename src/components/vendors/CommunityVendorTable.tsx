@@ -131,7 +131,7 @@ export default function CommunityVendorTable({
   }, []);
 
   // Check if banner was previously dismissed (separate keys for auth states)
-  // Reset banner when community changes
+  // Reset banner when community changes or after 24 hours
   useEffect(() => {
     // Detect community change
     if (prevCommunityName !== communityName) {
@@ -144,17 +144,30 @@ export default function CommunityVendorTable({
     
     const authState = isAuthenticated ? 'authenticated' : 'unauthenticated';
     const bannerKey = `banner_dismissed_${communityName}_${authState}`;
-    const wasDismissed = localStorage.getItem(bannerKey);
-    if (wasDismissed) {
-      setIsBannerVisible(false);
+    const dismissedTimestamp = localStorage.getItem(bannerKey);
+    
+    if (dismissedTimestamp) {
+      const dismissedTime = parseInt(dismissedTimestamp, 10);
+      const currentTime = Date.now();
+      const twentyFourHours = 24 * 60 * 60 * 1000;
+      
+      // Check if 24 hours have passed
+      if (currentTime - dismissedTime < twentyFourHours) {
+        setIsBannerVisible(false);
+      } else {
+        // 24 hours passed - clear dismissal and show banner
+        localStorage.removeItem(bannerKey);
+        setIsBannerVisible(true);
+        setIsBannerExiting(false);
+      }
     } else {
-      // Reset visibility when auth state changes and banner wasn't dismissed for this state
+      // Not dismissed - show banner
       setIsBannerVisible(true);
       setIsBannerExiting(false);
     }
   }, [communityName, isAuthenticated, prevCommunityName]);
 
-  // Auto-dismiss banner on scroll (separate dismissal per auth state)
+  // Auto-dismiss banner on scroll (separate dismissal per auth state, expires after 24 hours)
   useEffect(() => {
     if (!isBannerVisible || !hasScrolled) return;
 
@@ -164,10 +177,10 @@ export default function CommunityVendorTable({
     // Trigger fade-out animation
     setIsBannerExiting(true);
     
-    // After animation, hide banner and store dismissal for current auth state
+    // After animation, hide banner and store dismissal timestamp
     const timer = setTimeout(() => {
       setIsBannerVisible(false);
-      localStorage.setItem(bannerKey, 'true');
+      localStorage.setItem(bannerKey, Date.now().toString());
     }, 300); // Match animation duration
 
     return () => clearTimeout(timer);
