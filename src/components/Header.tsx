@@ -235,9 +235,7 @@ const Header = () => {
                   {/* Community Switcher - Mobile */}
                   <div className="mb-4">
                     <label className="text-xs font-medium text-muted-foreground mb-2 block">Service Providers</label>
-                    <div onClick={() => setMobileMenuOpen(false)}>
-                      <CommunityDropdown currentCommunity={userData?.communityName} fullWidth />
-                    </div>
+                    <CommunityDropdown fullWidth />
                   </div>
                   
                   <div className="flex flex-col gap-2">
@@ -332,7 +330,7 @@ const Header = () => {
                 <PointsBadge />
                 
                 {/* Community Switcher - Desktop */}
-                <CommunityDropdown currentCommunity={userData?.communityName} />
+                <CommunityDropdown />
                 
                 <div className="flex items-center gap-1">
                   {navigationItems.map(({ to, label }) => (

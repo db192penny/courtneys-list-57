@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -10,39 +10,44 @@ import { communityNames } from "@/utils/communityNames";
 import { Building2 } from "lucide-react";
 
 interface CommunityDropdownProps {
-  currentCommunity?: string;
   fullWidth?: boolean;
 }
 
-export function CommunityDropdown({ currentCommunity, fullWidth }: CommunityDropdownProps) {
+export function CommunityDropdown({ fullWidth }: CommunityDropdownProps) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const communities = Object.entries(communityNames);
   
-  // Determine current value (display name, not slug)
-  const currentValue = currentCommunity || "Boca Bridges";
+  // Extract slug from URL or default to boca-bridges
+  const communityMatch = location.pathname.match(/\/communities\/([^\/]+)/);
+  const currentSlug = communityMatch ? communityMatch[1] : 'boca-bridges';
+  
+  // Get display name from slug
+  const currentDisplayName = communityNames[currentSlug] || "Boca Bridges";
 
-  const handleCommunityChange = (communityName: string) => {
-    // Store in localStorage
-    localStorage.setItem('selected_community', communityName);
+  const handleCommunityChange = (slug: string) => {
+    // Store slug in localStorage
+    localStorage.setItem('selected_community', communityNames[slug]);
     
     // Navigate to community page
-    const slug = communityName.toLowerCase().replace(/\s+/g, '-');
     navigate(`/communities/${slug}`);
   };
 
   return (
     <Select
-      value={currentValue}
+      value={currentSlug}
       onValueChange={handleCommunityChange}
     >
       <SelectTrigger className={fullWidth ? "w-full h-9 bg-background" : "w-[200px] h-9 bg-background"}>
         <Building2 className="mr-2 h-4 w-4" />
-        <SelectValue />
+        <SelectValue placeholder={currentDisplayName}>
+          {currentDisplayName}
+        </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="bg-background z-50">
         {communities.map(([slug, name]) => (
-          <SelectItem key={slug} value={name}>
+          <SelectItem key={slug} value={slug}>
             {name}
           </SelectItem>
         ))}
