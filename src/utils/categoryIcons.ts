@@ -97,6 +97,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Masseuse": Hand,
   "General Contractor": HardHat,
   "Babysitting": Baby,
+  "Flooring": Layers,
 };
 
 export function getCategoryIcon(category: Category): LucideIcon {

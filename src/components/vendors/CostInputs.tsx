@@ -291,6 +291,15 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "hourly", amount: null, unit: "cabinet", notes: null },
     ];
   }
+
+  // Flooring: Materials + Installation per sq ft + Project fee
+  if (c === "flooring") {
+    return [
+      { cost_kind: "hourly", amount: null, unit: "sqft", notes: "Materials cost per sq ft" },
+      { cost_kind: "installation", amount: null, unit: "sqft", notes: "Labor/Installation per sq ft" },
+      { cost_kind: "project_fee", amount: null, unit: "project", notes: "Total project cost" },
+    ];
+  }
   
   // General Contractor: No structured fields
   if (c === "general contractor") {

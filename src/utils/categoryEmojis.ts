@@ -55,7 +55,8 @@ export const categoryEmojiMap: Record<string, string> = {
   'Wallpaper Installation': '📜',
   'Window Treatment': '🪟',
   'Masseuse': '💆',
-  'Babysitting': '👶'
+  'Babysitting': '👶',
+  'Flooring': '🪵'
 };
 
 export function getCategoryEmoji(category: string): string {
