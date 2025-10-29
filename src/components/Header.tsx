@@ -15,7 +15,7 @@ import { useUserData } from "@/hooks/useUserData";
 // New Logo Components
 function NewLogoDesktop() {
   return (
-    <Link to="/" className="flex flex-col items-start hover:opacity-80 transition-opacity">
+    <a href="https://courtneys-list.com/homepage" className="flex flex-col items-start hover:opacity-80 transition-opacity">
       <div className="flex items-center gap-2">
         <span className="text-xl sm:text-2xl">🏘️</span>
         <span className="font-bold text-lg sm:text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -25,18 +25,18 @@ function NewLogoDesktop() {
       <p className="text-xs sm:text-sm text-muted-foreground ml-6 sm:ml-8">
         Trusted Provider Reviews by Neighbors
       </p>
-    </Link>
+    </a>
   );
 }
 
 function NewLogoMobile() {
   return (
-    <Link to="/" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+    <a href="https://courtneys-list.com/homepage" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
       <span className="text-base">🏘️</span>
       <span className="font-bold text-sm bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
         Courtney's List
       </span>
-    </Link>
+    </a>
   );
 }
 
