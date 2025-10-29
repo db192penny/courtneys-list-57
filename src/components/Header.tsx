@@ -1,10 +1,10 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { CommunityDropdown } from "./CommunityDropdown";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Menu, Trophy, Coffee, Star, Award, Medal, Users, Settings, Shield, LogOut, Building2 } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Menu, Trophy, Coffee, Star, Award, Medal, Settings, Shield, LogOut, Building2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import useIsAdmin from "@/hooks/useIsAdmin";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -111,25 +111,6 @@ const Header = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
 
-  // Dynamic Service Providers link - prioritize user's home community
-  const serviceProvidersLink = useMemo(() => {
-    // 1. PRIMARY: Use user's actual home community
-    if (userData?.communityName) {
-      const slug = userData.communityName.toLowerCase().replace(/\s+/g, '-');
-      return `/communities/${slug}`;
-    }
-    
-    // 2. FALLBACK: Use localStorage (last visited community)
-    const storedCommunity = localStorage.getItem('selected_community');
-    if (storedCommunity) {
-      const slug = storedCommunity.toLowerCase().replace(/\s+/g, '-');
-      return `/communities/${slug}`;
-    }
-    
-    // 3. FINAL FALLBACK: Default if nothing else
-    return "/communities/boca-bridges";
-  }, [userData?.communityName]);
-
   // Determine if we're on homepage to set default community context
   const isHomepage = location.pathname === "/" || location.pathname === "/homepage";
   const isAuthPage = location.pathname === "/auth" || location.pathname === "/signin";
@@ -194,8 +175,6 @@ const Header = () => {
     
     // Handle specific route matching logic
     switch (label) {
-      case "Service Providers":
-        return currentPath.startsWith("/communities");
       case "Admin":
         return currentPath.startsWith("/admin");
       default:
@@ -206,8 +185,6 @@ const Header = () => {
   // Function to get appropriate icon for each menu item
   const getMenuIcon = (label: string) => {
     switch (label) {
-      case "Service Providers":
-        return <Users className="h-4 w-4 text-blue-600" />;
       case "Community Rewards":
         return <Trophy className="h-4 w-4 text-blue-600" />;
       case "Settings":
@@ -220,7 +197,6 @@ const Header = () => {
   };
 
   const navigationItems = authed ? [
-    { to: serviceProvidersLink, label: "Service Providers" },
     { to: "/neighborhood-cred", label: "Community Rewards" },
     { to: "/settings", label: "Settings" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
@@ -256,28 +232,13 @@ const Header = () => {
                     <MobilePointsDisplay />
                   </div>
                   
-                  {/* Admin Community Switcher - Mobile */}
-                  {isAdmin && (
-                    <div className="mb-4">
-                      <label className="text-xs font-medium text-muted-foreground mb-2 block">Community</label>
-                      <Select 
-                        value={communitySlug} 
-                        onValueChange={(value) => {
-                          navigate(`/communities/${value}`);
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <Building2 className="mr-2 h-4 w-4" />
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="boca-bridges">Boca Bridges</SelectItem>
-                          <SelectItem value="the-bridges">The Bridges</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  {/* Community Switcher - Mobile */}
+                  <div className="mb-4">
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Service Providers</label>
+                    <div onClick={() => setMobileMenuOpen(false)}>
+                      <CommunityDropdown currentCommunity={userData?.communityName} fullWidth />
                     </div>
-                  )}
+                  </div>
                   
                   <div className="flex flex-col gap-2">
                     {navigationItems.map(({ to, label }) => (
@@ -370,22 +331,8 @@ const Header = () => {
               <div className="flex items-center gap-2">
                 <PointsBadge />
                 
-                {/* Admin Community Switcher - Desktop */}
-                {isAdmin && (
-                  <Select 
-                    value={communitySlug} 
-                    onValueChange={(value) => navigate(`/communities/${value}`)}
-                  >
-                    <SelectTrigger className="w-[180px] h-9">
-                      <Building2 className="mr-2 h-4 w-4" />
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="boca-bridges">Boca Bridges</SelectItem>
-                      <SelectItem value="the-bridges">The Bridges</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
+                {/* Community Switcher - Desktop */}
+                <CommunityDropdown currentCommunity={userData?.communityName} />
                 
                 <div className="flex items-center gap-1">
                   {navigationItems.map(({ to, label }) => (
