@@ -300,6 +300,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "project_fee", amount: null, unit: "project", notes: "Total project cost" },
     ];
   }
+
+  // Locksmith: Service call + per job/service
+  if (c === "locksmith") {
+    return [
+      { cost_kind: "service_call", amount: null, unit: "visit", notes: null },
+      { cost_kind: "one_time", amount: null, unit: "service", notes: "Per lock/rekey/service" },
+    ];
+  }
   
   // General Contractor: No structured fields
   if (c === "general contractor") {

@@ -41,6 +41,7 @@ import {
   HardHat,
   Hand,
   Baby,
+  Key,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -98,6 +99,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "General Contractor": HardHat,
   "Babysitting": Baby,
   "Flooring": Layers,
+  "Locksmith": Key,
 };
 
 export function getCategoryIcon(category: Category): LucideIcon {
