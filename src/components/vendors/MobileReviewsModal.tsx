@@ -106,18 +106,28 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                   <div className="flex items-center gap-2">
                     <div className="text-xs text-blue-600 font-medium">
                       {(() => {
-                        // Get the actual vendor community
-                        const vendorCommunity = vendor?.community;
-                        
-                        // ONLY hide names if viewing DIFFERENT community
-                        if (userHomeCommunity && vendorCommunity && userHomeCommunity !== vendorCommunity) {
+                        // Check if logged out first
+                        if (!userHomeCommunity) {
+                          // Logged out: always show "Neighbor"
                           const streetPart = r.author_label?.includes(' on ') 
                             ? ' on ' + r.author_label.split(' on ')[1] 
                             : '';
                           return `Neighbor${streetPart}`;
                         }
                         
-                        // SAME COMMUNITY or no community data: show original names
+                        // Get the actual vendor community
+                        const vendorCommunity = vendor?.community;
+                        
+                        // Check if viewing DIFFERENT community
+                        if (userHomeCommunity !== vendorCommunity) {
+                          // Cross-community: show "Neighbor on [Street]"
+                          const streetPart = r.author_label?.includes(' on ') 
+                            ? ' on ' + r.author_label.split(' on ')[1] 
+                            : '';
+                          return `Neighbor${streetPart}`;
+                        }
+                        
+                        // SAME COMMUNITY: show original names
                         return r.author_label;
                       })()}
                     </div>
@@ -145,18 +155,28 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                       <div className="text-right">
                         <p className="text-sm font-semibold text-blue-700 mb-1">
                           — {(() => {
-                            // Get the actual vendor community
-                            const vendorCommunity = vendor?.community;
-                            
-                            // ONLY hide names if viewing DIFFERENT community
-                            if (userHomeCommunity && vendorCommunity && userHomeCommunity !== vendorCommunity) {
+                            // Check if logged out first
+                            if (!userHomeCommunity) {
+                              // Logged out: always show "Neighbor"
                               const streetPart = r.author_label?.includes(' on ') 
                                 ? ' on ' + r.author_label.split(' on ')[1] 
                                 : '';
                               return `Neighbor${streetPart}`;
                             }
                             
-                            // SAME COMMUNITY or no community data: show original names
+                            // Get the actual vendor community
+                            const vendorCommunity = vendor?.community;
+                            
+                            // Check if viewing DIFFERENT community
+                            if (userHomeCommunity !== vendorCommunity) {
+                              // Cross-community: show "Neighbor on [Street]"
+                              const streetPart = r.author_label?.includes(' on ') 
+                                ? ' on ' + r.author_label.split(' on ')[1] 
+                                : '';
+                              return `Neighbor${streetPart}`;
+                            }
+                            
+                            // SAME COMMUNITY: show original names
                             return r.author_label;
                           })()}
                         </p>
@@ -169,18 +189,28 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                   <div className="bg-white/60 rounded-lg p-3 border border-blue-100 text-center">
                     <div className="text-sm text-blue-600 mb-2">
                       {(() => {
-                        // Get the actual vendor community
-                        const vendorCommunity = vendor?.community;
-                        
-                        // ONLY hide names if viewing DIFFERENT community
-                        if (userHomeCommunity && vendorCommunity && userHomeCommunity !== vendorCommunity) {
+                        // Check if logged out first
+                        if (!userHomeCommunity) {
+                          // Logged out: always show "Neighbor"
                           const streetPart = r.author_label?.includes(' on ') 
                             ? ' on ' + r.author_label.split(' on ')[1] 
                             : '';
                           return `Neighbor${streetPart}`;
                         }
                         
-                        // SAME COMMUNITY or no community data: show original names
+                        // Get the actual vendor community
+                        const vendorCommunity = vendor?.community;
+                        
+                        // Check if viewing DIFFERENT community
+                        if (userHomeCommunity !== vendorCommunity) {
+                          // Cross-community: show "Neighbor on [Street]"
+                          const streetPart = r.author_label?.includes(' on ') 
+                            ? ' on ' + r.author_label.split(' on ')[1] 
+                            : '';
+                          return `Neighbor${streetPart}`;
+                        }
+                        
+                        // SAME COMMUNITY: show original names
                         return r.author_label;
                       })()}
                     </div>

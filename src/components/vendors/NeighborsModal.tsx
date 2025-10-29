@@ -166,14 +166,16 @@ export function NeighborsModal({
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-sm">
                               {(() => {
-                                // ONLY hide if actually different communities
+                                // Check if viewing different community
                                 if (userHomeCommunity && communityName && userHomeCommunity !== communityName) {
-                                  return 'Neighbor';
+                                  // Cross-community: Show "Neighbor" + street if available
+                                  return street ? `Neighbor on ${street}` : 'Neighbor';
                                 }
                                 // Same community: show the actual name
                                 return name;
                               })()}
-                              {street && ` on ${street}`}
+                              {/* Only add street if not already included in name */}
+                              {userHomeCommunity === communityName && street && !name.includes(' on ') && ` on ${street}`}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
