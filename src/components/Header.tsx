@@ -111,15 +111,24 @@ const Header = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
 
-  // Dynamic Service Providers link based on stored community
+  // Dynamic Service Providers link - prioritize user's home community
   const serviceProvidersLink = useMemo(() => {
+    // 1. PRIMARY: Use user's actual home community
+    if (userData?.communityName) {
+      const slug = userData.communityName.toLowerCase().replace(/\s+/g, '-');
+      return `/communities/${slug}`;
+    }
+    
+    // 2. FALLBACK: Use localStorage (last visited community)
     const storedCommunity = localStorage.getItem('selected_community');
     if (storedCommunity) {
       const slug = storedCommunity.toLowerCase().replace(/\s+/g, '-');
       return `/communities/${slug}`;
     }
+    
+    // 3. FINAL FALLBACK: Default if nothing else
     return "/communities/boca-bridges";
-  }, [location.pathname]);
+  }, [userData?.communityName]);
 
   // Determine if we're on homepage to set default community context
   const isHomepage = location.pathname === "/" || location.pathname === "/homepage";
