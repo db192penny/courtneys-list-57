@@ -135,7 +135,10 @@ export default function CommunityVendorTable({
   useEffect(() => {
     // Detect community change
     if (prevCommunityName !== communityName) {
-      // Community changed - reset banner visibility
+      // Community changed - clear any previous dismissal and reset banner visibility
+      const authState = isAuthenticated ? 'authenticated' : 'unauthenticated';
+      const bannerKey = `banner_dismissed_${communityName}_${authState}`;
+      localStorage.removeItem(bannerKey);
       setIsBannerVisible(true);
       setIsBannerExiting(false);
       setPrevCommunityName(communityName);
