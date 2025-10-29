@@ -79,7 +79,7 @@ const Index = () => {
                 </div>
                 <p className="text-sm md:text-base text-foreground/70 max-w-md">Your neighborhood's trusted service providers</p>
               </div>
-              <p className="text-sm md:text-lg lg:text-xl text-foreground/60 md:text-foreground/90 font-normal md:font-medium px-4 max-w-xl mx-auto" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Say goodbye to "Could you recommend a plumber?" <span className="whitespace-nowrap">Facebook posts</span></p>
+              <p className="text-sm md:text-lg lg:text-xl text-foreground/60 md:text-foreground/90 font-normal md:font-medium px-4 max-w-xl mx-auto" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Say goodbye to "Could you recommend <span className="whitespace-nowrap">a plumber?" Facebook posts</span></p>
           
           <div className="mx-auto w-full max-w-2xl px-2 pt-2">
             <p className="text-center text-lg md:text-xl font-semibold mb-4">Choose your community</p>
