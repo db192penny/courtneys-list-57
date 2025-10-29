@@ -7,7 +7,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useUserData } from "@/hooks/useUserData";
 
 type AddCostModalProps = {
   open: boolean;
@@ -15,7 +14,6 @@ type AddCostModalProps = {
   vendorId: string;
   vendorName: string;
   category: string;
-  vendorCommunity?: string;
 };
 
 export function AddCostModal({
@@ -24,13 +22,11 @@ export function AddCostModal({
   vendorId,
   vendorName,
   category,
-  vendorCommunity
 }: AddCostModalProps) {
   const [loading, setLoading] = useState(false);
   const [skipForNow, setSkipForNow] = useState(false);
   const [showName, setShowName] = useState(true);
   const { toast } = useToast();
-  const { data: userData } = useUserData();
   const queryClient = useQueryClient();
 
   // Category-specific form states
@@ -70,17 +66,6 @@ export function AddCostModal({
           description: "Please sign in to add cost information",
           variant: "destructive"
         });
-        return;
-      }
-      
-      // Cross-community validation
-      if (userData?.communityName && vendorCommunity && userData.communityName !== vendorCommunity) {
-        toast({
-          title: "Cannot add costs for providers in other communities",
-          description: `You can only add cost information for providers in ${userData.communityName}.`,
-          variant: "destructive"
-        });
-        setLoading(false);
         return;
       }
 

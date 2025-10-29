@@ -60,6 +60,21 @@ const SubmitVendor = () => {
   const vendorId = searchParams.get("vendor_id");
   const canEditCore = !!isAdmin || !vendorId;
 
+  // Check if user is trying to add provider to a different community
+  useEffect(() => {
+    if (userData?.communityName && communityParam && userData.communityName !== communityParam) {
+      toast({
+        title: "Cannot add provider",
+        description: `You can only add providers to ${userData.communityName}. Redirecting to your community...`,
+        variant: "destructive",
+      });
+      // Redirect to user's community submit page
+      setTimeout(() => {
+        navigate(`/submit?community=${userData.communityName}${category ? `&category=${category}` : ''}`);
+      }, 2000);
+    }
+  }, [userData, communityParam, navigate, category, toast]);
+
   // Pre-populate category from URL parameter after auth redirect
   useEffect(() => {
     const urlCategory = searchParams.get("category");

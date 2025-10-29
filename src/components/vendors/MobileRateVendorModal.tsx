@@ -153,16 +153,6 @@ export default function MobileRateVendorModal({ open, onOpenChange, vendor, onSu
       return;
     }
     
-    // Cross-community validation
-    if (userData?.communityName && vendorCommunity && userData.communityName !== vendorCommunity) {
-      toast({
-        title: "Cannot rate providers in other communities",
-        description: `You can only rate providers in ${userData.communityName}. Contact them to use their services!`,
-        variant: "destructive"
-      });
-      return;
-    }
-    
     if (!rating || rating < 1 || rating > 5) {
       toast({ title: "Rating required", description: "Please select a rating from 1 to 5.", variant: "destructive" });
       return;

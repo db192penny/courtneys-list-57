@@ -39,6 +39,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { GATracking } from "@/components/analytics/GoogleAnalytics";
 import { useAnalyticsTracking } from "@/contexts/AnalyticsContext";
+import { useUserData } from "@/hooks/useUserData";
 
 import ReviewsHover from "@/components/vendors/ReviewsHover";
 import PreviewReviewsHover from "@/components/vendors/PreviewReviewsHover";
@@ -261,6 +262,7 @@ export default function CommunityVendorTable({
   const { data: userHomeVendors } = useUserHomeVendors();
   const { data: userReviews } = useUserReviews();
   const userCosts = useUserCosts();
+  const { data: userData } = useUserData();
   
   // Modal states
   const [rateModalOpen, setRateModalOpen] = useState(false);
@@ -311,11 +313,31 @@ export default function CommunityVendorTable({
   };
 
   const openRate = (row: CommunityVendorRow) => {
+    // Check if user is trying to rate a vendor from a different community
+    if (userData?.communityName && userData.communityName !== communityName) {
+      toast({
+        title: "Cannot rate vendor",
+        description: `You can only rate vendors in ${userData.communityName}. This vendor is in ${communityName}.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSelectedVendor({ id: row.id, name: row.name, category: row.category });
     setRateModalOpen(true);
   };
 
   const openCosts = (row: CommunityVendorRow) => {
+    // Check if user is trying to add costs for a vendor from a different community
+    if (userData?.communityName && userData.communityName !== communityName) {
+      toast({
+        title: "Cannot add costs",
+        description: `You can only add costs for vendors in ${userData.communityName}. This vendor is in ${communityName}.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSelectedVendor({ id: row.id, name: row.name, category: row.category });
     setCostModalOpen(true);
   };
