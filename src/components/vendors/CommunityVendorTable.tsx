@@ -111,6 +111,7 @@ export default function CommunityVendorTable({
   const { isScrollingDown, hasScrolled } = useScrollDirection();
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [isBannerExiting, setIsBannerExiting] = useState(false);
+  const [prevCommunityName, setPrevCommunityName] = useState<string>(communityName);
   const { trackCategoryClick } = useAnalyticsTracking();
 
   // Initialize category from URL parameter
@@ -130,7 +131,17 @@ export default function CommunityVendorTable({
   }, []);
 
   // Check if banner was previously dismissed (separate keys for auth states)
+  // Reset banner when community changes
   useEffect(() => {
+    // Detect community change
+    if (prevCommunityName !== communityName) {
+      // Community changed - reset banner visibility
+      setIsBannerVisible(true);
+      setIsBannerExiting(false);
+      setPrevCommunityName(communityName);
+      return;
+    }
+    
     const authState = isAuthenticated ? 'authenticated' : 'unauthenticated';
     const bannerKey = `banner_dismissed_${communityName}_${authState}`;
     const wasDismissed = localStorage.getItem(bannerKey);
@@ -141,7 +152,7 @@ export default function CommunityVendorTable({
       setIsBannerVisible(true);
       setIsBannerExiting(false);
     }
-  }, [communityName, isAuthenticated]);
+  }, [communityName, isAuthenticated, prevCommunityName]);
 
   // Auto-dismiss banner on scroll (separate dismissal per auth state)
   useEffect(() => {
@@ -312,6 +323,12 @@ export default function CommunityVendorTable({
     }
   };
 
+  const handleShowBanner = () => {
+    setIsBannerVisible(true);
+    setIsBannerExiting(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const openRate = (row: CommunityVendorRow) => {
     // Check if user is trying to rate a vendor from a different community
     if (userData?.communityName && userData.communityName !== communityName) {
@@ -399,7 +416,7 @@ export default function CommunityVendorTable({
             </div>
           )}
 
-          {/* Row 1: Category Dropdown + Share Button */}
+          {/* Row 1: Category Dropdown + Info + Share Buttons */}
           <div className="flex items-end gap-3 mb-4">
             <div className="flex-1 flex flex-col justify-end">
               <HorizontalCategoryPills
@@ -412,6 +429,29 @@ export default function CommunityVendorTable({
                 isBannerVisible={isMobile && isBannerVisible}
               />
             </div>
+            
+            {isMobile && !isBannerVisible && (
+              <div className="flex flex-col justify-end">
+                <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-2 block text-right sm:text-left">
+                  Info
+                </label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleShowBanner}
+                      className="h-12 w-12 p-0 flex items-center justify-center"
+                    >
+                      <Building2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Show community info</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            )}
             
             <div className="flex flex-col justify-end">
               <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-2 block text-right sm:text-left">
