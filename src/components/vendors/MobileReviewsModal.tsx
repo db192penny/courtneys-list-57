@@ -118,14 +118,14 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                         // Get the actual vendor community
                         const vendorCommunity = vendor?.community;
                         
-                        // Check if viewing DIFFERENT community
-                        if (userHomeCommunity !== vendorCommunity) {
-                          // Cross-community: show "Neighbor on [Street]"
-                          const streetPart = r.author_label?.includes(' on ') 
-                            ? ' on ' + r.author_label.split(' on ')[1] 
-                            : '';
-                          return `Neighbor${streetPart}`;
-                        }
+                  // Check if viewing DIFFERENT community
+                  if (userHomeCommunity && vendorCommunity && userHomeCommunity !== vendorCommunity) {
+                    // Cross-community: show "Neighbor on [Street]"
+                    const streetPart = r.author_label?.includes(' on ') 
+                      ? ' on ' + r.author_label.split(' on ')[1] 
+                      : '';
+                    return `Neighbor${streetPart}`;
+                  }
                         
                         // SAME COMMUNITY: show original names
                         return r.author_label;
@@ -168,7 +168,7 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                             const vendorCommunity = vendor?.community;
                             
                             // Check if viewing DIFFERENT community
-                            if (userHomeCommunity !== vendorCommunity) {
+                            if (userHomeCommunity && vendorCommunity && userHomeCommunity !== vendorCommunity) {
                               // Cross-community: show "Neighbor on [Street]"
                               const streetPart = r.author_label?.includes(' on ') 
                                 ? ' on ' + r.author_label.split(' on ')[1] 
@@ -202,7 +202,7 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                         const vendorCommunity = vendor?.community;
                         
                         // Check if viewing DIFFERENT community
-                        if (userHomeCommunity !== vendorCommunity) {
+                        if (userHomeCommunity && vendorCommunity && userHomeCommunity !== vendorCommunity) {
                           // Cross-community: show "Neighbor on [Street]"
                           const streetPart = r.author_label?.includes(' on ') 
                             ? ' on ' + r.author_label.split(' on ')[1] 
