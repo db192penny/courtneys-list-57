@@ -484,6 +484,7 @@ export default function VendorMobileCard({
             onOpenChange={() => {}}
             vendor={vendor}
             onRate={() => onRate(vendor)}
+            communityName={communityName}
           />
         </DialogContent>
       </Dialog>

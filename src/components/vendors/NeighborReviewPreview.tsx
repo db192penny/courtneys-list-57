@@ -429,13 +429,14 @@ export function NeighborReviewPreview({
       </DialogTrigger>
       <DialogContent className="max-w-md mx-auto">
         <DialogHeader>
-          <DialogTitle>Boca Bridges</DialogTitle>
+          <DialogTitle>{communityName || "Boca Bridges"}</DialogTitle>
         </DialogHeader>
         <MobileReviewsModal 
           open={true}
           onOpenChange={() => {}}
           vendor={{ id: vendorId }}
           onRate={() => {}}
+          communityName={communityName}
         />
       </DialogContent>
     </Dialog>

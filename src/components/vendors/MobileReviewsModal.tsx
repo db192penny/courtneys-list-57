@@ -19,7 +19,7 @@ interface Review {
   is_pending?: boolean;
 }
 
-export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
+export function MobileReviewsModal({ open, onOpenChange, vendor, onRate, communityName }) {
   const { data: profile } = useUserProfile();
   const { data: userData } = useUserData();
   const navigate = useNavigate();
@@ -116,7 +116,7 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                         }
                         
                         // Get the actual vendor community
-                        const vendorCommunity = vendor?.community;
+                        const vendorCommunity = communityName;
                         
                   // Check if viewing DIFFERENT community
                   if (userHomeCommunity && vendorCommunity && userHomeCommunity !== vendorCommunity) {
@@ -165,7 +165,7 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                             }
                             
                             // Get the actual vendor community
-                            const vendorCommunity = vendor?.community;
+                            const vendorCommunity = communityName;
                             
                             // Check if viewing DIFFERENT community
                             if (userHomeCommunity && vendorCommunity && userHomeCommunity !== vendorCommunity) {
@@ -199,7 +199,7 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate }) {
                         }
                         
                         // Get the actual vendor community
-                        const vendorCommunity = vendor?.community;
+                        const vendorCommunity = communityName;
                         
                         // Check if viewing DIFFERENT community
                         if (userHomeCommunity && vendorCommunity && userHomeCommunity !== vendorCommunity) {
