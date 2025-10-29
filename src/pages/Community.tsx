@@ -176,10 +176,7 @@ export default function Community() {
         <div className="md:hidden mb-4">
           <Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800 shadow-sm">
             <CardContent className="p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                <h2 className="text-sm font-semibold text-foreground">Switch Community</h2>
-              </div>
+              <h2 className="text-sm font-semibold text-foreground mb-2">Community</h2>
               <CommunityDropdown fullWidth />
             </CardContent>
           </Card>
