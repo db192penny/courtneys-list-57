@@ -12,7 +12,7 @@ import { User } from '@supabase/supabase-js';
 import { useUserData } from '@/hooks/useUserData';
 import { toSlug } from '@/utils/slug';
 
-export default function ActivityGuide() {
+export default function ActivityGuide({ className }: { className?: string }) {
   const navigate = useNavigate();
   const { data: rewards = [] } = usePointRewards();
   const { toast } = useToast();
@@ -159,7 +159,7 @@ export default function ActivityGuide() {
 
   return (
     <>
-      <Card>
+      <Card className={className}>
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Lightbulb className="w-4 h-4" />

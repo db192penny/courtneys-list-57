@@ -11,6 +11,7 @@ import AdminBadge from "@/components/badges/AdminBadge";
 import BadgeProgress from "@/components/badges/BadgeProgress";
 import PointHistoryTable from "@/components/badges/PointHistoryTable";
 import CommunityLeaderboard from "@/components/badges/CommunityLeaderboard";
+import ActivityGuide from "@/components/badges/ActivityGuide";
 import { Trophy, Award } from "lucide-react";
 
 const NeighborhoodCred = () => {
@@ -100,6 +101,9 @@ const NeighborhoodCred = () => {
             />
           </CardContent>
         </Card>
+
+        {/* How to Earn Points */}
+        <ActivityGuide className="mb-6" />
 
         {/* Community Leaderboard */}
         {communityName && (
