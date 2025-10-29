@@ -232,12 +232,6 @@ const Header = () => {
                     <MobilePointsDisplay />
                   </div>
                   
-                  {/* Community Switcher - Mobile */}
-                  <div className="mb-4">
-                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Service Providers</label>
-                    <CommunityDropdown fullWidth onClose={() => setMobileMenuOpen(false)} />
-                  </div>
-                  
                   <div className="flex flex-col gap-2">
                     {navigationItems.map(({ to, label }) => (
                       <Button 
