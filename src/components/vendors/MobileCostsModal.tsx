@@ -4,11 +4,15 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserData } from "@/hooks/useUserData";
+import { formatNameWithLastInitial } from "@/utils/nameFormatting";
+import { extractStreetName, capitalizeStreetName } from "@/utils/address";
 
 type Props = {
   vendorId: string;
   userHasCosts?: boolean;
   onEditCosts?: () => void;
+  vendorCommunity?: string;
 };
 
 type CostData = {
@@ -39,10 +43,47 @@ const formatCost = (amount: number | null, unit?: string | null, period?: string
   return `$${formattedAmount}${unitDisplay}`;
 };
 
-export function MobileCostsModal({ vendorId, userHasCosts, onEditCosts }: Props) {
+export function MobileCostsModal({ vendorId, userHasCosts, onEditCosts, vendorCommunity }: Props) {
   const { data: profile } = useUserProfile();
+  const { data: userData } = useUserData();
   const navigate = useNavigate();
   const isVerified = !!profile?.isVerified;
+
+  const formatCostAuthor = (authorLabel: string) => {
+    let name = '';
+    let street = '';
+    
+    // Try pipe format first
+    if (authorLabel.includes('|')) {
+      [name, street] = authorLabel.split('|').map(s => s.trim());
+    } else if (authorLabel.includes(' on ')) {
+      // Try "on" format (e.g., "Amy W. on Rosella Rd")
+      [name, street] = authorLabel.split(' on ').map(s => s.trim());
+    } else {
+      return authorLabel; // fallback
+    }
+    
+    const cleanStreet = street ? extractStreetName(street) : "";
+    const formattedStreet = cleanStreet ? capitalizeStreetName(cleanStreet) : "";
+    
+    // Check if cross-community
+    const isCrossCommunity = userData?.communityName && 
+                            vendorCommunity && 
+                            userData.communityName !== vendorCommunity;
+    
+    if (isCrossCommunity) {
+      // Show anonymized version
+      return formattedStreet ? `Neighbor on ${formattedStreet}` : 'Neighbor';
+    }
+    
+    // Same community - show name with street
+    if (name === 'Neighbor' || name === '') {
+      return formattedStreet ? `Neighbor on ${formattedStreet}` : 'Neighbor';
+    }
+    
+    const formattedName = formatNameWithLastInitial(name);
+    return formattedStreet ? `${formattedName} on ${formattedStreet}` : formattedName;
+  };
   
   const { data: costs, isLoading } = useQuery({
     queryKey: ["vendor-costs-combined", vendorId],
@@ -136,7 +177,7 @@ export function MobileCostsModal({ vendorId, userHasCosts, onEditCosts }: Props)
               </p>
             )}
             <p className="text-xs text-gray-500 mt-1">
-              — {cost.author_label}
+              — {formatCostAuthor(cost.author_label)}
             </p>
           </div>
         ))}

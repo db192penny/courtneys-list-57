@@ -500,6 +500,7 @@ export default function VendorMobileCard({
           <MobileCostsModal 
             vendorId={vendor.id}
             userHasCosts={userHasCosts}
+            vendorCommunity={communityName}
             onEditCosts={() => {
               setCostModalOpen(false);
               setSelectedVendorForCostEdit({

@@ -8,10 +8,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { MobileCostsModal } from "./MobileCostsModal";
 import { useState } from "react";
+import { useUserData } from "@/hooks/useUserData";
+import { formatNameWithLastInitial } from "@/utils/nameFormatting";
+import { extractStreetName, capitalizeStreetName } from "@/utils/address";
 
 type Props = {
   vendorId: string;
   children: React.ReactNode;
+  vendorCommunity?: string;
 };
 
 type CostData = {
@@ -42,11 +46,48 @@ const formatCost = (amount: number | null, unit?: string | null, period?: string
   return `$${formattedAmount}${unitDisplay}`;
 };
 
-export default function CostsHover({ vendorId, children }: Props) {
+export default function CostsHover({ vendorId, children, vendorCommunity }: Props) {
   const { data: profile } = useUserProfile();
+  const { data: userData } = useUserData();
   const navigate = useNavigate();
   const isVerified = !!profile?.isVerified;
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+
+  const formatCostAuthor = (authorLabel: string) => {
+    let name = '';
+    let street = '';
+    
+    // Try pipe format first
+    if (authorLabel.includes('|')) {
+      [name, street] = authorLabel.split('|').map(s => s.trim());
+    } else if (authorLabel.includes(' on ')) {
+      // Try "on" format (e.g., "Amy W. on Rosella Rd")
+      [name, street] = authorLabel.split(' on ').map(s => s.trim());
+    } else {
+      return authorLabel; // fallback
+    }
+    
+    const cleanStreet = street ? extractStreetName(street) : "";
+    const formattedStreet = cleanStreet ? capitalizeStreetName(cleanStreet) : "";
+    
+    // Check if cross-community
+    const isCrossCommunity = userData?.communityName && 
+                            vendorCommunity && 
+                            userData.communityName !== vendorCommunity;
+    
+    if (isCrossCommunity) {
+      // Show anonymized version
+      return formattedStreet ? `Neighbor on ${formattedStreet}` : 'Neighbor';
+    }
+    
+    // Same community - show name with street
+    if (name === 'Neighbor' || name === '') {
+      return formattedStreet ? `Neighbor on ${formattedStreet}` : 'Neighbor';
+    }
+    
+    const formattedName = formatNameWithLastInitial(name);
+    return formattedStreet ? `${formattedName} on ${formattedStreet}` : formattedName;
+  };
 
   const { data: costs, isLoading, error } = useQuery({
     queryKey: ["vendor-costs", vendorId],
@@ -139,7 +180,7 @@ export default function CostsHover({ vendorId, children }: Props) {
                         </div>
                       ) : null}
                       <Badge variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
-                        {cost.author_label}
+                        {formatCostAuthor(cost.author_label)}
                       </Badge>
                     </div>
                     <div className="text-[10px] text-muted-foreground">
@@ -171,7 +212,7 @@ export default function CostsHover({ vendorId, children }: Props) {
         <DialogHeader>
           <DialogTitle>Cost Details</DialogTitle>
         </DialogHeader>
-        <MobileCostsModal vendorId={vendorId} />
+        <MobileCostsModal vendorId={vendorId} vendorCommunity={vendorCommunity} />
       </DialogContent>
     </Dialog>
   </>

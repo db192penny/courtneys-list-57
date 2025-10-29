@@ -97,13 +97,13 @@ export function CostDisplay({
                         Costs are shared just within our neighborhood circle. Sign up to view them.
                       </div>
                     ) : (
-                      <MobileCostsModal vendorId={vendorId} />
+                      <MobileCostsModal vendorId={vendorId} vendorCommunity={communityName} />
                     )}
                   </div>
                 </DialogContent>
               </Dialog>
             ) : (
-              <CostsHover vendorId={vendorId}>
+              <CostsHover vendorId={vendorId} vendorCommunity={communityName}>
                 <span className="text-xl font-normal underline decoration-dotted underline-offset-4 cursor-pointer">
                   {communityPrice}
                 </span>
