@@ -175,6 +175,8 @@ const Header = () => {
     
     // Handle specific route matching logic
     switch (label) {
+      case "Service Providers":
+        return currentPath.startsWith("/communities/");
       case "Admin":
         return currentPath.startsWith("/admin");
       default:
@@ -185,6 +187,8 @@ const Header = () => {
   // Function to get appropriate icon for each menu item
   const getMenuIcon = (label: string) => {
     switch (label) {
+      case "Service Providers":
+        return <Building2 className="h-4 w-4 text-blue-600" />;
       case "Community Rewards":
         return <Trophy className="h-4 w-4 text-blue-600" />;
       case "Settings":
@@ -197,6 +201,12 @@ const Header = () => {
   };
 
   const navigationItems = authed ? [
+    { 
+      to: userData?.communityName 
+        ? `/communities/${userData.communityName.toLowerCase().replace(/\s+/g, '-')}` 
+        : '/communities/the-bridges', 
+      label: "Service Providers" 
+    },
     { to: "/neighborhood-cred", label: "Community Rewards" },
     { to: "/settings", label: "Settings" },
     ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
