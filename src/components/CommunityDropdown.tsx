@@ -11,9 +11,10 @@ import { Building2 } from "lucide-react";
 
 interface CommunityDropdownProps {
   fullWidth?: boolean;
+  onClose?: () => void;
 }
 
-export function CommunityDropdown({ fullWidth }: CommunityDropdownProps) {
+export function CommunityDropdown({ fullWidth, onClose }: CommunityDropdownProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -32,6 +33,9 @@ export function CommunityDropdown({ fullWidth }: CommunityDropdownProps) {
     
     // Navigate to community page
     navigate(`/communities/${slug}`);
+    
+    // Close mobile menu if callback provided
+    onClose?.();
   };
 
   return (
