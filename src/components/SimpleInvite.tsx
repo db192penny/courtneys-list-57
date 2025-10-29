@@ -79,7 +79,7 @@ export function SimpleInvite() {
       if (copySuccess) {
         toast({ 
           title: '📋 Invite Link Copied!',
-          description: 'Earn 10 points when your neighbor joins! That\'s halfway to your free Starbucks! ☕',
+          description: 'Earn 10 points when your neighbor joins!',
           duration: 5000,
           className: "bg-green-50 border-green-500 border-2"
         });
@@ -88,7 +88,7 @@ export function SimpleInvite() {
         // Most mobile browsers will have copied it anyway
         toast({ 
           title: '📋 Invite Link Generated!',
-          description: 'Link saved to clipboard. Earn 10 points when your neighbor joins! ☕',
+          description: 'Link saved to clipboard. Earn 10 points when your neighbor joins!',
           duration: 5000,
           className: "bg-green-50 border-green-500 border-2"
         });
@@ -112,7 +112,7 @@ export function SimpleInvite() {
       setTimeout(() => setCopied(false), 2000);
       toast({ 
         title: '📋 Invite Link Copied!',
-        description: 'Earn 10 points when your neighbor joins! That\'s halfway to your free Starbucks! ☕' 
+        description: 'Earn 10 points when your neighbor joins!'
       });
     }
   };

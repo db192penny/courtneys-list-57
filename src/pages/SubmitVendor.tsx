@@ -392,22 +392,9 @@ const SubmitVendor = () => {
         }
       }
 
-      // Calculate Starbucks progress
-      const { data: currentUser } = await supabase
-        .from("users")
-        .select("points")
-        .eq("id", userId)
-        .single();
-      
-      const currentPoints = currentUser?.points ?? 0;
-      const newPointsTotal = currentPoints + 5;
-      const pointsToStarbucks = Math.max(20 - newPointsTotal, 0);
-
       toast({ 
-        title: "🎉 Review Added! +5 Points", 
-        description: pointsToStarbucks > 0 
-          ? `${pointsToStarbucks} more points until your free Starbucks! ☕ Keep reviewing!`
-          : "You've earned your Starbucks reward! Check your Neighborhood Cred page! 🎉☕"
+        title: "🎉 +5 Points!",
+        description: "Review updated! Thanks for sharing your experience with neighbors!"
       });
       navigate("/dashboard");
       return;

@@ -354,8 +354,8 @@ export function AddCostModal({
       if (error) throw error;
 
       toast({
-        title: "💰 Cost Added!",
-        description: "You earned 5 points! You're getting closer to your free Starbucks card! ☕",
+        title: "💰 +5 Points!",
+        description: "Cost information added! Thanks for helping neighbors budget!",
         duration: 5000,
         className: "bg-green-50 border-green-500 border-2 text-green-900"
       });
