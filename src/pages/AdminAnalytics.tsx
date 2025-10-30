@@ -123,9 +123,9 @@ export function AdminAnalytics() {
     setLoading(true);
     try {
       // Fetch user activity data with session info and activity counts
-      // David Birnbaum's user ID and emails to exclude
-      const adminUserId = '50c337c8-2c85-4aae-84da-26ee79f4c43b';
-      const adminEmails = ['db@fivefourventures.com', 'davebirnbaum@gmail.com'];
+      // Admin user IDs and emails to exclude
+      const adminUserIds = ['50c337c8-2c85-4aae-84da-26ee79f4c43b', '06000af8-15dd-42eb-b506-3dd5514a2c05'];
+      const adminEmails = ['db@fivefourventures.com', 'davebirnbaum@gmail.com', 'lindsay.envision@gmail.com'];
       const twoDaysAgo = new Date();
       twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
@@ -145,7 +145,7 @@ export function AdminAnalytics() {
           community
         `)
         .not('user_id', 'is', null)
-        .neq('user_id', adminUserId)
+        .not('user_id', 'in', `(${adminUserIds.join(',')})`)
         .gte('session_start', twoDaysAgo.toISOString())
         .order('session_start', { ascending: false });
 
@@ -154,7 +154,7 @@ export function AdminAnalytics() {
       console.log(`Raw session data: ${sessionData?.length || 0} sessions found`);
 
       // Filter out any remaining admin sessions by email (backup filter)
-      const filteredSessions = (sessionData || []).filter(session => session.user_id !== adminUserId);
+      const filteredSessions = (sessionData || []).filter(session => !adminUserIds.includes(session.user_id!));
       console.log(`After filtering admin sessions: ${filteredSessions.length} sessions remaining`);
 
       // Fetch user details and activity counts for each session
