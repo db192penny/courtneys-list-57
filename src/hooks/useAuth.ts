@@ -77,6 +77,25 @@ export function useAuth(): AuthState {
             await new Promise(resolve => setTimeout(resolve, 3000 - elapsed));
           }
           
+          // Identify user in Mixpanel after magic link authentication
+          if (typeof window !== 'undefined' && (window as any).mixpanel && session?.user) {
+            try {
+              const userId = session.user.id;
+              const userEmail = session.user.email;
+              
+              (window as any).mixpanel.identify(userId);
+              (window as any).mixpanel.people.set({
+                '$email': userEmail,
+                '$name': session.user.user_metadata?.name || userEmail?.split('@')[0] || 'User',
+                'last_login': new Date().toISOString(),
+              });
+              
+              console.log('✅ Mixpanel identified:', userEmail);
+            } catch (error) {
+              console.error('Mixpanel identification error:', error);
+            }
+          }
+          
           if (mountedRef.current) {
             setAuthState({
               user: session?.user ?? null,
@@ -93,6 +112,25 @@ export function useAuth(): AuthState {
         
         // Regular auth check for non-magic-link scenarios
         const { data: { session } } = await supabase.auth.getSession();
+        
+        // Identify user in Mixpanel for regular session
+        if (typeof window !== 'undefined' && (window as any).mixpanel && session?.user) {
+          try {
+            const userId = session.user.id;
+            const userEmail = session.user.email;
+            
+            (window as any).mixpanel.identify(userId);
+            (window as any).mixpanel.people.set({
+              '$email': userEmail,
+              '$name': session.user.user_metadata?.name || userEmail?.split('@')[0] || 'User',
+              'last_login': new Date().toISOString(),
+            });
+            
+            console.log('✅ Mixpanel identified:', userEmail);
+          } catch (error) {
+            console.error('Mixpanel identification error:', error);
+          }
+        }
         
         if (mountedRef.current) {
           setAuthState({

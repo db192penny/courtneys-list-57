@@ -229,6 +229,35 @@ const Auth = () => {
 
       if (event === "SIGNED_IN" && session?.user?.id) {
         console.log("✅ [Auth] SIGNED_IN event detected - calling finalizeOnboarding");
+        
+        // Track signup/signin in Mixpanel for Google OAuth
+        if (typeof window !== 'undefined' && (window as any).mixpanel && session?.user) {
+          try {
+            const userId = session.user.id;
+            const userEmail = session.user.email;
+            const userName = session.user.user_metadata?.name || userEmail?.split('@')[0];
+            
+            (window as any).mixpanel.alias(userId);
+            (window as any).mixpanel.identify(userId);
+            (window as any).mixpanel.people.set({
+              '$email': userEmail,
+              '$name': userName,
+              'signup_date': new Date().toISOString(),
+              'signup_method': 'google',
+              'community': communityName || 'boca-bridges',
+            });
+            
+            (window as any).mixpanel.track('Signup Completed', {
+              method: 'google',
+              community: communityName || 'boca-bridges',
+            });
+            
+            console.log('✅ Signup tracked:', userEmail);
+          } catch (error) {
+            console.error('Mixpanel tracking error:', error);
+          }
+        }
+        
         // This is what was missing - call finalizeOnboarding after signup
         await finalizeOnboarding(session.user.id, session.user.email);
       }
@@ -606,6 +635,32 @@ const Auth = () => {
       toast({ title: "Signup failed", description: "Could not create user account", variant: "destructive" });
       setLoading(false);
       return;
+    }
+
+    // Track email signup in Mixpanel
+    if (typeof window !== 'undefined' && (window as any).mixpanel && authData.user) {
+      try {
+        const userEmail = authData.user.email;
+        
+        (window as any).mixpanel.alias(userId);
+        (window as any).mixpanel.identify(userId);
+        (window as any).mixpanel.people.set({
+          '$email': userEmail,
+          '$name': name.trim(),
+          'signup_date': new Date().toISOString(),
+          'signup_method': 'email',
+          'community': communityName || 'boca-bridges',
+        });
+        
+        (window as any).mixpanel.track('Signup Completed', {
+          method: 'email',
+          community: communityName || 'boca-bridges',
+        });
+        
+        console.log('✅ Signup tracked:', userEmail);
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
     }
 
     // Track terms acceptance on email signup (immediate, no magic link)
