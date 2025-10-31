@@ -25,6 +25,18 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
     if (val === "__suggest__") {
       setShowSuggestionModal(true);
     } else {
+      // Track category selection in Mixpanel
+      if (typeof window !== 'undefined' && window.mixpanel) {
+        try {
+          window.mixpanel.track('Category Selected', {
+            from_category: selectedCategory,
+            to_category: val,
+          });
+          console.log('📊 Tracked category selection:', val);
+        } catch (error) {
+          console.error('Mixpanel tracking error:', error);
+        }
+      }
       onCategoryChange(val);
     }
   };

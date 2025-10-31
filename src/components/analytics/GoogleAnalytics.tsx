@@ -7,13 +7,6 @@ const GA_MEASUREMENT_ID = 'G-89WW8L9NNQ';
 // Debug mode - set to false in production
 const DEBUG_MODE = window.location.hostname === 'localhost';
 
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
-  }
-}
-
 interface GoogleAnalyticsProps {
   user?: any; // Your user object from Supabase auth
 }

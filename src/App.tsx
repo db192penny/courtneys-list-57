@@ -180,6 +180,28 @@ function AppContent() {
   const location = useLocation();
   const [showLegacyTerms, setShowLegacyTerms] = useState(false);
   const [checkingTerms, setCheckingTerms] = useState(true);
+
+  // Track Facebook landing
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.mixpanel) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get('utm_source');
+      
+      if (utmSource === 'facebook') {
+        try {
+          window.mixpanel.track('Landed from Facebook', {
+            utm_medium: urlParams.get('utm_medium'),
+            utm_campaign: urlParams.get('utm_campaign'),
+            utm_content: urlParams.get('utm_content'),
+            landing_page: window.location.pathname,
+          });
+          console.log('📊 Tracked Facebook landing');
+        } catch (error) {
+          console.error('Mixpanel tracking error:', error);
+        }
+      }
+    }
+  }, []);
   
   // Extract community name from URL path
   const getCommunityName = () => {

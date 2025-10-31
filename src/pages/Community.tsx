@@ -50,6 +50,22 @@ export default function Community() {
     }
   }, [communityName]);
 
+  // Track community page view in Mixpanel
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.mixpanel && communityName) {
+      try {
+        window.mixpanel.track('Community Page Viewed', {
+          community: communityName,
+          url: window.location.pathname,
+          has_welcome_param: searchParams.has('welcome'),
+        });
+        console.log('📊 Tracked community view:', communityName);
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+  }, [communityName, searchParams]);
+
   // Handle invite codes from URL
   useEffect(() => {
     const inviteCode = searchParams.get('invite');

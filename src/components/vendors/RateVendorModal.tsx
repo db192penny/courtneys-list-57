@@ -310,6 +310,31 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
       // Track review submission
       GATracking.trackReviewSubmit(vendor, rating);
       
+      // Track in Mixpanel
+      if (typeof window !== 'undefined' && window.mixpanel) {
+        try {
+          window.mixpanel.track('Review Submitted', {
+            vendor_name: vendor.name,
+            category: vendor.category,
+            rating: rating,
+            has_comment: !!comments,
+            comment_length: comments?.length || 0,
+            community: vendorCommunity || 'unknown',
+          });
+          
+          // Increment user's review count
+          window.mixpanel.people.increment('total_reviews', 1);
+          window.mixpanel.people.set({
+            'last_review_date': new Date().toISOString(),
+            'last_review_category': vendor.category,
+          });
+          
+          console.log('📊 Tracked review submission');
+        } catch (error) {
+          console.error('Mixpanel tracking error:', error);
+        }
+      }
+      
       toast({ 
         title: "🎉 Review Added! +5 Points", 
         description,
