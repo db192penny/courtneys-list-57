@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useIsHoaAdmin } from "@/hooks/useIsHoaAdmin";
+import { useState } from "react";
 
 type Vendor = {
   id: string;
@@ -20,8 +21,31 @@ function VendorCard({ vendor, isVerified }: { vendor: Vendor; isVerified: boolea
   const navigate = useNavigate();
   const { data: isAdmin } = useIsAdmin();
   const { data: isHoaAdmin } = useIsHoaAdmin();
+  const [contactRevealed, setContactRevealed] = useState(false);
 
   const canEdit = isAdmin || isHoaAdmin;
+
+  const handleRevealContact = () => {
+    if (typeof window !== 'undefined' && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Clicked Contact Button: ${vendor.name}`, {
+          vendor_id: vendor.id,
+          vendor_name: vendor.name,
+          category: vendor.category,
+        });
+        
+        window.mixpanel.people.increment('total_contact_clicks', 1);
+        window.mixpanel.people.set({
+          'last_contact_date': new Date().toISOString(),
+        });
+        
+        console.log('📊 Tracked contact button click:', vendor.name);
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+    setContactRevealed(true);
+  };
 
   return (
     <Card>
@@ -38,10 +62,23 @@ function VendorCard({ vendor, isVerified }: { vendor: Vendor; isVerified: boolea
           )}
         </div>
 
-        {isVerified && vendor.contact_info && (
-          <p className="text-sm text-muted-foreground mt-2">
-            Contact: {vendor.contact_info}
-          </p>
+        {isVerified && !contactRevealed && vendor.contact_info && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRevealContact}
+            className="mt-2 w-full"
+          >
+            📞 Show Contact Info
+          </Button>
+        )}
+
+        {isVerified && contactRevealed && vendor.contact_info && (
+          <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
+            <p className="text-sm font-medium text-center">
+              {vendor.contact_info}
+            </p>
+          </div>
         )}
 
         {!isVerified && (

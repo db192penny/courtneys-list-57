@@ -132,6 +132,7 @@ export default function VendorMobileCard({
   const [googleReviewsModalOpen, setGoogleReviewsModalOpen] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   const [contactPopoverOpen, setContactPopoverOpen] = useState(false);
+  const [contactRevealed, setContactRevealed] = useState(false);
   const [accessGateOpen, setAccessGateOpen] = useState(false);
   const [accessGateType, setAccessGateType] = useState<"rate" | "reviews" | "costs">("rate");
   const [neighborsModalOpen, setNeighborsModalOpen] = useState(false);
@@ -146,19 +147,98 @@ export default function VendorMobileCard({
 
   const userHasCosts = userCosts?.has(vendor.id) || false;
 
+  const handleContactButtonClick = () => {
+    // Track the initial contact button click
+    if (typeof window !== 'undefined' && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Clicked Contact Button: ${vendor.name}`, {
+          vendor_id: vendor.id,
+          vendor_name: vendor.name,
+          category: vendor.category,
+          has_contact_info: !isContactInfoPending(vendor.contact_info),
+          community: communityName,
+        });
+        
+        // Increment user's contact attempts
+        window.mixpanel.people.increment('total_contact_clicks', 1);
+        window.mixpanel.people.set({
+          'last_contact_date': new Date().toISOString(),
+        });
+        
+        console.log('📊 Tracked contact button click:', vendor.name);
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+    
+    // Reveal the contact options
+    setContactRevealed(true);
+  };
+
   const handleCall = () => {
+    if (typeof window !== 'undefined' && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Called Vendor: ${vendor.name}`, {
+          vendor_id: vendor.id,
+          vendor_name: vendor.name,
+          phone: vendor.contact_info,
+          action: 'call',
+          category: vendor.category,
+        });
+        
+        window.mixpanel.people.increment('vendors_called', 1);
+        console.log('📊 Tracked vendor call:', vendor.name);
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+    
     trackContactAction('call_clicked', vendor.id, vendor.name, vendor.contact_info || undefined);
     window.location.href = `tel:${vendor.contact_info}`;
-    setContactPopoverOpen(false);
+    setContactRevealed(false);
   };
 
   const handleText = () => {
+    if (typeof window !== 'undefined' && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Texted Vendor: ${vendor.name}`, {
+          vendor_id: vendor.id,
+          vendor_name: vendor.name,
+          phone: vendor.contact_info,
+          action: 'text',
+          category: vendor.category,
+        });
+        
+        window.mixpanel.people.increment('vendors_texted', 1);
+        console.log('📊 Tracked vendor text:', vendor.name);
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+    
     trackContactAction('text_clicked', vendor.id, vendor.name, vendor.contact_info || undefined);
     window.location.href = `sms:${vendor.contact_info}`;
-    setContactPopoverOpen(false);
+    setContactRevealed(false);
   };
 
   const handleCopyNumber = async () => {
+    if (typeof window !== 'undefined' && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Copied Vendor Number: ${vendor.name}`, {
+          vendor_id: vendor.id,
+          vendor_name: vendor.name,
+          phone: vendor.contact_info,
+          action: 'copy',
+          category: vendor.category,
+        });
+        
+        window.mixpanel.people.increment('vendor_numbers_copied', 1);
+        console.log('📊 Tracked number copy:', vendor.name);
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+    
     trackContactAction('copy_clicked', vendor.id, vendor.name, vendor.contact_info || undefined);
     try {
       await navigator.clipboard.writeText(vendor.contact_info || '');
@@ -179,7 +259,7 @@ export default function VendorMobileCard({
         description: "Phone number copied to clipboard",
       });
     }
-    setContactPopoverOpen(false);
+    setContactRevealed(false);
   };
 
   return (
@@ -375,98 +455,72 @@ export default function VendorMobileCard({
           </Button>
 
           {/* Contact Button */}
-          {showContact && (
-            <Popover 
-              open={contactPopoverOpen} 
-              onOpenChange={(open) => {
-                setContactPopoverOpen(open);
-                if (open) {
-                  trackContactAction('contact_opened', vendor.id, vendor.name, vendor.contact_info || undefined);
-                }
-              }}
+          {showContact && !contactRevealed && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 text-xs"
+              onClick={handleContactButtonClick}
             >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 text-xs"
-                >
-                  📞 Contact
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-2">
-                {isContactInfoPending(vendor.contact_info) ? (
-                  <div className="space-y-3">
-                    <div className="text-sm text-muted-foreground">
-                      <p className="font-medium text-foreground mb-2">Contact info coming soon!</p>
-                      <p className="mb-3">
-                        We're working on getting {vendor.name}'s phone number. Check back soon or help us out below.
-                      </p>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2 pt-2 border-t">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => {
-                          trackContactAction('add_contact_clicked', vendor.id, vendor.name);
-                          setContactPopoverOpen(false);
-                          setAddContactModalOpen(true);
-                        }}
-                        className="w-full text-xs"
-                      >
-                        📝 I have their contact info
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          toast({
-                            title: "Thanks for your patience!",
-                            description: "We'll update this vendor's contact info soon.",
-                          });
-                          setContactPopoverOpen(false);
-                        }}
-                        className="w-full text-xs"
-                      >
-                        Got it, thanks
-                      </Button>
-                    </div>
+              📞 Contact
+            </Button>
+          )}
+
+          {/* Revealed Contact Actions */}
+          {showContact && contactRevealed && (
+            <div className="flex-1 flex flex-col gap-1.5">
+              {isContactInfoPending(vendor.contact_info) ? (
+                <div className="bg-orange-50 border border-orange-200 rounded-md p-2">
+                  <p className="text-xs text-orange-800 font-medium mb-1">
+                    Contact info coming soon!
+                  </p>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => {
+                      trackContactAction('add_contact_clicked', vendor.id, vendor.name);
+                      setContactRevealed(false);
+                      setAddContactModalOpen(true);
+                    }}
+                    className="w-full text-xs mt-1"
+                  >
+                    📝 I have their info
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="text-xs font-medium text-center bg-blue-50 py-1 px-2 rounded">
+                    {formatUSPhoneDisplay(vendor.contact_info)}
                   </div>
-                ) : (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex gap-1.5">
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={handleCall}
-                      className="flex items-center gap-2 justify-start"
+                      className="flex-1 text-xs"
                     >
-                      <Phone size={16} />
-                      Call
+                      <Phone size={14} />
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={handleText}
-                      className="flex items-center gap-2 justify-start"
+                      className="flex-1 text-xs"
                     >
-                      <MessageSquare size={16} />
-                      Text
+                      <MessageSquare size={14} />
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={handleCopyNumber}
-                      className="flex items-center gap-2 justify-start"
+                      className="flex-1 text-xs"
                     >
-                      <Copy size={16} />
-                      Copy Number
+                      <Copy size={14} />
                     </Button>
                   </div>
-                )}
-              </PopoverContent>
-            </Popover>
+                </>
+              )}
+            </div>
           )}
         </div>
       </CardContent>
