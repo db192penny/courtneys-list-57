@@ -315,6 +315,24 @@ export default function VendorMobileCard({
                 vendor_id: vendor.id,
                 vendor_name: vendor.name 
               });
+              
+              // Track Rate button click in Mixpanel
+              if (typeof window !== 'undefined' && window.mixpanel) {
+                try {
+                  window.mixpanel.track(`Clicked Rate Button: ${vendor.name}`, {
+                    vendor_id: vendor.id,
+                    vendor_name: vendor.name,
+                    category: vendor.category,
+                    is_authenticated: isAuthenticated,
+                    user_has_reviewed: userReviews?.has(vendor.id) || false,
+                    community: communityName,
+                  });
+                  console.log('📊 Tracked rate button click:', vendor.name);
+                } catch (error) {
+                  console.error('Mixpanel tracking error:', error);
+                }
+              }
+              
               try {
                 await trackModalOpen('review', vendor.id);
                 await trackVendorClick(vendor.id, vendor.name, vendor.category);

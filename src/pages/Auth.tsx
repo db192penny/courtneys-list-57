@@ -397,6 +397,22 @@ const Auth = () => {
       const { data: emailStatus, error: statusError } = await supabase.rpc("get_email_status", {
         _email: targetEmail,
       });
+      
+      // Track signup completion for email signups (new users)
+      if (!statusError && emailStatus === "not_found") {
+        if (typeof window !== 'undefined' && window.mixpanel) {
+          try {
+            const detectedCommunity = communityName || 'boca-bridges';
+            window.mixpanel.track('Signup Completed', {
+              method: 'email',
+              community: detectedCommunity,
+            });
+            console.log('📊 Tracked email signup');
+          } catch (error) {
+            console.error('Mixpanel tracking error:', error);
+          }
+        }
+      }
 
       if (statusError) {
         toast({

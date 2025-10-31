@@ -347,6 +347,20 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
       setSubmittedVendorId(vendor.id);
       onOpenChange(false);
       setShowCostConfirm(true);
+      
+      // Track cost prompt shown
+      if (typeof window !== 'undefined' && window.mixpanel) {
+        try {
+          window.mixpanel.track(`Cost Prompt Shown after Review: ${vendor.name}`, {
+            vendor_id: vendor.id,
+            vendor_name: vendor.name,
+            review_rating: rating,
+          });
+          console.log('📊 Tracked cost prompt shown');
+        } catch (error) {
+          console.error('Mixpanel tracking error:', error);
+        }
+      }
     } catch (e: any) {
       console.error("[RateVendorModal] Submit error:", e);
       toast({ title: "Error", description: e?.message || "Please try again.", variant: "destructive" });
@@ -356,12 +370,38 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
   };
 
   const handleSkipCosts = () => {
+    // Track user clicked "No Thanks"
+    if (typeof window !== 'undefined' && window.mixpanel && vendor) {
+      try {
+        window.mixpanel.track(`Skipped Adding Costs: ${vendor.name}`, {
+          vendor_id: vendor.id,
+          vendor_name: vendor.name,
+        });
+        console.log('📊 Tracked: User skipped costs');
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+    
     setShowCostConfirm(false);
     setSubmittedVendorId(null);
     onSuccess?.();
   };
 
   const handleAddCosts = () => {
+    // Track user clicked "Yes" to add costs
+    if (typeof window !== 'undefined' && window.mixpanel && vendor) {
+      try {
+        window.mixpanel.track(`Clicked Add Costs from Prompt: ${vendor.name}`, {
+          vendor_id: vendor.id,
+          vendor_name: vendor.name,
+        });
+        console.log('📊 Tracked: User chose to add costs');
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+    
     setShowCostConfirm(false);
     setShowCostModal(true);
   };
