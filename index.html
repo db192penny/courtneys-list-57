@@ -30,10 +30,11 @@
 
       mixpanel.init('0fc89fc6f905490757814c4e946eb6a5', {
         debug: false,
-        track_pageview: true,
+        track_pageview: false,
         persistence: 'localStorage',
         record_sessions_percent: 10,
-        autocapture: true
+        autotrack: false,
+        autocapture: false
       });
     </script>
   </head>
