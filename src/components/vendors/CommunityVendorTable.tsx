@@ -369,6 +369,22 @@ export default function CommunityVendorTable({
       return;
     }
     
+    // Track cost button click in Mixpanel
+    if (typeof window !== 'undefined' && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Clicked View Costs: ${row.name}`, {
+          vendor_name: row.name,
+          vendor_id: row.id,
+          category: row.category,
+          has_costs: (row.community_sample_size || 0) > 0,
+          community: communityName,
+        });
+        console.log('📊 Tracked cost button click:', row.name);
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+    
     setSelectedVendor({ id: row.id, name: row.name, category: row.category });
     setCostModalOpen(true);
   };

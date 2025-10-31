@@ -87,6 +87,27 @@ export default function SubmitCostModal({
         title: "✅ Cost information saved!",
         description: "Thank you for helping your neighbors budget!",
       });
+      
+      // Track cost submission in Mixpanel
+      if (typeof window !== 'undefined' && window.mixpanel) {
+        try {
+          const totalAmount = validCostEntries.reduce((sum, entry) => sum + (entry.amount || 0), 0);
+          const formattedAmount = `$${totalAmount}`;
+          window.mixpanel.track(`Submitted Cost Data: ${vendorName} - ${formattedAmount}`, {
+            vendor_name: vendorName,
+            vendor_id: vendorId,
+            total_amount: totalAmount,
+            num_entries: validCostEntries.length,
+            category: category,
+          });
+          
+          // Also increment user's cost contributions
+          window.mixpanel.people.increment('total_costs_submitted', 1);
+          console.log('📊 Tracked cost submission');
+        } catch (error) {
+          console.error('Mixpanel tracking error:', error);
+        }
+      }
 
       onSuccess();
     } catch (err) {

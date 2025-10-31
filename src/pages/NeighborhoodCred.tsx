@@ -48,6 +48,18 @@ const NeighborhoodCred = () => {
       if (!cancel) {
         setPoints(userData?.points ?? 0);
         setLoading(false);
+        
+        // Track points page view in Mixpanel
+        if (typeof window !== 'undefined' && window.mixpanel && userData?.points !== undefined) {
+          try {
+            window.mixpanel.track(`Viewed Points Dashboard: ${userData.points} points`, {
+              total_points: userData.points,
+            });
+            console.log('📊 Tracked points dashboard view');
+          } catch (error) {
+            console.error('Mixpanel tracking error:', error);
+          }
+        }
       }
     })();
     return () => { cancel = true; };

@@ -189,9 +189,10 @@ function AppContent() {
       
       if (utmSource === 'facebook') {
         try {
-          window.mixpanel.track('Landed from Facebook', {
+          const campaign = urlParams.get('utm_campaign') || 'unknown';
+          window.mixpanel.track(`Landed from Facebook: ${campaign}`, {
             utm_medium: urlParams.get('utm_medium'),
-            utm_campaign: urlParams.get('utm_campaign'),
+            utm_campaign: campaign,
             utm_content: urlParams.get('utm_content'),
             landing_page: window.location.pathname,
           });

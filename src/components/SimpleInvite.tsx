@@ -93,6 +93,21 @@ export function SimpleInvite() {
           className: "bg-green-50 border-green-500 border-2"
         });
       }
+      
+      // Track invite sent in Mixpanel
+      if (typeof window !== 'undefined' && window.mixpanel) {
+        try {
+          window.mixpanel.track('Sent Invite to Neighbor', {
+            invite_method: 'link',
+          });
+          
+          // Track total invites sent by user
+          window.mixpanel.people.increment('invites_sent', 1);
+          console.log('📊 Tracked invite sent');
+        } catch (error) {
+          console.error('Mixpanel tracking error:', error);
+        }
+      }
       // Never show the modal - remove setShowModal(true)
     } catch (error) {
       console.error('Error:', error);

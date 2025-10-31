@@ -507,6 +507,25 @@ const SubmitVendor = () => {
       title: "🎉 Provider Submitted!",
       description: "You earned 5 points! Keep contributing to level up your badge and earn rewards! ☕",
     });
+    
+    // Track vendor submission in Mixpanel
+    if (typeof window !== 'undefined' && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Added New Vendor: ${name.trim()}`, {
+          vendor_name: name.trim(),
+          vendor_id: vendorIdNew,
+          category: category,
+          has_google_place_id: !!googlePlaceId,
+          community: communityParam,
+        });
+        
+        // Track vendors added by user
+        window.mixpanel.people.increment('vendors_added', 1);
+        console.log('📊 Tracked vendor submission');
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
 
     // Set vendor ID and show cost confirmation dialog
     setSubmittedVendorId(vendorIdNew);

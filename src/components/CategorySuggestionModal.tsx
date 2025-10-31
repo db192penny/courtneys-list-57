@@ -78,12 +78,27 @@ export default function CategorySuggestionModal({ open, onOpenChange }: Category
         status: "pending",
       });
 
-      if (error) throw error;
-
-      toast({
-        title: "Suggestion submitted!",
-        description: "Thanks! We'll review your suggestion.",
-      });
+      if (error) {
+        console.error("Error submitting category suggestion:", error);
+        toast({
+          title: "Submission failed",
+          description: "Unable to submit your suggestion. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        // Track category suggestion in Mixpanel
+        if (typeof window !== 'undefined' && window.mixpanel) {
+          try {
+            window.mixpanel.track(`Suggested Category: ${trimmedCategory}`, {
+              category_name: trimmedCategory,
+              community: communityName,
+            });
+            console.log('📊 Tracked category suggestion');
+          } catch (error) {
+            console.error('Mixpanel tracking error:', error);
+          }
+        }
+      }
 
       // Reset form and close modal
       setCategoryName("");

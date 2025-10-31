@@ -28,7 +28,8 @@ export const HorizontalCategoryPills: React.FC<HorizontalCategoryPillsProps> = (
       // Track category selection in Mixpanel
       if (typeof window !== 'undefined' && window.mixpanel) {
         try {
-          window.mixpanel.track('Category Selected', {
+          const toCat = val === 'all' ? 'All Categories' : val;
+          window.mixpanel.track(`Filtered by Category: ${toCat}`, {
             from_category: selectedCategory,
             to_category: val,
           });

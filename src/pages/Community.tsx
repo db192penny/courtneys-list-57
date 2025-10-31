@@ -54,7 +54,7 @@ export default function Community() {
   useEffect(() => {
     if (typeof window !== 'undefined' && window.mixpanel && communityName) {
       try {
-        window.mixpanel.track('Community Page Viewed', {
+        window.mixpanel.track(`Viewed Community: ${communityName}`, {
           community: communityName,
           url: window.location.pathname,
           has_welcome_param: searchParams.has('welcome'),

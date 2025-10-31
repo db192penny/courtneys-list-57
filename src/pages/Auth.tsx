@@ -247,9 +247,10 @@ const Auth = () => {
               'community': communityName || 'boca-bridges',
             });
             
-            (window as any).mixpanel.track('Signup Completed', {
+            const detectedCommunity = communityName || 'boca-bridges';
+            (window as any).mixpanel.track(`New Signup via Google: ${detectedCommunity}`, {
               method: 'google',
-              community: communityName || 'boca-bridges',
+              community: detectedCommunity,
             });
             
             console.log('✅ Signup tracked:', userEmail);
@@ -652,9 +653,9 @@ const Auth = () => {
           'community': communityName || 'boca-bridges',
         });
         
-        (window as any).mixpanel.track('Signup Completed', {
+        (window as any).mixpanel.track(`New Signup via Email: ${detectedCommunity}`, {
           method: 'email',
-          community: communityName || 'boca-bridges',
+          community: detectedCommunity,
         });
         
         console.log('✅ Signup tracked:', userEmail);

@@ -53,7 +53,8 @@ export function AccessGateModal({ open, onOpenChange, contentType, communityName
       setModalOpenTime(openTime);
       
       try {
-        window.mixpanel.track('Auth Modal Shown', {
+        const triggerText = contentType === 'rate' ? 'Rate Vendor' : contentType === 'costs' ? 'View Costs' : contentType === 'add_vendor' ? 'Add Vendor' : 'View Reviews';
+        window.mixpanel.track(`Auth Modal Shown: ${triggerText}`, {
           trigger: contentType,
           community: communityName,
         });
@@ -103,11 +104,11 @@ export function AccessGateModal({ open, onOpenChange, contentType, communityName
   const handleClose = (isOpen: boolean) => {
     if (!isOpen && typeof window !== 'undefined' && window.mixpanel && modalOpenTime > 0) {
       try {
-        const timeOnModal = Math.round((Date.now() - modalOpenTime) / 1000);
-        window.mixpanel.track('Auth Modal Dismissed', {
+        const timeSpent = Math.round((Date.now() - modalOpenTime) / 1000);
+        window.mixpanel.track(`Auth Modal Dismissed after ${timeSpent}s`, {
           trigger: contentType,
           community: communityName,
-          time_on_modal_seconds: timeOnModal,
+          time_on_modal_seconds: timeSpent,
         });
         console.log('📊 Tracked auth modal dismissed');
       } catch (error) {

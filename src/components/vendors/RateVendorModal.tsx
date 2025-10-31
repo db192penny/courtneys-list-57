@@ -313,7 +313,8 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
       // Track in Mixpanel
       if (typeof window !== 'undefined' && window.mixpanel) {
         try {
-          window.mixpanel.track('Review Submitted', {
+          const starText = rating === 1 ? 'Star' : 'Stars';
+          window.mixpanel.track(`Submitted ${rating}-${starText} Review: ${vendor.name}`, {
             vendor_name: vendor.name,
             category: vendor.category,
             rating: rating,
