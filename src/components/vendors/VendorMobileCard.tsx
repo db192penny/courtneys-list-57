@@ -294,6 +294,24 @@ export default function VendorMobileCard({
                     vendor_name: vendor.name,
                     homes_serviced: vendor.homes_serviced 
                   });
+                  
+                  // Track neighbors button click in Mixpanel
+                  if (typeof window !== 'undefined' && window.mixpanel) {
+                    try {
+                      window.mixpanel.track(`Clicked Neighbors: ${vendor.name}`, {
+                        vendor_id: vendor.id,
+                        vendor_name: vendor.name,
+                        category: vendor.category,
+                        homes_serviced: vendor.homes_serviced,
+                        is_authenticated: isAuthenticated,
+                        community: communityName,
+                      });
+                      console.log('📊 Tracked neighbors button click:', vendor.name);
+                    } catch (error) {
+                      console.error('Mixpanel tracking error:', error);
+                    }
+                  }
+                  
                   if (isAuthenticated) {
                     setNeighborsModalOpen(true);
                   } else {
@@ -421,6 +439,24 @@ export default function VendorMobileCard({
                 vendor_id: vendor.id,
                 vendor_name: vendor.name 
               });
+              
+              // Track reviews button click in Mixpanel
+              if (typeof window !== 'undefined' && window.mixpanel) {
+                try {
+                  window.mixpanel.track(`Clicked Read Reviews: ${vendor.name}`, {
+                    vendor_id: vendor.id,
+                    vendor_name: vendor.name,
+                    category: vendor.category,
+                    review_count: vendor.hoa_rating_count || 0,
+                    is_authenticated: isAuthenticated,
+                    community: communityName,
+                  });
+                  console.log('📊 Tracked reviews button click:', vendor.name);
+                } catch (error) {
+                  console.error('Mixpanel tracking error:', error);
+                }
+              }
+              
               if (isAuthenticated) {
                 setIsReviewsModalOpen(true);
               } else {
