@@ -250,6 +250,22 @@ export function NeighborReviewPreview({
 
   const handleInteraction = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.preventDefault();
+    
+    // Track read all reviews click in Mixpanel
+    if (typeof window !== 'undefined' && window.mixpanel) {
+      try {
+        window.mixpanel.track('Clicked Read All Reviews', {
+          vendor_id: vendorId,
+          review_count: totalReviews,
+          is_authenticated: isAuthenticated,
+          community: communityName,
+        });
+        console.log('📊 Tracked read all reviews click for vendor:', vendorId);
+      } catch (error) {
+        console.error('Mixpanel tracking error:', error);
+      }
+    }
+    
     if (onOpenModal) {
       onOpenModal();
     } else {
