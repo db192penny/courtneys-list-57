@@ -46,7 +46,7 @@ export function AnalyticsTracker() {
           pageName = 'User Profile';
         } else if (path === '/settings') {
           pageName = 'Settings';
-        } else if (path === '/submit-vendor') {
+        } else if (path === '/submit' || path === '/submit-vendor' || path.includes('/submit')) {
           pageName = 'Submit Vendor';
         } else if (path === '/contact') {
           pageName = 'Contact Us';
