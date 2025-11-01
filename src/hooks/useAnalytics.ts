@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 
 // Global session tracker - prevents duplicate sessions across all component instances
 let GLOBAL_SESSION_ID: string | null = null;
 let GLOBAL_USER_ID: string | null = null;
 let SESSION_START_TIME: number | null = null;
+let CREATING_SESSION = false; // Phase 4: Lock to prevent race conditions
 
 interface AnalyticsSession {
   id: string;
@@ -25,6 +27,7 @@ interface TrackEventOptions {
 
 export function useAnalytics() {
   const { user } = useAuth();
+  const isAdmin = useIsAdmin(); // Phase 2: Check if user is admin
   const [session, setSession] = useState<AnalyticsSession | null>(null);
   const startTimeRef = useRef<Date>(new Date());
   const lastPageRef = useRef<string>('');
@@ -75,6 +78,18 @@ export function useAnalytics() {
 
   // Initialize session
   const initializeSession = async () => {
+    // Phase 2: Skip session creation entirely for admin users
+    if (isAdmin) {
+      console.log('⚠️ Admin detected - skipping analytics session creation');
+      return;
+    }
+
+    // Phase 4: Prevent race conditions with session creation lock
+    if (CREATING_SESSION) {
+      console.log('⏳ Session creation already in progress, skipping...');
+      return;
+    }
+
     const userId = user?.id || 'anonymous';
     
     // Guard: Don't create duplicate sessions if we already have one for this user
@@ -84,7 +99,7 @@ export function useAnalytics() {
       
       // Reuse session if less than 30 minutes old
       if (sessionAge < 30 * 60 * 1000) {
-        console.log('Reusing existing analytics session:', GLOBAL_SESSION_ID);
+        console.log('♻️ Reusing existing analytics session:', GLOBAL_SESSION_ID);
         
         // Restore session state in this component instance
         const existingSessionKey = 'analytics_active_session';
@@ -104,6 +119,9 @@ export function useAnalytics() {
         return;
       }
     }
+    
+    // Phase 4: Set lock before starting async session creation
+    CREATING_SESSION = true;
     
     // Only create new session if:
     // 1. No session exists, OR
@@ -151,6 +169,9 @@ export function useAnalytics() {
       GLOBAL_USER_ID = userId;
       SESSION_START_TIME = Date.now();
       
+      // Phase 4: Release lock after successful creation
+      CREATING_SESSION = false;
+      
       // Store session info to prevent duplicates
       const existingSessionKey = 'analytics_active_session';
       localStorage.setItem(existingSessionKey, JSON.stringify({
@@ -193,6 +214,8 @@ export function useAnalytics() {
 
     } catch (error) {
       console.warn('Analytics session initialization failed:', error);
+      // Phase 4: Release lock on error
+      CREATING_SESSION = false;
     }
   };
 
@@ -299,7 +322,7 @@ export function useAnalytics() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       // DO NOT call endSession() here - causes session spam on navigation
     };
-  }, [user]);
+  }, [user?.id, isAdmin]); // Phase 3: Only re-run when user ID or admin status changes
 
   return {
     trackEvent,
