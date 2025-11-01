@@ -217,14 +217,6 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "service_call", amount: null, unit: "visit", quantity: null, notes: null },
     ];
   }
-  
-  // Tile Installation: Installation per sq ft + hourly rate
-  if (c === "tile installation") {
-    return [
-      { cost_kind: "installation", amount: null, unit: "sq ft", notes: null },
-      { cost_kind: "hourly", amount: null, unit: "hour", notes: null },
-    ];
-  }
 
   // Turf Installation: Installation per sq ft + hourly rate
   if (c === "turf installation") {

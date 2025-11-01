@@ -49,7 +49,6 @@ export const categoryEmojiMap: Record<string, string> = {
   'Patio Screening': '🏠',
   'Holiday Lighting': '✨',
   'Home Theater & AV': '📺',
-  'Tile Installation': '🟫',
   'Turf Installation': '🌿',
   'Pavers': '🧱',
   'Wallpaper Installation': '📜',

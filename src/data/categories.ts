@@ -40,7 +40,6 @@ export const CATEGORIES = [
   "Plumbing",
   "Pool",
   "Power Washing",
-  "Tile Installation",
   "Turf Installation",
   "Pavers",
   "Wallpaper Installation",
