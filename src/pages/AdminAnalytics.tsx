@@ -80,10 +80,12 @@ export function AdminAnalytics() {
             
             <div className="flex gap-3 items-center">
               <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-36">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="1">Today</SelectItem>
+                  <SelectItem value="2">Yesterday</SelectItem>
                   <SelectItem value="7">Last 7 days</SelectItem>
                   <SelectItem value="14">Last 14 days</SelectItem>
                   <SelectItem value="30">Last 30 days</SelectItem>
