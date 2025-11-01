@@ -7,7 +7,7 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 let GLOBAL_SESSION_ID: string | null = null;
 let GLOBAL_USER_ID: string | null = null;
 let SESSION_START_TIME: number | null = null;
-let CREATING_SESSION = false; // Phase 4: Lock to prevent race conditions
+let SESSION_CREATION_PROMISE: Promise<void> | null = null; // Async mutex for session creation
 
 interface AnalyticsSession {
   id: string;
@@ -78,15 +78,29 @@ export function useAnalytics() {
 
   // Initialize session
   const initializeSession = async () => {
-    // Phase 2: Skip session creation entirely for admin users
-    if (isAdmin) {
+    // Phase 1: Wait for admin status to load before proceeding
+    if (isAdmin.isLoading) {
+      console.log('⏳ Waiting for admin status to load...');
+      return;
+    }
+
+    // Phase 1: Skip session creation entirely for admin users
+    if (isAdmin.data === true) {
       console.log('⚠️ Admin detected - skipping analytics session creation');
       return;
     }
 
-    // Phase 4: Prevent race conditions with session creation lock
-    if (CREATING_SESSION) {
-      console.log('⏳ Session creation already in progress, skipping...');
+    // Phase 2: If another component is creating a session, wait for it
+    if (SESSION_CREATION_PROMISE) {
+      console.log('⏳ Session creation in progress, waiting...');
+      await SESSION_CREATION_PROMISE;
+      console.log('✅ Session creation completed by another component, exiting');
+      return;
+    }
+
+    // Phase 4: If we already have a valid session in this component, don't reinitialize
+    if (session?.id && GLOBAL_SESSION_ID === session.id) {
+      console.log('✅ Session already initialized in this component');
       return;
     }
 
@@ -120,8 +134,11 @@ export function useAnalytics() {
       }
     }
     
-    // Phase 4: Set lock before starting async session creation
-    CREATING_SESSION = true;
+    // Phase 2: Create a promise that other concurrent calls can await
+    let resolveCreation: (() => void) | undefined;
+    SESSION_CREATION_PROMISE = new Promise<void>(resolve => { 
+      resolveCreation = resolve; 
+    });
     
     // Only create new session if:
     // 1. No session exists, OR
@@ -169,8 +186,11 @@ export function useAnalytics() {
       GLOBAL_USER_ID = userId;
       SESSION_START_TIME = Date.now();
       
-      // Phase 4: Release lock after successful creation
-      CREATING_SESSION = false;
+      // Phase 2: Release the mutex lock
+      SESSION_CREATION_PROMISE = null;
+      if (resolveCreation) {
+        resolveCreation(); // Signal to waiting components that creation is done
+      }
       
       // Store session info to prevent duplicates
       const existingSessionKey = 'analytics_active_session';
@@ -214,8 +234,11 @@ export function useAnalytics() {
 
     } catch (error) {
       console.warn('Analytics session initialization failed:', error);
-      // Phase 4: Release lock on error
-      CREATING_SESSION = false;
+      // Phase 2: Release the mutex lock even on error
+      SESSION_CREATION_PROMISE = null;
+      if (resolveCreation) {
+        resolveCreation(); // Signal to waiting components that creation failed
+      }
     }
   };
 
@@ -322,7 +345,7 @@ export function useAnalytics() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       // DO NOT call endSession() here - causes session spam on navigation
     };
-  }, [user?.id, isAdmin]); // Phase 3: Only re-run when user ID or admin status changes
+  }, [user?.id, isAdmin.data]); // Phase 3: Only re-run when user ID or actual admin status changes
 
   return {
     trackEvent,
