@@ -2,6 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
+// Global session tracker - prevents duplicate sessions across all component instances
+let GLOBAL_SESSION_ID: string | null = null;
+let GLOBAL_USER_ID: string | null = null;
+let SESSION_START_TIME: number | null = null;
+
 interface AnalyticsSession {
   id: string;
   sessionToken: string;
@@ -70,35 +75,45 @@ export function useAnalytics() {
 
   // Initialize session
   const initializeSession = async () => {
-    // Check if we already have an active session in the last 5 minutes
-    const existingSessionKey = 'analytics_active_session';
-    const existingSession = localStorage.getItem(existingSessionKey);
+    const userId = user?.id || 'anonymous';
     
-    if (existingSession) {
-      try {
-        const parsedSession = JSON.parse(existingSession);
-        const sessionAge = Date.now() - parsedSession.timestamp;
+    // Guard: Don't create duplicate sessions if we already have one for this user
+    if (GLOBAL_SESSION_ID && GLOBAL_USER_ID === userId) {
+      const now = Date.now();
+      const sessionAge = SESSION_START_TIME ? (now - SESSION_START_TIME) : 0;
+      
+      // Reuse session if less than 30 minutes old
+      if (sessionAge < 30 * 60 * 1000) {
+        console.log('Reusing existing analytics session:', GLOBAL_SESSION_ID);
         
-        // If session is less than 5 minutes old, reuse it
-        if (sessionAge < 5 * 60 * 1000) {
-          console.log('Reusing existing analytics session:', parsedSession.sessionToken);
-          setSession({
-            id: parsedSession.id,
-            sessionToken: parsedSession.sessionToken,
-            startTime: new Date(parsedSession.startTime)
-          });
-          return;
+        // Restore session state in this component instance
+        const existingSessionKey = 'analytics_active_session';
+        const existingSession = localStorage.getItem(existingSessionKey);
+        if (existingSession) {
+          try {
+            const parsedSession = JSON.parse(existingSession);
+            setSession({
+              id: parsedSession.id,
+              sessionToken: parsedSession.sessionToken,
+              startTime: new Date(parsedSession.startTime)
+            });
+          } catch (e) {
+            console.warn('Failed to restore session state:', e);
+          }
         }
-      } catch (e) {
-        console.warn('Failed to parse existing session:', e);
+        return;
       }
     }
-
+    
+    // Only create new session if:
+    // 1. No session exists, OR
+    // 2. Different user, OR
+    // 3. Session is stale (> 30 minutes)
     const sessionToken = generateSessionToken();
     const { deviceType, browser, os } = getDeviceInfo();
     const community = getCommunity();
     
-    console.log('Creating new analytics session for user:', user?.id || 'anonymous');
+    console.log('Creating new analytics session for user:', userId);
     
     try {
       const { data, error } = await supabase
@@ -131,7 +146,13 @@ export function useAnalytics() {
 
       setSession(newSession);
       
+      // Update global session tracker
+      GLOBAL_SESSION_ID = data.id;
+      GLOBAL_USER_ID = userId;
+      SESSION_START_TIME = Date.now();
+      
       // Store session info to prevent duplicates
+      const existingSessionKey = 'analytics_active_session';
       localStorage.setItem(existingSessionKey, JSON.stringify({
         id: data.id,
         sessionToken,
@@ -225,6 +246,12 @@ export function useAnalytics() {
   // End session
   const endSession = async () => {
     if (!session) return;
+    
+    // Only end if this is the current global session
+    if (GLOBAL_SESSION_ID !== session.id) {
+      console.log('Skipping session end - not the active session');
+      return;
+    }
 
     const duration = Math.floor((Date.now() - session.startTime.getTime()) / 1000);
 
@@ -237,8 +264,12 @@ export function useAnalytics() {
         })
         .eq('id', session.id);
       
-      // Clear stored session data
+      // Clear global session data
+      GLOBAL_SESSION_ID = null;
+      GLOBAL_USER_ID = null;
+      SESSION_START_TIME = null;
       localStorage.removeItem('analytics_active_session');
+      
       console.log('Analytics session ended:', session.sessionToken);
     } catch (error) {
       console.warn('Session end tracking failed:', error);
@@ -256,7 +287,7 @@ export function useAnalytics() {
 
     window.addEventListener('popstate', handlePopState);
 
-    // End session on page unload
+    // End session ONLY on browser close (not on component unmount/navigation)
     const handleBeforeUnload = () => {
       endSession();
     };
@@ -266,7 +297,7 @@ export function useAnalytics() {
     return () => {
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      endSession();
+      // DO NOT call endSession() here - causes session spam on navigation
     };
   }, [user]);
 
