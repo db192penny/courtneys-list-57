@@ -14,14 +14,6 @@ export function GoogleSignInButton({
   label = "Continue with Google",
   community = ""
 }: GoogleSignInButtonProps) {
-  
-  // Show for all Bridges communities
-  const shouldShow = community.toLowerCase().includes('bridges');
-  
-  if (!shouldShow) {
-    return null;
-  }
-  
   return (
     <>
       <Button

@@ -105,17 +105,6 @@ const SignIn = () => {
       // Get community context
       const communityContext = community || "";
       
-      // Allow Google OAuth for all Bridges communities
-      if (!communityContext.toLowerCase().includes('bridges')) {
-        toast({
-          title: "Feature not available",
-          description: "Google sign-in is currently only available for Bridges communities.",
-          variant: "destructive"
-        });
-        setLoading(false);
-        return;
-      }
-      
       const redirectUrl = communityContext
         ? `${window.location.origin}/auth/callback?context=${communityContext}&intent=signin`
         : `${window.location.origin}/auth/callback?intent=signin`;
