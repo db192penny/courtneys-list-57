@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { communityNames } from "@/utils/communityNames";
+import { communityNames, publicCommunities } from "@/utils/communityNames";
 
 interface CommunityDropdownProps {
   fullWidth?: boolean;
@@ -17,7 +17,7 @@ export function CommunityDropdown({ fullWidth, onClose }: CommunityDropdownProps
   const navigate = useNavigate();
   const location = useLocation();
 
-  const communities = Object.entries(communityNames);
+  const communities = Object.entries(publicCommunities);
   
   // Extract slug from URL or default to boca-bridges
   const communityMatch = location.pathname.match(/\/communities\/([^\/]+)/);

@@ -8,6 +8,16 @@ export const communityNames: Record<string, string> = {
 };
 
 /**
+ * Public-facing communities (shown in dropdown)
+ * Only add communities here when ready to launch publicly
+ */
+export const publicCommunities: Record<string, string> = {
+  'boca-bridges': 'Boca Bridges',
+  'the-bridges': 'The Bridges',
+  // 'the-oaks' is NOT here - hidden from public
+};
+
+/**
  * Get display name for a community slug
  * @param slug - URL slug (e.g., 'boca-bridges')
  * @returns Display name (e.g., 'Boca Bridges')
