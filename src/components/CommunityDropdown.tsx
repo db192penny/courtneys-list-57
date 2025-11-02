@@ -27,11 +27,21 @@ export function CommunityDropdown({ fullWidth, onClose }: CommunityDropdownProps
   const currentDisplayName = communityNames[currentSlug] || "Boca Bridges";
 
   const handleCommunityChange = (slug: string) => {
+    // Get current category from URL if it exists
+    const currentParams = new URLSearchParams(window.location.search);
+    const currentCategory = currentParams.get('category');
+    
+    // Build new URL with preserved category
+    let targetPath = `/communities/${slug}`;
+    if (currentCategory && currentCategory !== 'all') {
+      targetPath += `?category=${encodeURIComponent(currentCategory)}`;
+    }
+    
     // Store slug in localStorage
     localStorage.setItem('selected_community', communityNames[slug]);
     
-    // Navigate to community page
-    navigate(`/communities/${slug}`);
+    // Navigate to community page with preserved category
+    navigate(targetPath);
     
     // Close mobile menu if callback provided
     onClose?.();
