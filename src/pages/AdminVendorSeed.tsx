@@ -26,6 +26,7 @@ const AdminVendorSeed = () => {
   const [submitting, setSubmitting] = useState(false);
   const [adminCommunity, setAdminCommunity] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [availableCommunities, setAvailableCommunities] = useState<string[]>([]);
   
   const { data: canSeed, isLoading: adminLoading } = useCanSeedVendors();
   
@@ -68,6 +69,25 @@ const AdminVendorSeed = () => {
 
     loadAdminData();
   }, [canSeed, adminLoading, navigate, toast]);
+
+  // Fetch available communities from database
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      const { data, error } = await supabase
+        .from('communities')
+        .select('name')
+        .order('name');
+      
+      if (data && !error) {
+        setAvailableCommunities(data.map(c => c.name));
+      } else {
+        // Fallback to hardcoded list if query fails
+        setAvailableCommunities(['Boca Bridges', 'The Bridges', 'The Oaks']);
+      }
+    };
+    
+    fetchCommunities();
+  }, []);
 
   const handleVendorSelected = async (payload: VendorSelectedPayload) => {
     setName(payload.name);
@@ -291,11 +311,13 @@ const AdminVendorSeed = () => {
                   <SelectValue placeholder="Select a community" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Boca Bridges">Boca Bridges</SelectItem>
-                  <SelectItem value="The Bridges">The Bridges</SelectItem>
+                  {availableCommunities.map((communityName) => (
+                    <SelectItem key={communityName} value={communityName}>
+                      {communityName}
+                    </SelectItem>
+                  ))}
                   {adminCommunity && 
-                   adminCommunity !== "Boca Bridges" && 
-                   adminCommunity !== "The Bridges" && (
+                   !availableCommunities.includes(adminCommunity) && (
                     <SelectItem value={adminCommunity}>{adminCommunity}</SelectItem>
                   )}
                 </SelectContent>
