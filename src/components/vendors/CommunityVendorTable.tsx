@@ -114,6 +114,13 @@ export default function CommunityVendorTable({
   const [prevCommunityName, setPrevCommunityName] = useState<string>(communityName);
   const { trackCategoryClick } = useAnalyticsTracking();
 
+  // Initialize category from URL parameter
+  useEffect(() => {
+    const urlCategory = searchParams.get('category');
+    if (urlCategory) {
+      setCategory(urlCategory);
+    }
+  }, [searchParams]);
 
   // Remove animation after initial attention
   useEffect(() => {
@@ -279,52 +286,6 @@ export default function CommunityVendorTable({
       categories: totalCategories
     };
   }, [data, availableCategories]);
-
-  // Initialize and validate category from URL parameter
-  useEffect(() => {
-    const urlCategory = searchParams.get('category');
-    
-    console.log('[CommunityVendorTable] Category initialization:', {
-      urlCategory,
-      currentCategory: category,
-      availableCategories: availableCategories?.slice(0, 5), // Log first 5
-      availableCategoriesLoaded: !!availableCategories
-    });
-    
-    if (urlCategory && urlCategory !== 'all') {
-      // Wait for availableCategories to load before validating
-      if (availableCategories && availableCategories.length > 0) {
-        const categoryExists = availableCategories.includes(urlCategory);
-        
-        if (categoryExists) {
-          console.log('[CommunityVendorTable] ✅ Category exists, setting:', urlCategory);
-          setCategory(urlCategory);
-        } else {
-          console.log('[CommunityVendorTable] ⚠️ Category not found, falling back to Pool. Tried:', urlCategory);
-          setCategory("Pool");
-          
-          // Clean up URL to remove invalid category
-          const newParams = new URLSearchParams(searchParams);
-          newParams.delete('category');
-          setSearchParams(newParams, { replace: true });
-        }
-      } else {
-        // availableCategories not loaded yet, set from URL anyway
-        // It will be revalidated once availableCategories loads
-        console.log('[CommunityVendorTable] Categories not loaded yet, setting:', urlCategory);
-        setCategory(urlCategory);
-      }
-    } else if (urlCategory === 'all') {
-      setCategory('all');
-    } else {
-      // No URL category, ensure we're on Pool
-      if (category !== 'Pool') {
-        console.log('[CommunityVendorTable] No URL category, resetting to Pool');
-        setCategory('Pool');
-      }
-    }
-  }, [searchParams, availableCategories]); // Watch both searchParams AND availableCategories
-  
   const { data: userHomeVendors } = useUserHomeVendors();
   const { data: userReviews } = useUserReviews();
   const userCosts = useUserCosts();
