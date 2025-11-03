@@ -165,13 +165,17 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
         setIsHoaAdmin(hoaFlag);
         setIsSiteAdmin(siteFlag);
       }
-      // Fetch ALL communities for dropdown (not just admin's HOA)
-      const { data: allCommunities } = await supabase
-        .from('communities')
-        .select('name')
-        .order('name');
+      // Fetch ALL communities from multiple sources
+      const [{ data: assets }, { data: households }] = await Promise.all([
+        supabase.from('community_assets').select('hoa_name').order('hoa_name'),
+        supabase.from('household_hoa').select('hoa_name').order('hoa_name')
+      ]);
 
-      const communityList = allCommunities?.map(c => c.name) || ['Boca Bridges', 'The Bridges', 'The Oaks'];
+      const allCommunityNames = new Set<string>();
+      assets?.forEach(a => allCommunityNames.add(a.hoa_name));
+      households?.forEach(h => allCommunityNames.add(h.hoa_name));
+      
+      const communityList = Array.from(allCommunityNames).sort() || ['Boca Bridges', 'The Bridges', 'The Oaks'];
 
       if (hoaFlag) {
         const [{ data: rows, error }, { data: myHoa }] = await Promise.all([
