@@ -195,50 +195,9 @@ export default function Community() {
         {/* Welcome toolbar for new users */}
         <WelcomeToolbar communitySlug={slug} />
         
-        {/* Mobile Hero Card - Shows initially, hides on scroll */}
-        {!hasScrolled && (
-          <div className="md:hidden mb-4">
-            <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-none shadow-md">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <img
-                    src={photoUrl}
-                    alt={`${communityName} logo`}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h1 className="text-lg font-bold text-foreground truncate">{communityName}</h1>
-                    <p className="text-xs text-muted-foreground">Trusted Provider List</p>
-                  </div>
-                </div>
-                
-                {/* Stats - Compact 2x2 Grid */}
-                <div className="grid grid-cols-4 gap-2 text-center">
-                  <div>
-                    <div className="text-sm font-bold">{homesLabel}</div>
-                    <div className="text-[10px] text-muted-foreground">Homes</div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold">{totalReviews}</div>
-                    <div className="text-[10px] text-muted-foreground">Reviews</div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold">{avgRating > 0 ? `${avgRating.toFixed(1)}★` : '-'}</div>
-                    <div className="text-[10px] text-muted-foreground">Rating</div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold">{activeUsers}</div>
-                    <div className="text-[10px] text-muted-foreground">Neighbors</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-        
-        {/* Mobile Compact Sticky Bar - Shows when scrolled */}
-        {isMobile && hasScrolled && (
-          <div className="md:hidden fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out">
+        {/* Mobile Compact Sticky Bar - Always visible on mobile */}
+        {isMobile && (
+          <div className="md:hidden fixed top-0 left-0 right-0 z-50">
             <MobileCompactBar
               communityName={communityName}
               photoUrl={photoUrl}
@@ -338,7 +297,7 @@ export default function Community() {
 
         {/* Show real data when it exists */}
         {!!data && data.length > 0 && (
-          <div className={`mt-2 sm:mt-6 space-y-2 sm:space-y-3 ${isMobile && hasScrolled ? 'pt-12' : ''}`}>
+          <div className={`mt-2 sm:mt-6 space-y-2 sm:space-y-3 ${isMobile ? 'pt-14' : ''}`}>
             <CommunityVendorTable 
               communityName={communityName} 
               showContact={true} 

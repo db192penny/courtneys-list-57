@@ -139,33 +139,10 @@ const CommunityPreview = () => {
       </div>
 
       <div className="container py-8 space-y-8">
-        {/* Mobile Hero Card - Shows initially, hides on scroll */}
-        {!hasScrolled && (
-          <div className="md:hidden">
-            <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-none shadow-md">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <img
-                    src={photoUrl}
-                    alt={`${communityName} logo`}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h1 className="text-lg font-bold text-foreground truncate">{communityName}</h1>
-                    <p className="text-xs text-muted-foreground">Early preview</p>
-                  </div>
-                  <div className="px-2 py-1 bg-primary/10 rounded text-[10px] font-medium text-primary">
-                    Preview
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
         
-        {/* Mobile Compact Sticky Bar - Shows when scrolled */}
-        {isMobile && hasScrolled && (
-          <div className="md:hidden fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out">
+        {/* Mobile Compact Sticky Bar - Always visible on mobile */}
+        {isMobile && (
+          <div className="md:hidden fixed top-0 left-0 right-0 z-50">
             <MobileCompactBar
               communityName={communityName}
               photoUrl={photoUrl}
@@ -221,7 +198,7 @@ const CommunityPreview = () => {
         )}
 
         {/* Vendor Table */}
-        <div className={`space-y-4 ${isMobile && hasScrolled ? 'pt-12' : ''}`}>
+        <div className={`space-y-4 ${isMobile ? 'pt-14' : ''}`}>
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold">Service Providers</h2>
