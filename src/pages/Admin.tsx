@@ -50,7 +50,6 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
   const [availableCommunities, setAvailableCommunities] = useState<string[]>([]);
   const [selectedCommunity, setSelectedCommunity] = useState<string | null>(null);
   const [brandingAddr, setBrandingAddr] = useState<string>("");
-  const [brandingPhone, setBrandingPhone] = useState<string>("");
   const [brandingPhotoPath, setBrandingPhotoPath] = useState<string | null>(null);
   const [brandingPhotoUrl, setBrandingPhotoUrl] = useState<string | null>(null);
   const [brandingSaving, setBrandingSaving] = useState(false);
@@ -59,7 +58,7 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
   const refreshBranding = async (hoa: string) => {
     const { data, error } = await supabase
       .from("community_assets")
-      .select("hoa_name, photo_path, address_line, contact_phone, total_homes")
+      .select("hoa_name, photo_path, address_line, total_homes")
       .eq("hoa_name", hoa)
       .maybeSingle();
     if (error) {
@@ -67,7 +66,6 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
       return;
     }
     setBrandingAddr((data as any)?.address_line ?? "");
-    setBrandingPhone((data as any)?.contact_phone ?? "");
     setTotalHomes((data as any)?.total_homes ?? "");
     const path = (data as any)?.photo_path ?? null;
     setBrandingPhotoPath(path);
@@ -117,7 +115,6 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
           .from("community_assets")
           .update({
             address_line: brandingAddr || null,
-            contact_phone: brandingPhone || null,
             photo_path: brandingPhotoPath || null,
             total_homes: totalHomes === "" ? null : Number(totalHomes),
           })
@@ -129,7 +126,6 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
           .insert({
             hoa_name: community,
             address_line: brandingAddr || null,
-            contact_phone: brandingPhone || null,
             photo_path: brandingPhotoPath || null,
             total_homes: totalHomes === "" ? null : Number(totalHomes),
           });
@@ -169,6 +165,14 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
         setIsHoaAdmin(hoaFlag);
         setIsSiteAdmin(siteFlag);
       }
+      // Fetch ALL communities for dropdown (not just admin's HOA)
+      const { data: allCommunities } = await supabase
+        .from('communities')
+        .select('name')
+        .order('name');
+
+      const communityList = allCommunities?.map(c => c.name) || ['Boca Bridges', 'The Bridges', 'The Oaks'];
+
       if (hoaFlag) {
         const [{ data: rows, error }, { data: myHoa }] = await Promise.all([
           supabase.rpc("admin_list_pending_households"),
@@ -180,30 +184,26 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
           const hoa = (Array.isArray(myHoa) ? (myHoa as any[])[0]?.hoa_name : (myHoa as any)?.hoa_name) as string | undefined;
           if (hoa) {
             setHoaName(hoa);
-            setAvailableCommunities([hoa]);
+            setAvailableCommunities(communityList);
             setSelectedCommunity(hoa);
             await refreshBranding(hoa);
+          } else {
+            setAvailableCommunities(communityList);
+            setSelectedCommunity(communityList[0]);
+            await refreshBranding(communityList[0]);
           }
         }
       }
       
-      // Fetch all communities for site admins
+      // Site admins also get all communities
       if (siteFlag) {
-        const { data: communitiesData } = await supabase
-          .from("household_hoa")
-          .select("hoa_name")
-          .order("hoa_name");
-        
-        if (communitiesData) {
-          const uniqueCommunities = Array.from(new Set(communitiesData.map(c => c.hoa_name)));
-          if (!cancelled) {
-            setAvailableCommunities(uniqueCommunities);
-            // If no HOA admin community set, default to first available
-            if (!hoaName && uniqueCommunities.length > 0) {
-              const firstCommunity = uniqueCommunities[0];
-              setSelectedCommunity(firstCommunity);
-              await refreshBranding(firstCommunity);
-            }
+        if (!cancelled) {
+          setAvailableCommunities(communityList);
+          // If no HOA admin community set, default to first available
+          if (!hoaName && communityList.length > 0) {
+            const firstCommunity = communityList[0];
+            setSelectedCommunity(firstCommunity);
+            await refreshBranding(firstCommunity);
           }
         }
       }
@@ -531,16 +531,6 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
                       placeholder="HOA address line"
                       value={brandingAddr}
                       onChange={(e) => setBrandingAddr(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="branding-phone">HOA Contact Phone</Label>
-                    <Input
-                      id="branding-phone"
-                      placeholder="e.g. (561) 555-1234"
-                      value={brandingPhone}
-                      onChange={(e) => setBrandingPhone(e.target.value)}
                     />
                   </div>
 
