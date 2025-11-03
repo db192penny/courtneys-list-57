@@ -39,7 +39,7 @@ const CommunityPreview = () => {
   
   // Mobile compact bar state
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [sortKey, setSortKey] = useState("homes");
+  const [sortKey, setSortKey] = useState("hoa_rating"); // Default to highest rated for mobile
 
   // Track page view
   useEffect(() => {
@@ -171,13 +171,6 @@ const CommunityPreview = () => {
               photoUrl={photoUrl}
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
-              sortKey={sortKey}
-              onSortChange={setSortKey}
-              sortOptions={[
-                { key: "homes", label: "Most Used" },
-                { key: "hoa_rating", label: "Top Rated" },
-                { key: "google_rating", label: "Google" },
-              ]}
             />
           </div>
         )}

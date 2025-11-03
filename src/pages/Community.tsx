@@ -48,7 +48,7 @@ export default function Community() {
   
   // Mobile compact bar state
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [sortKey, setSortKey] = useState("homes");
+  const [sortKey, setSortKey] = useState("hoa_rating"); // Default to highest rated for mobile
 
   // Store community context for signup flow
   useEffect(() => {
@@ -244,13 +244,6 @@ export default function Community() {
               photoUrl={photoUrl}
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
-              sortKey={sortKey}
-              onSortChange={setSortKey}
-              sortOptions={[
-                { key: "homes", label: "Most Used" },
-                { key: "hoa_rating", label: "Top Rated" },
-                { key: "google_rating", label: "Google" },
-              ]}
             />
           </div>
         )}

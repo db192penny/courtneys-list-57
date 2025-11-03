@@ -12,9 +12,6 @@ interface MobileCompactBarProps {
   photoUrl: string;
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
-  sortKey: string;
-  onSortChange: (sort: string) => void;
-  sortOptions: Array<{ key: string; label: string }>;
 }
 
 export function MobileCompactBar({
@@ -22,9 +19,6 @@ export function MobileCompactBar({
   photoUrl,
   selectedCategory,
   onCategoryChange,
-  sortKey,
-  onSortChange,
-  sortOptions,
 }: MobileCompactBarProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,21 +32,24 @@ export function MobileCompactBar({
   };
 
   return (
-    <div className="bg-background/95 backdrop-blur-md border-b border-border shadow-sm py-2 px-4">
-      <div className="flex items-center gap-2">
-        {/* Community Logo & Name - Tappable */}
+    <div className="bg-background/95 backdrop-blur-md border-b border-border shadow-sm py-3 px-4">
+      <div className="flex items-center gap-3">
+        {/* Community Switcher - Enhanced & Prominent */}
         <Sheet>
           <SheetTrigger asChild>
-            <button className="flex items-center gap-2 flex-shrink-0 min-w-0 hover:opacity-80 transition-opacity">
-              <img
-                src={photoUrl}
-                alt={communityName}
-                className="w-8 h-8 rounded-full object-cover border border-border"
-              />
-              <span className="text-sm font-semibold text-foreground truncate max-w-[100px]">
-                {communityName}
-              </span>
-              <ChevronDown className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 transition-colors flex-1 min-w-0 border border-border/50">
+              <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
+              <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                <img
+                  src={photoUrl}
+                  alt={communityName}
+                  className="w-6 h-6 rounded-full object-cover border border-border flex-shrink-0"
+                />
+                <span className="text-sm font-semibold text-foreground truncate">
+                  {communityName}
+                </span>
+              </div>
+              <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             </button>
           </SheetTrigger>
           <SheetContent side="bottom" className="h-[60vh]">
@@ -74,12 +71,12 @@ export function MobileCompactBar({
           </SheetContent>
         </Sheet>
 
-        {/* Category Selector - Compact */}
+        {/* Category Selector - Enhanced */}
         <Select value={selectedCategory} onValueChange={onCategoryChange}>
-          <SelectTrigger className="h-8 text-xs flex-1 min-w-0">
+          <SelectTrigger className="h-10 text-sm flex-1 min-w-0">
             <SelectValue>
               <span className="truncate">
-                {selectedCategory === "all" ? "All" : `${getCategoryEmoji(selectedCategory)} ${selectedCategory}`}
+                {selectedCategory === "all" ? "All Categories" : `${getCategoryEmoji(selectedCategory)} ${selectedCategory}`}
               </span>
             </SelectValue>
           </SelectTrigger>
@@ -88,20 +85,6 @@ export function MobileCompactBar({
             {CATEGORIES.map((cat) => (
               <SelectItem key={cat} value={cat}>
                 {getCategoryEmoji(cat)} {cat}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Sort Selector - Compact */}
-        <Select value={sortKey} onValueChange={onSortChange}>
-          <SelectTrigger className="h-8 text-xs w-[100px] flex-shrink-0">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {sortOptions.map((sort) => (
-              <SelectItem key={sort.key} value={sort.key}>
-                {sort.label}
               </SelectItem>
             ))}
           </SelectContent>
