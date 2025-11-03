@@ -1,24 +1,21 @@
-import { ChevronDown } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChevronDown, Users, Building2 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { CATEGORIES } from "@/data/categories";
-import { getCategoryEmoji } from "@/utils/categoryEmojis";
 import { useNavigate, useLocation } from "react-router-dom";
 import { publicCommunities, communityNames } from "@/utils/communityNames";
 
 interface MobileCompactBarProps {
   communityName: string;
   photoUrl: string;
-  selectedCategory: string;
-  onCategoryChange: (category: string) => void;
+  vendorCount?: number;
+  activeUsers?: number;
 }
 
 export function MobileCompactBar({
   communityName,
   photoUrl,
-  selectedCategory,
-  onCategoryChange,
+  vendorCount = 0,
+  activeUsers = 0,
 }: MobileCompactBarProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,18 +29,18 @@ export function MobileCompactBar({
   };
 
   return (
-    <div className="bg-background/95 backdrop-blur-md border-b border-border shadow-sm py-3 px-4">
-      <div className="flex items-center gap-3">
-        {/* Community Switcher - Enhanced & Prominent */}
+    <div className="bg-background/95 backdrop-blur-md border-b border-border shadow-sm py-2.5 px-4">
+      <div className="flex items-center justify-between gap-3">
+        {/* Community Switcher with Photo */}
         <Sheet>
           <SheetTrigger asChild>
-            <button className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 transition-colors flex-1 min-w-0 border border-border/50">
+            <button className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 transition-colors min-w-0 border border-border/50">
               <img
                 src={photoUrl}
                 alt={communityName}
                 className="w-7 h-7 rounded-full object-cover border border-border flex-shrink-0"
               />
-              <span className="text-sm font-bold text-foreground flex-1 text-left">
+              <span className="text-sm font-bold text-foreground truncate">
                 {communityName}
               </span>
               <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -68,24 +65,21 @@ export function MobileCompactBar({
           </SheetContent>
         </Sheet>
 
-        {/* Category Selector - Enhanced */}
-        <Select value={selectedCategory} onValueChange={onCategoryChange}>
-          <SelectTrigger className="h-10 text-sm flex-1 min-w-0">
-            <SelectValue>
-              <span className="truncate">
-                {selectedCategory === "all" ? "All Categories" : `${getCategoryEmoji(selectedCategory)} ${selectedCategory}`}
-              </span>
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {CATEGORIES.map((cat) => (
-              <SelectItem key={cat} value={cat}>
-                {getCategoryEmoji(cat)} {cat}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Quick Stats */}
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          {vendorCount > 0 && (
+            <div className="flex items-center gap-1">
+              <Building2 className="w-3.5 h-3.5" />
+              <span className="font-medium">{vendorCount}</span>
+            </div>
+          )}
+          {activeUsers > 0 && (
+            <div className="flex items-center gap-1">
+              <Users className="w-3.5 h-3.5" />
+              <span className="font-medium">{activeUsers}</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

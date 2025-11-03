@@ -146,8 +146,6 @@ const CommunityPreview = () => {
             <MobileCompactBar
               communityName={communityName}
               photoUrl={photoUrl}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
             />
           </div>
         )}

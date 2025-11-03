@@ -201,8 +201,8 @@ export default function Community() {
             <MobileCompactBar
               communityName={communityName}
               photoUrl={photoUrl}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
+              vendorCount={totalReviews > 0 ? data?.length || 0 : 0}
+              activeUsers={activeUsers}
             />
           </div>
         )}

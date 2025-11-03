@@ -450,21 +450,18 @@ export default function CommunityVendorTable({
 
           {/* Row 1: Category Dropdown + Info + Share Buttons */}
           <div className="flex items-end gap-3 mb-4">
-            {/* Hide category pills on mobile - MobileCompactBar handles it */}
-            {!isMobile && (
-              <div className="flex-1 flex flex-col justify-end">
-                <HorizontalCategoryPills
-                  selectedCategory={category}
-                  onCategoryChange={handleCategoryChange}
-                  categories={(
-                    availableCategories?.length > 0 ? 
-                    availableCategories : CATEGORIES
-                  ) as string[]}
-                  isBannerVisible={isMobile && isBannerVisible}
-                />
-              </div>
-            )}
-            <div className={`flex flex-col justify-end ${isMobile ? 'flex-1' : ''}`}>
+            <div className="flex-1 flex flex-col justify-end">
+              <HorizontalCategoryPills
+                selectedCategory={category}
+                onCategoryChange={handleCategoryChange}
+                categories={(
+                  availableCategories?.length > 0 ? 
+                  availableCategories : CATEGORIES
+                ) as string[]}
+                isBannerVisible={isMobile && isBannerVisible}
+              />
+            </div>
+            <div className="flex flex-col justify-end">
               <label className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-2 block text-right sm:text-left">
                 Share
               </label>
