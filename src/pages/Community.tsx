@@ -190,8 +190,8 @@ export default function Community() {
         
         {/* Mobile Community Selector - Banner Style */}
         <div className="md:hidden mb-4">
-          <Card className="bg-gradient-to-br from-blue-50/80 to-purple-50/80 dark:from-blue-950/30 dark:to-purple-950/30 border-blue-200/50 dark:border-blue-800/30 shadow-md">
-            <CardContent className="p-4">
+          <Card className="bg-primary/5 border-primary/20 shadow-sm">
+            <CardContent className="p-3">
               <CommunityDropdown bannerStyle photoUrl={photoUrl} />
             </CardContent>
           </Card>

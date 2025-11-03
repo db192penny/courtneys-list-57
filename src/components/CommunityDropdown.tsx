@@ -59,25 +59,25 @@ export function CommunityDropdown({ fullWidth, onClose, photoUrl, bannerStyle }:
         value={currentSlug}
         onValueChange={handleCommunityChange}
       >
-        <SelectTrigger className="w-full h-auto border-0 bg-transparent p-0 hover:bg-transparent focus:ring-0 focus:ring-offset-0">
+        <SelectTrigger className="w-full h-auto border-0 bg-transparent p-0 hover:bg-transparent focus:ring-0 focus:ring-offset-0 [&>svg]:hidden">
           <div className="flex items-center gap-3 w-full">
             {/* Community Photo */}
             <div className="flex-shrink-0">
               <img
                 src={photoUrl}
                 alt={`${currentDisplayName} logo`}
-                className="w-12 h-12 rounded-full object-cover border-2 border-background shadow-md"
+                className="w-10 h-10 rounded-full object-cover border border-primary/20 shadow-sm"
               />
             </div>
             
             {/* Community Name Section */}
             <div className="flex-1 text-left">
-              <div className="text-xs font-medium text-muted-foreground mb-0.5">Community</div>
+              <div className="text-xs font-medium text-primary uppercase tracking-wide">Community</div>
               <div className="text-base font-bold text-foreground">{currentDisplayName}</div>
             </div>
             
             {/* Chevron Icon */}
-            <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <ChevronDown className="h-5 w-5 text-primary flex-shrink-0" />
           </div>
         </SelectTrigger>
         <SelectContent className="bg-background z-50 border-accent/20">
