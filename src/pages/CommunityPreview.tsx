@@ -11,8 +11,6 @@ import { usePreviewSession } from "@/hooks/usePreviewSession";
 import EmailManagementPanel from "@/components/preview/EmailManagementPanel";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { BackToTopButton } from "@/components/ui/BackToTopButton";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { MobileCompactBar } from "@/components/vendors/MobileCompactBar";
 
 
 function slugToName(slug: string): string {
@@ -29,17 +27,12 @@ const CommunityPreview = () => {
   const navigate = useNavigate();
   const { trackEvent } = usePreviewSession();
   const { isScrollingDown, hasScrolled } = useScrollDirection();
-  const isMobile = useIsMobile();
   const [hideHeader, setHideHeader] = useState(false);
   useEffect(() => {
     if (hasScrolled) setHideHeader(true);
   }, [hasScrolled]);
   
   const communityName = useMemo(() => (slug ? slugToName(slug) : ""), [slug]);
-  
-  // Mobile compact bar state
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [sortKey, setSortKey] = useState("hoa_rating"); // Default to highest rated for mobile
 
   // Track page view
   useEffect(() => {
@@ -139,17 +132,6 @@ const CommunityPreview = () => {
       </div>
 
       <div className="container py-8 space-y-8">
-        
-      {/* Mobile Compact Sticky Bar - Always visible on mobile */}
-      {isMobile && (
-        <div className="md:hidden fixed top-14 left-0 right-0 z-40">
-            <MobileCompactBar
-              communityName={communityName}
-              photoUrl={photoUrl}
-            />
-          </div>
-        )}
-        
         {/* Hero Card - Desktop/Tablet Only */}
         {!hideHeader && (
           <div className="hidden md:block">
@@ -196,7 +178,7 @@ const CommunityPreview = () => {
         )}
 
         {/* Vendor Table */}
-        <div className={`space-y-4 ${isMobile ? 'pt-28' : ''}`}>
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold">Service Providers</h2>

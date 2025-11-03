@@ -17,8 +17,6 @@ import { BackToTopButton } from "@/components/ui/BackToTopButton";
 import { CommunityNavigationNotice } from "@/components/CommunityNavigationNotice";
 import { CommunityDropdown } from "@/components/CommunityDropdown";
 import { storeAuthReturnPath } from "@/utils/authRedirect";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { MobileCompactBar } from "@/components/vendors/MobileCompactBar";
 
 function slugToName(slug: string) {
   const cleaned = (slug || "")
@@ -38,17 +36,12 @@ export default function Community() {
   const { data: profile } = useUserProfile();
   const { isAuthenticated: sessionAuthenticated } = useAuth();
   const { isScrollingDown, hasScrolled } = useScrollDirection();
-  const isMobile = useIsMobile();
   const [hideHeader, setHideHeader] = useState(false);
   useEffect(() => {
     if (hasScrolled) setHideHeader(true);
   }, [hasScrolled]);
   
   const communityName = useMemo(() => slugToName(slug), [slug]);
-  
-  // Mobile compact bar state
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [sortKey, setSortKey] = useState("hoa_rating"); // Default to highest rated for mobile
 
   // Store community context for signup flow
   useEffect(() => {
@@ -195,17 +188,15 @@ export default function Community() {
         {/* Welcome toolbar for new users */}
         <WelcomeToolbar communitySlug={slug} />
         
-        {/* Mobile Compact Sticky Bar - Always visible on mobile */}
-        {isMobile && (
-          <div className="md:hidden fixed top-14 left-0 right-0 z-40">
-            <MobileCompactBar
-              communityName={communityName}
-              photoUrl={photoUrl}
-              vendorCount={totalReviews > 0 ? data?.length || 0 : 0}
-              activeUsers={activeUsers}
-            />
-          </div>
-        )}
+        {/* Mobile Community Selector - Prominent placement */}
+        <div className="md:hidden mb-4">
+          <Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800 shadow-sm">
+            <CardContent className="p-4">
+              <h2 className="text-sm font-semibold text-foreground mb-2">Community</h2>
+              <CommunityDropdown fullWidth />
+            </CardContent>
+          </Card>
+        </div>
         
         {/* Desktop Community Selector - Above hero card */}
         <div className="hidden md:block mb-4">
@@ -297,7 +288,7 @@ export default function Community() {
 
         {/* Show real data when it exists */}
         {!!data && data.length > 0 && (
-          <div className={`mt-2 sm:mt-6 space-y-2 sm:space-y-3 ${isMobile ? 'pt-28' : ''}`}>
+          <div className="mt-2 sm:mt-6 space-y-2 sm:space-y-3">
             <CommunityVendorTable 
               communityName={communityName} 
               showContact={true} 
