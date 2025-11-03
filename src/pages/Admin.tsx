@@ -137,6 +137,7 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
         toast.error("Save failed", { description: opError.message });
       } else {
         toast.success("Branding saved");
+        await refreshBranding(community);
       }
     } finally {
       setBrandingSaving(false);
