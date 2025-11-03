@@ -1,4 +1,4 @@
-import { MapPin, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -37,18 +37,15 @@ export function MobileCompactBar({
         {/* Community Switcher - Enhanced & Prominent */}
         <Sheet>
           <SheetTrigger asChild>
-            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 transition-colors flex-1 min-w-0 border border-border/50">
-              <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-              <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                <img
-                  src={photoUrl}
-                  alt={communityName}
-                  className="w-6 h-6 rounded-full object-cover border border-border flex-shrink-0"
-                />
-                <span className="text-sm font-semibold text-foreground truncate">
-                  {communityName}
-                </span>
-              </div>
+            <button className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 transition-colors flex-1 min-w-0 border border-border/50">
+              <img
+                src={photoUrl}
+                alt={communityName}
+                className="w-7 h-7 rounded-full object-cover border border-border flex-shrink-0"
+              />
+              <span className="text-sm font-bold text-foreground flex-1 text-left">
+                {communityName}
+              </span>
               <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             </button>
           </SheetTrigger>
