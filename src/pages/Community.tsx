@@ -17,6 +17,8 @@ import { BackToTopButton } from "@/components/ui/BackToTopButton";
 import { CommunityNavigationNotice } from "@/components/CommunityNavigationNotice";
 import { CommunityDropdown } from "@/components/CommunityDropdown";
 import { storeAuthReturnPath } from "@/utils/authRedirect";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileCompactBar } from "@/components/vendors/MobileCompactBar";
 
 function slugToName(slug: string) {
   const cleaned = (slug || "")
@@ -36,12 +38,17 @@ export default function Community() {
   const { data: profile } = useUserProfile();
   const { isAuthenticated: sessionAuthenticated } = useAuth();
   const { isScrollingDown, hasScrolled } = useScrollDirection();
+  const isMobile = useIsMobile();
   const [hideHeader, setHideHeader] = useState(false);
   useEffect(() => {
     if (hasScrolled) setHideHeader(true);
   }, [hasScrolled]);
   
   const communityName = useMemo(() => slugToName(slug), [slug]);
+  
+  // Mobile compact bar state
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortKey, setSortKey] = useState("homes");
 
   // Store community context for signup flow
   useEffect(() => {
@@ -188,15 +195,65 @@ export default function Community() {
         {/* Welcome toolbar for new users */}
         <WelcomeToolbar communitySlug={slug} />
         
-        {/* Mobile Community Selector - Prominent placement */}
-        <div className="md:hidden mb-4">
-          <Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800 shadow-sm">
-            <CardContent className="p-4">
-              <h2 className="text-sm font-semibold text-foreground mb-2">Community</h2>
-              <CommunityDropdown fullWidth />
-            </CardContent>
-          </Card>
-        </div>
+        {/* Mobile Hero Card - Shows initially, hides on scroll */}
+        {!hasScrolled && (
+          <div className="md:hidden mb-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-none shadow-md">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <img
+                    src={photoUrl}
+                    alt={`${communityName} logo`}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-lg font-bold text-foreground truncate">{communityName}</h1>
+                    <p className="text-xs text-muted-foreground">Trusted Provider List</p>
+                  </div>
+                </div>
+                
+                {/* Stats - Compact 2x2 Grid */}
+                <div className="grid grid-cols-4 gap-2 text-center">
+                  <div>
+                    <div className="text-sm font-bold">{homesLabel}</div>
+                    <div className="text-[10px] text-muted-foreground">Homes</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold">{totalReviews}</div>
+                    <div className="text-[10px] text-muted-foreground">Reviews</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold">{avgRating > 0 ? `${avgRating.toFixed(1)}★` : '-'}</div>
+                    <div className="text-[10px] text-muted-foreground">Rating</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold">{activeUsers}</div>
+                    <div className="text-[10px] text-muted-foreground">Neighbors</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
+        {/* Mobile Compact Sticky Bar - Shows when scrolled */}
+        {isMobile && hasScrolled && (
+          <div className="md:hidden fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out">
+            <MobileCompactBar
+              communityName={communityName}
+              photoUrl={photoUrl}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              sortKey={sortKey}
+              onSortChange={setSortKey}
+              sortOptions={[
+                { key: "homes", label: "Most Used" },
+                { key: "hoa_rating", label: "Top Rated" },
+                { key: "google_rating", label: "Google" },
+              ]}
+            />
+          </div>
+        )}
         
         {/* Desktop Community Selector - Above hero card */}
         <div className="hidden md:block mb-4">
@@ -288,7 +345,7 @@ export default function Community() {
 
         {/* Show real data when it exists */}
         {!!data && data.length > 0 && (
-          <div className="mt-2 sm:mt-6 space-y-2 sm:space-y-3">
+          <div className={`mt-2 sm:mt-6 space-y-2 sm:space-y-3 ${isMobile && hasScrolled ? 'pt-12' : ''}`}>
             <CommunityVendorTable 
               communityName={communityName} 
               showContact={true} 
