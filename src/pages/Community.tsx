@@ -197,7 +197,7 @@ export default function Community() {
         
         {/* Mobile Compact Sticky Bar - Always visible on mobile */}
         {isMobile && (
-          <div className="md:hidden fixed top-0 left-0 right-0 z-50">
+          <div className="md:hidden fixed top-14 left-0 right-0 z-40">
             <MobileCompactBar
               communityName={communityName}
               photoUrl={photoUrl}
@@ -297,7 +297,7 @@ export default function Community() {
 
         {/* Show real data when it exists */}
         {!!data && data.length > 0 && (
-          <div className={`mt-2 sm:mt-6 space-y-2 sm:space-y-3 ${isMobile ? 'pt-14' : ''}`}>
+          <div className={`mt-2 sm:mt-6 space-y-2 sm:space-y-3 ${isMobile ? 'pt-28' : ''}`}>
             <CommunityVendorTable 
               communityName={communityName} 
               showContact={true} 

@@ -140,9 +140,9 @@ const CommunityPreview = () => {
 
       <div className="container py-8 space-y-8">
         
-        {/* Mobile Compact Sticky Bar - Always visible on mobile */}
-        {isMobile && (
-          <div className="md:hidden fixed top-0 left-0 right-0 z-50">
+      {/* Mobile Compact Sticky Bar - Always visible on mobile */}
+      {isMobile && (
+        <div className="md:hidden fixed top-14 left-0 right-0 z-40">
             <MobileCompactBar
               communityName={communityName}
               photoUrl={photoUrl}
@@ -198,7 +198,7 @@ const CommunityPreview = () => {
         )}
 
         {/* Vendor Table */}
-        <div className={`space-y-4 ${isMobile ? 'pt-14' : ''}`}>
+        <div className={`space-y-4 ${isMobile ? 'pt-28' : ''}`}>
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold">Service Providers</h2>
