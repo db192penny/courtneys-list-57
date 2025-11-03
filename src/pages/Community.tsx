@@ -188,12 +188,11 @@ export default function Community() {
         {/* Welcome toolbar for new users */}
         <WelcomeToolbar communitySlug={slug} />
         
-        {/* Mobile Community Selector - Prominent placement */}
+        {/* Mobile Community Selector - Banner Style */}
         <div className="md:hidden mb-4">
-          <Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800 shadow-sm">
+          <Card className="bg-gradient-to-br from-blue-50/80 to-purple-50/80 dark:from-blue-950/30 dark:to-purple-950/30 border-blue-200/50 dark:border-blue-800/30 shadow-md">
             <CardContent className="p-4">
-              <h2 className="text-sm font-semibold text-foreground mb-2">Community</h2>
-              <CommunityDropdown fullWidth />
+              <CommunityDropdown bannerStyle photoUrl={photoUrl} />
             </CardContent>
           </Card>
         </div>

@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -7,15 +8,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { communityNames, publicCommunities } from "@/utils/communityNames";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CommunityDropdownProps {
   fullWidth?: boolean;
   onClose?: () => void;
+  photoUrl?: string;
+  bannerStyle?: boolean;
 }
 
-export function CommunityDropdown({ fullWidth, onClose }: CommunityDropdownProps) {
+export function CommunityDropdown({ fullWidth, onClose, photoUrl, bannerStyle }: CommunityDropdownProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   const communities = Object.entries(publicCommunities);
   
@@ -47,6 +52,50 @@ export function CommunityDropdown({ fullWidth, onClose }: CommunityDropdownProps
     onClose?.();
   };
 
+  // Banner style for mobile
+  if (bannerStyle && isMobile && photoUrl) {
+    return (
+      <Select
+        value={currentSlug}
+        onValueChange={handleCommunityChange}
+      >
+        <SelectTrigger className="w-full h-auto border-0 bg-transparent p-0 hover:bg-transparent focus:ring-0 focus:ring-offset-0">
+          <div className="flex items-center gap-3 w-full">
+            {/* Community Photo */}
+            <div className="flex-shrink-0">
+              <img
+                src={photoUrl}
+                alt={`${currentDisplayName} logo`}
+                className="w-12 h-12 rounded-full object-cover border-2 border-background shadow-md"
+              />
+            </div>
+            
+            {/* Community Name Section */}
+            <div className="flex-1 text-left">
+              <div className="text-xs font-medium text-muted-foreground mb-0.5">Community</div>
+              <div className="text-base font-bold text-foreground">{currentDisplayName}</div>
+            </div>
+            
+            {/* Chevron Icon */}
+            <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          </div>
+        </SelectTrigger>
+        <SelectContent className="bg-background z-50 border-accent/20">
+          {communities.map(([slug, name]) => (
+            <SelectItem 
+              key={slug} 
+              value={slug}
+              className="font-medium"
+            >
+              {name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
+
+  // Standard dropdown style
   return (
     <Select
       value={currentSlug}
