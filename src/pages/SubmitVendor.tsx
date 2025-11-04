@@ -51,7 +51,7 @@ const SubmitVendor = () => {
   const [submittedVendorId, setSubmittedVendorId] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const { data: isAdmin } = useIsAdmin();
-  const { data: canSeed } = useCanSeedVendors();
+  const { data: canSeed } = useCanSeedVendors(communityParam);
   const isAdminUser = canSeed || false;
   const { data: userData } = useUserData();
 
