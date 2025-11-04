@@ -287,17 +287,6 @@ const Auth = () => {
       // Get community context
       const communityContext = communityName || "boca-bridges";
 
-      // Allow Google OAuth for all Bridges communities
-      if (!communityContext.toLowerCase().includes("bridges")) {
-        toast({
-          title: "Feature not available",
-          description: "Google sign-up is currently only available for Bridges communities.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
