@@ -45,6 +45,7 @@ export const CATEGORIES = [
   "Wallpaper Installation",
   "Water Filtration",
   "Window Cleaning",
+  "Window Installation & Repair",
   "Window Treatment",
   "Masseuse",
   "General Contractor",

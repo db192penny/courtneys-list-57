@@ -60,6 +60,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
 
+  // Window Installation & Repair: Service call for repairs + installation for new windows
+  if (c === "window installation & repair") {
+    return [
+      { cost_kind: "service_call", amount: null, unit: "visit", notes: null },
+      { cost_kind: "installation", amount: null, unit: "window", quantity: null, notes: null },
+    ];
+  }
+
   // Plumbing/Electrical/Painters/Pet Grooming/House Cleaning/Mobile Tire Repair/Mobile Scratch/Dent Repair/Appliance Repair/Grill Cleaning/Dryer Vent Cleaning: Service Call only
   if (c === "plumbing" || c === "electrical" || c === "painters" || c === "pet grooming" || c === "house cleaning" || c === "mobile tire repair" || c === "mobile scratch/dent repair" || c === "appliance repair" || c === "grill cleaning" || c === "dryer vent cleaning") {
     return [

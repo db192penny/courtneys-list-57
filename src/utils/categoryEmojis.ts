@@ -42,6 +42,7 @@ export const categoryEmojiMap: Record<string, string> = {
   'Power Washing': '🚿',
   'Water Filtration': '💧',
   'Window Cleaning': '🧼',
+  'Window Installation & Repair': '🪟',
   'Interior Design': '🛋️',
   'Moving Company': '🚚',
   'Damage Assessment/Restoration': '🛠️',

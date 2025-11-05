@@ -42,6 +42,7 @@ import {
   Hand,
   Baby,
   Key,
+  FrameIcon,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -83,6 +84,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Home Organization": Package,
   "Water Filtration": Filter,
   "Window Cleaning": Sparkles,
+  "Window Installation & Repair": FrameIcon,
   "Interior Design": Palette,
   "Moving Company": Truck,
   "Damage Assessment/Restoration": Shield,
