@@ -52,7 +52,7 @@ const SubmitVendor = () => {
   const isMobile = useIsMobile();
   const { data: isAdmin } = useIsAdmin();
   const { data: canSeed } = useCanSeedVendors(communityParam);
-  const isAdminUser = canSeed || false;
+  const isAdminUser = isAdmin || canSeed || false;
   const { data: userData } = useUserData();
 
   const canonical = typeof window !== "undefined" ? window.location.href : undefined;
