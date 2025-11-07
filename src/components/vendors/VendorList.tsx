@@ -28,7 +28,7 @@ export default function VendorList({
       console.log("[VendorList] loading vendors", { category });
       let q = supabase.from("vendors").select("*").order("created_at", { ascending: false });
       if (category && category !== "all") {
-        q = q.eq("category", category);
+        q = q.or(`category.eq.${category},secondary_categories.cs.{${category}}`);
       }
       const { data, error } = await q;
       if (error) throw error;
