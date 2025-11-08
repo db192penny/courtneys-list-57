@@ -242,8 +242,8 @@ export function AddCostModal({
         }
       }
       
-      // Patio Screening
-      else if (categoryLower.includes("patio screening")) {
+      // Screen Doors & Enclosures
+      else if (categoryLower.includes("screen doors & enclosures")) {
         if (patioInstallation) {
           costsToInsert.push({
             vendor_id: vendorId,

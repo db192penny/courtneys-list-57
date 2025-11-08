@@ -186,8 +186,8 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
 
-  // Patio Screening: Installation per sq ft + repair per panel
-  if (c === "patio screening") {
+  // Screen Doors & Enclosures: Installation per sq ft + repair per panel
+  if (c === "screen doors & enclosures") {
     return [
       { cost_kind: "installation", amount: null, unit: "sq ft", notes: null },
       { cost_kind: "service_call", amount: null, unit: "panel", notes: null },
