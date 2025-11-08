@@ -89,7 +89,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Moving Company": Truck,
   "Damage Assessment/Restoration": Shield,
   "Carpet/Upholstery Cleaning": Sofa,
-  "Screen Doors & Enclosures": Grid3x3,
+  "Screen Doors & Enclosures": DoorOpen,
   "Holiday Lighting": Star,
   "Home Theater & AV": Tv,
   "Turf Installation": Sprout,
