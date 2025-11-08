@@ -47,7 +47,7 @@ export const categoryEmojiMap: Record<string, string> = {
   'Moving Company': '🚚',
   'Damage Assessment/Restoration': '🛠️',
   'Carpet/Upholstery Cleaning': '🧽',
-  'Patio Screening': '🏠',
+  'Screen Doors & Enclosures': '🏠',
   'Holiday Lighting': '✨',
   'Home Theater & AV': '📺',
   'Turf Installation': '🌿',

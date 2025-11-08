@@ -32,7 +32,7 @@ export const CATEGORIES = [
   "Mobile Scratch/Dent Repair",
   "Moving Company",
   "Painters",
-  "Patio Screening",
+  "Screen Doors & Enclosures",
   "Pest Control",
   "Roofing",
   "Stone Fabricators",
