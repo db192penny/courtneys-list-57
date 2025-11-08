@@ -59,7 +59,7 @@ export function CommunityDropdown({ fullWidth, onClose, photoUrl, bannerStyle }:
         value={currentSlug}
         onValueChange={handleCommunityChange}
       >
-        <SelectTrigger className="w-full h-auto border-0 bg-transparent p-0 hover:bg-transparent focus:ring-0 focus:ring-offset-0 [&>svg]:hidden">
+        <SelectTrigger className="w-full h-auto border-2 border-border bg-background/80 backdrop-blur-sm p-4 rounded-xl hover:bg-background hover:border-primary/30 transition-all focus:ring-2 focus:ring-primary/20 focus:ring-offset-0 shadow-sm [&>svg]:hidden">
           <div className="flex items-center gap-3 w-full">
             {/* Community Photo */}
             <div className="flex-shrink-0">
@@ -72,7 +72,7 @@ export function CommunityDropdown({ fullWidth, onClose, photoUrl, bannerStyle }:
             
             {/* Community Name Section */}
             <div className="flex-1 text-left">
-              <div className="text-xs font-medium text-primary uppercase tracking-wide">Community</div>
+              <div className="text-xs font-bold text-primary uppercase tracking-wide">CHOOSE COMMUNITY</div>
               <div className="text-base font-bold text-foreground">{currentDisplayName}</div>
             </div>
             
