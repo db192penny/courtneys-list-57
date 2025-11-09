@@ -409,37 +409,47 @@ export default function CommunityVendorTable({
         }`}>
           {/* Hero-Style Community Banner - Mobile Only */}
           {isMobile && communityPhotoUrl && isBannerVisible && (
-            <div className={`bg-gradient-to-br from-primary/10 via-background to-background border border-border/50 shadow-md rounded-lg p-6 mb-6 transition-all duration-300 ${
+            <div className={`bg-card border-l-4 border-l-primary border border-border/30 shadow-sm rounded-lg p-6 mb-6 transition-all duration-300 ${
               isBannerExiting ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
             }`}>
               <div className="flex items-start gap-4">
                 <img 
                   src={communityPhotoUrl} 
                   alt={communityName}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/50 shadow-lg flex-shrink-0"
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/20 shadow-sm flex-shrink-0"
                 />
                 <div className="flex-1 min-w-0">
                   <h2 className="text-xl font-bold text-foreground tracking-tight leading-tight">
                     {communityName}
                   </h2>
-                  <p className="text-lg font-semibold text-muted-foreground tracking-wide leading-tight mt-0.5">
+                  <p className="text-base font-medium text-muted-foreground tracking-wide leading-tight mt-1">
                     Trusted Provider List
                   </p>
                   
-                  {/* Social Proof Stats - Compact Single Line */}
+                  {/* Social Proof Stats - Enhanced with better spacing */}
                   {(communityStats || socialProofStats) && (
-                    <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
-                      <span className="text-yellow-500">⭐</span>
-                      <span className="font-medium">
-                        {(communityStats?.active_users ?? socialProofStats?.neighbors) || 0} neighbors, {(communityStats?.total_reviews ?? socialProofStats?.reviews) || 0} reviews
-                      </span>
+                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/20">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-yellow-500 text-base">⭐</span>
+                        <span className="font-semibold text-foreground">
+                          {(communityStats?.active_users ?? socialProofStats?.neighbors) || 0}
+                        </span>
+                        <span className="text-sm text-muted-foreground">neighbors</span>
+                      </div>
+                      <span className="text-border">•</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-foreground">
+                          {(communityStats?.total_reviews ?? socialProofStats?.reviews) || 0}
+                        </span>
+                        <span className="text-sm text-muted-foreground">reviews</span>
+                      </div>
                     </div>
                   )}
                   
                   {/* Loading state for stats */}
                   {!socialProofStats && isLoading && (
-                    <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
-                      <span className="text-yellow-500">⭐</span>
+                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/20 text-sm text-muted-foreground">
+                      <span className="text-yellow-500 text-base">⭐</span>
                       <span>Loading...</span>
                     </div>
                   )}
