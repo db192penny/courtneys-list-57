@@ -157,13 +157,15 @@ function ConditionalHeader() {
   const location = useLocation();
   const hideHeaderPaths = [
     '/community-preview/',
-    '/bridges/rate-vendors',
     '/complete-profile'
   ];
   
+  // Also hide header for any community rate-vendors page
+  const isRateVendorsPage = /^\/[^/]+\/rate-vendors/.test(location.pathname);
+  
   const shouldHideHeader = hideHeaderPaths.some(path => 
     location.pathname === path || location.pathname.startsWith(path)
-  );
+  ) || isRateVendorsPage;
   
   return shouldHideHeader ? null : <Header />;
 }
@@ -319,7 +321,7 @@ function AppContent() {
         <Route path="/mockup-preview" element={<MockupPreview />} />
         <Route path="/logo-mockup" element={<LogoMockup />} />
         <Route path="/homepage" element={<Index />} />
-        <Route path="/bridges/rate-vendors" element={<RateVendors />} />
+        <Route path="/:communitySlug/rate-vendors" element={<RateVendors />} />
         <Route path="/admin/survey-ratings" element={<AdminProtectedRoute><SurveyRatingsAdmin /></AdminProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>

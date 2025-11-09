@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { getCommunityDisplayName } from "@/utils/communityNames";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +15,11 @@ type PageType = "email" | "rating" | "thankyou" | "error" | "completed";
 export default function RateVendors() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { communitySlug } = useParams<{ communitySlug: string }>();
   const token = searchParams.get("token");
+  
+  // Map slug to display name
+  const communityName = getCommunityDisplayName(communitySlug);
   
   const { loading, error, surveyResponse, pendingVendors, updateEmail, submitRating, skipVendor } = useSurveyRating(token);
   
@@ -49,19 +54,19 @@ export default function RateVendors() {
   // Custom metadata for link previews
   const helmetContent = (
     <Helmet>
-      <title>⭐ The Bridges Service Providers</title>
+      <title>⭐ {communityName} Service Providers</title>
       <meta name="description" content="Help your neighbors find trusted service vendors" />
       
       {/* Facebook/WhatsApp Preview */}
-      <meta property="og:title" content="⭐ The Bridges Service Providers" />
+      <meta property="og:title" content={`⭐ ${communityName} Service Providers`} />
       <meta property="og:description" content="Help your neighbors find trusted service vendors" />
       <meta property="og:type" content="website" />
       <meta property="og:image" content="https://courtneys-list.com/bridges-logo.jpg" />
-      <meta property="og:site_name" content="The Bridges Directory" />
+      <meta property="og:site_name" content={`${communityName} Directory`} />
       
       {/* Twitter/Other Platforms */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="⭐ The Bridges Service Providers" />
+      <meta name="twitter:title" content={`⭐ ${communityName} Service Providers`} />
       <meta name="twitter:description" content="Help your neighbors find trusted service vendors" />
       <meta name="twitter:image" content="https://courtneys-list.com/bridges-logo.jpg" />
     </Helmet>
@@ -193,7 +198,7 @@ export default function RateVendors() {
               <div className="flex justify-center mb-4">
                 <img 
                   src="/bridges-logo.jpg" 
-                  alt="The Bridges" 
+                  alt={communityName} 
                   className="w-24 h-24 rounded-full object-cover"
                 />
               </div>
@@ -259,7 +264,7 @@ export default function RateVendors() {
                 <div className="flex justify-center">
                   <img 
                     src="/bridges-logo.jpg" 
-                    alt="The Bridges" 
+                    alt={communityName} 
                     className="w-24 h-24 rounded-full object-cover"
                   />
                 </div>
@@ -269,7 +274,7 @@ export default function RateVendors() {
                 </h1>
 
                 <p className="text-xl md:text-2xl text-foreground">
-                  Thanks for Helping Build The Bridges Directory! 🏡
+                  Thanks for Helping Build The {communityName} Directory! 🏡
                 </p>
               </div>
 
