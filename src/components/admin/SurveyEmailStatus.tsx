@@ -28,16 +28,55 @@ export function SurveyEmailStatus() {
   const fetchStats = async (comm: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('survey_email_tracking' as any, { 
-        community: comm 
-      });
-      
-      if (error) throw error;
-      if (data && Array.isArray(data) && data.length > 0) {
-        setStats(data[0]);
-      } else {
-        setStats(null);
-      }
+      const applyFilters = (q: any) => {
+        let qq = q.not("source", "ilike", "archived_%");
+        if (comm && comm !== "ALL") {
+          qq = qq.filter("community", "ilike", comm);
+        }
+        return qq;
+      };
+
+      const totalQuery = applyFilters(
+        supabase.from("preview_sessions" as any).select("id", { count: "exact", head: true })
+      );
+      const sentQuery = applyFilters(
+        supabase
+          .from("preview_sessions" as any)
+          .select("id", { count: "exact", head: true })
+          .not("email", "is", null)
+          .not("email_sent_at", "is", null)
+      );
+      const pendingQuery = applyFilters(
+        supabase
+          .from("preview_sessions" as any)
+          .select("id", { count: "exact", head: true })
+          .not("email", "is", null)
+          .is("email_sent_at", null)
+      );
+      const completedQuery = applyFilters(
+        supabase
+          .from("preview_sessions" as any)
+          .select("id", { count: "exact", head: true })
+          .not("review_form_completed_at", "is", null)
+      );
+
+      const [totalRes, sentRes, pendingRes, completedRes] = await Promise.all([
+        totalQuery,
+        sentQuery,
+        pendingQuery,
+        completedQuery,
+      ]);
+
+      const stats: EmailStats = {
+        total_respondents: totalRes.count || 0,
+        emails_sent: sentRes.count || 0,
+        emails_pending: pendingRes.count || 0,
+        forms_completed: completedRes.count || 0,
+        completion_rate: (totalRes.count || 0) > 0
+          ? ((completedRes.count || 0) / (totalRes.count || 0)) * 100
+          : 0,
+      };
+      setStats(stats);
     } catch (error) {
       console.error('Error fetching email stats:', error);
       setStats(null);

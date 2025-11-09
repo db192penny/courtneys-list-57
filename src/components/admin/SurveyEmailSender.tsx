@@ -21,16 +21,19 @@ export function SurveyEmailSender() {
 
   const fetchPendingCount = async (comm: string) => {
     try {
-      const { data, error } = await supabase.rpc('survey_email_tracking' as any, { 
-        community: comm 
-      });
-      
+      const { count, error } = await supabase
+        .from("preview_sessions" as any)
+        .select("id", { count: "exact", head: true })
+        .filter("community", "ilike", comm)
+        .not("source", "ilike", "archived_%")
+        .not("email", "is", null)
+        .is("email_sent_at", null);
+
       if (error) throw error;
-      if (data && Array.isArray(data) && data.length > 0) {
-        setPendingCount(data[0].emails_pending || 0);
-      }
+      setPendingCount(count || 0);
     } catch (error) {
       console.error('Error fetching pending count:', error);
+      setPendingCount(0);
     }
   };
 

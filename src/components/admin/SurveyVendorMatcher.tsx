@@ -41,12 +41,42 @@ export function SurveyVendorMatcher() {
 
   const fetchUnmatched = async (comm: string) => {
     try {
-      const { data, error } = await supabase.rpc('survey_get_unmatched_vendors' as any, { 
-        community: comm 
+      // Fetch sessions for the community (case-insensitive), excluding archived
+      const { data: sessions, error: sessionsError } = await supabase
+        .from("preview_sessions" as any)
+        .select("id")
+        .filter("community", "ilike", comm)
+        .not("source", "ilike", "archived_%");
+
+      if (sessionsError) throw sessionsError;
+
+      const sessionIds = (sessions || []).map((s: any) => s.id);
+      if (sessionIds.length === 0) {
+        setUnmatched([]);
+        return;
+      }
+
+      // Fetch unmatched ratings (no vendor_id) for those sessions
+      const { data: ratings, error: ratingsError } = await supabase
+        .from("survey_ratings" as any)
+        .select("vendor_name,vendor_category,vendor_id,session_id")
+        .is("vendor_id", null)
+        .in("session_id", sessionIds);
+
+      if (ratingsError) throw ratingsError;
+
+      // Aggregate by vendor_name + category
+      const map = new Map<string, UnmatchedVendor>();
+      (ratings || []).forEach((r: any) => {
+        const name = r.vendor_name || "Unknown";
+        const category = r.vendor_category || "Unknown";
+        const key = `${name}__${category}`;
+        const prev = map.get(key) || { vendor_name: name, category, count: 0 };
+        prev.count += 1;
+        map.set(key, prev);
       });
-      
-      if (error) throw error;
-      setUnmatched((data as UnmatchedVendor[]) || []);
+
+      setUnmatched(Array.from(map.values()).sort((a, b) => b.count - a.count));
     } catch (error) {
       console.error('Error fetching unmatched vendors:', error);
     }
@@ -62,41 +92,11 @@ export function SurveyVendorMatcher() {
       return;
     }
 
-    setLoading(true);
-    setResults(null);
-
-    try {
-      const { data, error } = await supabase.rpc('survey_auto_match_vendors' as any, { 
-        community: community 
-      });
-
-      if (error) throw error;
-
-      if (data && Array.isArray(data) && data.length > 0) {
-        setResults({
-          exact_matches: data[0].exact_matches || 0,
-          fuzzy_matches: data[0].fuzzy_matches || 0,
-          created_new: data[0].created_new || 0
-        });
-
-        toast({
-          title: "Vendors Matched",
-          description: `Matched ${data[0].exact_matches + data[0].fuzzy_matches} vendors`
-        });
-
-        // Refresh unmatched list
-        await fetchUnmatched(community);
-      }
-    } catch (error: any) {
-      console.error('Error matching vendors:', error);
-      toast({
-        title: "Match Failed",
-        description: error.message || "Failed to match vendors",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
+    // Workaround mode: RPC disabled. Inform user.
+    toast({
+      title: "Auto-match unavailable",
+      description: "Temporarily disabled while bypassing RPCs. Use unmatched list to review vendors.",
+    });
   };
 
   return (
