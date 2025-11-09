@@ -40,10 +40,12 @@ export default function RateVendors() {
         .from('community_assets')
         .select('photo_path')
         .eq('hoa_name', communityName)
-        .single();
+        .maybeSingle();
       
       if (data?.photo_path && !error) {
         setCommunityLogo(data.photo_path);
+      } else {
+        console.log('No community logo found for:', communityName);
       }
     };
     
@@ -220,7 +222,7 @@ export default function RateVendors() {
                 <img 
                   src={communityLogo} 
                   alt={communityName} 
-                  className="w-24 h-24 rounded-full object-cover"
+                  className="w-24 h-24 rounded-full object-cover border-4 border-primary/10 shadow-lg"
                 />
               </div>
               <div className="text-6xl">🎉</div>
@@ -286,7 +288,7 @@ export default function RateVendors() {
                   <img 
                     src={communityLogo} 
                     alt={communityName} 
-                    className="w-24 h-24 rounded-full object-cover"
+                    className="w-24 h-24 rounded-full object-cover border-4 border-primary/10 shadow-lg"
                   />
                 </div>
                 
