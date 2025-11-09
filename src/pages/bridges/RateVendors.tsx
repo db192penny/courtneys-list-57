@@ -43,9 +43,14 @@ export default function RateVendors() {
         .maybeSingle();
       
       if (data?.photo_path && !error) {
-        setCommunityLogo(data.photo_path);
+        // Convert storage path to public URL
+        const publicUrl = supabase.storage
+          .from("community-photos")
+          .getPublicUrl(data.photo_path).data.publicUrl;
+        setCommunityLogo(publicUrl);
+        console.log('✅ Community logo loaded for:', communityName, publicUrl);
       } else {
-        console.log('No community logo found for:', communityName);
+        console.log('⚠️ No community logo found for:', communityName);
       }
     };
     
