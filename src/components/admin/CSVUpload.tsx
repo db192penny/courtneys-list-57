@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronDown, Upload, Copy } from "lucide-react";
 import Papa from "papaparse";
+import { normalizeCommunityName } from "@/utils/communityNormalization";
 
 interface CSVUploadProps {
   onUploadSuccess: () => void;
@@ -119,11 +120,14 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
           
           console.log(`${row.Name}: ${isDuplicate ? 'DUPLICATE ⚠️' : 'NEW ✅'}`);
 
+          // Normalize community name for consistent storage
+          const normalizedCommunity = normalizeCommunityName(row.Community);
+
           parsed.push({
             name: row.Name,
             contactMethod: row["Contact Method"] || "email",
             contact: row.Contact,
-            community: row.Community || "The Bridges", // Default to The Bridges if not specified
+            community: normalizedCommunity.displayName,
             vendors,
             isDuplicate,
             selected: false, // Default to unchecked
