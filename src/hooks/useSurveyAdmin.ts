@@ -58,17 +58,33 @@ export function useSurveyStats() {
 
       if (sessError) throw sessError;
 
-      // Get total vendors from survey_pending_ratings
+      const activeSessionIds = sessions?.map((s: any) => s.id) || [];
+
+      // Return zeros if no active sessions
+      if (activeSessionIds.length === 0) {
+        return {
+          totalPeople: 0,
+          completedPeople: 0,
+          inProgressPeople: 0,
+          notStartedPeople: 0,
+          totalVendors: 0,
+          vendorsRated: 0,
+        };
+      }
+
+      // Get total vendors from survey_pending_ratings (filtered by active sessions)
       const { data: pendingRatings, error: ratError } = await supabase
         .from("survey_pending_ratings" as any)
-        .select("session_id");
+        .select("session_id")
+        .in("session_id", activeSessionIds);
 
       if (ratError) throw ratError;
 
-      // Get ACTUAL ratings from survey_ratings (source of truth)
+      // Get ACTUAL ratings from survey_ratings (filtered by active sessions)
       const { data: actualRatings, error: actualError } = await (supabase as any)
         .from("survey_ratings")
-        .select("session_id");
+        .select("session_id")
+        .in("session_id", activeSessionIds);
 
       if (actualError) throw actualError;
 
@@ -131,17 +147,26 @@ export function useSurveyRespondents() {
 
       if (sessError) throw sessError;
 
-      // Get total vendors per session from survey_pending_ratings
+      const activeSessionIds = sessions?.map((s: any) => s.id) || [];
+
+      // Return empty array if no active sessions
+      if (activeSessionIds.length === 0) {
+        return [];
+      }
+
+      // Get total vendors per session from survey_pending_ratings (filtered by active sessions)
       const { data: pendingRatings, error: ratError } = await supabase
         .from("survey_pending_ratings" as any)
-        .select("session_id");
+        .select("session_id")
+        .in("session_id", activeSessionIds);
 
       if (ratError) throw ratError;
 
-      // Get ACTUAL ratings from survey_ratings (source of truth)
+      // Get ACTUAL ratings from survey_ratings (filtered by active sessions)
       const { data: actualRatings, error: actualError } = await (supabase as any)
         .from("survey_ratings")
-        .select("session_id");
+        .select("session_id")
+        .in("session_id", activeSessionIds);
 
       if (actualError) throw actualError;
 
