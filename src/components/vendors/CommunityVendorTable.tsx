@@ -407,53 +407,49 @@ export default function CommunityVendorTable({
         <div className={`sticky top-2 sm:top-16 z-40 bg-background/80 backdrop-blur-sm transition-transform duration-300 ease-out mb-3 sm:mb-6 ${
           isScrollingDown ? '-translate-y-full' : 'translate-y-0'
         }`}>
-          {/* Hero-Style Community Banner - Mobile Only */}
-          {isMobile && communityPhotoUrl && isBannerVisible && (
-            <div className={`bg-card border-l-4 border-l-primary border border-border/30 shadow-sm rounded-lg p-6 mb-6 transition-all duration-300 ${
+          {/* Stats Grid - Mobile Only */}
+          {isMobile && isBannerVisible && (
+            <div className={`bg-card border border-border rounded-lg shadow-sm p-4 mb-6 transition-all duration-300 ${
               isBannerExiting ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
             }`}>
-              <div className="flex items-start gap-4">
-                <img 
-                  src={communityPhotoUrl} 
-                  alt={communityName}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/20 shadow-sm flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-bold text-foreground tracking-tight leading-tight">
-                    {communityName}
-                  </h2>
-                  <p className="text-base font-medium text-muted-foreground tracking-wide leading-tight mt-1">
-                    Trusted Provider List
-                  </p>
-                  
-                  {/* Social Proof Stats - Enhanced with better spacing */}
-                  {(communityStats || socialProofStats) && (
-                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/20">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-yellow-500 text-base">⭐</span>
-                        <span className="font-semibold text-foreground">
+              <div className="space-y-3">
+                <h2 className="text-base font-semibold text-foreground">
+                  {communityName} Stats
+                </h2>
+                
+                {/* Stats Grid */}
+                {(communityStats || socialProofStats) && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Neighbors */}
+                    <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg border border-primary/10">
+                      <Users className="h-5 w-5 text-primary flex-shrink-0" />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xl font-bold text-foreground leading-none">
                           {(communityStats?.active_users ?? socialProofStats?.neighbors) || 0}
                         </span>
-                        <span className="text-sm text-muted-foreground">neighbors</span>
+                        <span className="text-xs text-muted-foreground mt-0.5">Neighbors</span>
                       </div>
-                      <span className="text-border">•</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-foreground">
+                    </div>
+                    
+                    {/* Reviews */}
+                    <div className="flex items-center gap-2 p-3 bg-amber-500/5 rounded-lg border border-amber-500/10">
+                      <Star className="h-5 w-5 text-amber-500 flex-shrink-0" />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xl font-bold text-foreground leading-none">
                           {(communityStats?.total_reviews ?? socialProofStats?.reviews) || 0}
                         </span>
-                        <span className="text-sm text-muted-foreground">reviews</span>
+                        <span className="text-xs text-muted-foreground mt-0.5">Reviews</span>
                       </div>
                     </div>
-                  )}
-                  
-                  {/* Loading state for stats */}
-                  {!socialProofStats && isLoading && (
-                    <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/20 text-sm text-muted-foreground">
-                      <span className="text-yellow-500 text-base">⭐</span>
-                      <span>Loading...</span>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
+                
+                {/* Loading state for stats */}
+                {!socialProofStats && isLoading && (
+                  <div className="text-sm text-muted-foreground text-center py-2">
+                    Loading stats...
+                  </div>
+                )}
               </div>
             </div>
           )}
