@@ -208,7 +208,30 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
 
           sessionId = (existingSession as any).id;
           token = (existingSession as any).session_token;
-          console.log(`UPDATE: Adding ${person.vendors.length} vendors to existing session for ${person.name}`);
+
+          // Update existing session with normalized community and contact info
+          const { error: updateError } = await supabase
+            .from("preview_sessions" as any)
+            .update({
+              community: person.community,
+              address: `${person.community}, Delray Beach, FL`,
+              normalized_address: person.community.toLowerCase().replace(/\s+/g, ' '),
+              email: person.contactMethod?.toLowerCase() === "email" ? person.contact : null,
+              metadata: {
+                phone: person.contactMethod?.toLowerCase() === "phone" ? person.contact : null,
+                contact_method: person.contactMethod,
+                from_survey: true,
+                last_updated: new Date().toISOString(),
+              },
+            })
+            .eq("id", sessionId);
+
+          if (updateError) {
+            console.error('Update session error:', updateError);
+            throw updateError;
+          }
+
+          console.log(`UPDATE: Normalized community to "${person.community}" and adding ${person.vendors.length} vendors for ${person.name}`);
         } else {
           // Create new session
           token = `survey_${person.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
