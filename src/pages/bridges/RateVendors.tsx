@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { getCommunityDisplayName } from "@/utils/communityNames";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,26 @@ export default function RateVendors() {
   const [emailInput, setEmailInput] = useState("");
   const [totalVendors, setTotalVendors] = useState(0);
   const [initialVendorCount, setInitialVendorCount] = useState(0);
+  const [communityLogo, setCommunityLogo] = useState("/bridges-logo.jpg"); // Default fallback
+
+  // Fetch community logo
+  useEffect(() => {
+    const fetchCommunityLogo = async () => {
+      if (!communityName) return;
+      
+      const { data, error } = await supabase
+        .from('community_assets')
+        .select('photo_path')
+        .eq('hoa_name', communityName)
+        .single();
+      
+      if (data?.photo_path && !error) {
+        setCommunityLogo(data.photo_path);
+      }
+    };
+    
+    fetchCommunityLogo();
+  }, [communityName]);
 
   useEffect(() => {
     if (!loading && surveyResponse && pendingVendors) {
@@ -197,7 +218,7 @@ export default function RateVendors() {
             <div className="text-center space-y-6">
               <div className="flex justify-center mb-4">
                 <img 
-                  src="/bridges-logo.jpg" 
+                  src={communityLogo} 
                   alt={communityName} 
                   className="w-24 h-24 rounded-full object-cover"
                 />
@@ -263,7 +284,7 @@ export default function RateVendors() {
               <div className="text-center space-y-6">
                 <div className="flex justify-center">
                   <img 
-                    src="/bridges-logo.jpg" 
+                    src={communityLogo} 
                     alt={communityName} 
                     className="w-24 h-24 rounded-full object-cover"
                   />
@@ -274,7 +295,7 @@ export default function RateVendors() {
                 </h1>
 
                 <p className="text-xl md:text-2xl text-foreground">
-                  Thanks for Helping Build The {communityName} Directory! 🏡
+                  Thanks for Helping Build {communityName} Directory! 🏡
                 </p>
               </div>
 
