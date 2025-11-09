@@ -19,6 +19,7 @@ interface ParsedRespondent {
   name: string;
   contactMethod: string;
   contact: string;
+  community: string;
   vendors: Array<{ name: string; category: string }>;
   isDuplicate: boolean;
   selected: boolean;
@@ -69,6 +70,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
           console.log(`Processing ${row.Name}:`, {
             contact: row.Contact,
             contactMethod: row["Contact Method"],
+            community: row.Community,
             poolService: row["Pool Service"],
             additionalVendors: row["Additional Vendors Summary"]
           });
@@ -121,6 +123,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             name: row.Name,
             contactMethod: row["Contact Method"] || "email",
             contact: row.Contact,
+            community: row.Community || "The Bridges", // Default to The Bridges if not specified
             vendors,
             isDuplicate,
             selected: false, // Default to unchecked
@@ -212,9 +215,9 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
               session_token: token,
               name: person.name,
               email: person.contactMethod?.toLowerCase() === "email" ? person.contact : null,
-              address: "The Bridges, Delray Beach, FL",
-              normalized_address: "the bridges delray beach fl",
-              community: "The Bridges",
+              address: `${person.community}, Delray Beach, FL`,
+              normalized_address: person.community.toLowerCase().replace(/\s+/g, ' '),
+              community: person.community,
               source: "admin_csv_upload",
               metadata: {
                 phone: person.contactMethod?.toLowerCase() === "phone" ? person.contact : null,
