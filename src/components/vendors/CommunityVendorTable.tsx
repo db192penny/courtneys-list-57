@@ -407,37 +407,51 @@ export default function CommunityVendorTable({
         <div className={`sticky top-2 sm:top-16 z-40 bg-background/80 backdrop-blur-sm transition-transform duration-300 ease-out mb-3 sm:mb-6 ${
           isScrollingDown ? '-translate-y-full' : 'translate-y-0'
         }`}>
-          {/* Minimal Badge Style - Mobile Only */}
+          {/* Horizontal Info Bar - Mobile Only */}
           {isMobile && communityPhotoUrl && isBannerVisible && (
-            <div className={`border border-border/50 rounded-full px-4 py-2.5 mb-6 transition-all duration-300 bg-background/50 ${
+            <div className={`bg-card border border-border rounded-lg shadow-sm mb-6 transition-all duration-300 overflow-hidden ${
               isBannerExiting ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
             }`}>
-              <div className="flex items-center gap-3">
-                {/* Community Image */}
-                <img 
-                  src={communityPhotoUrl} 
-                  alt={communityName}
-                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                />
+              <div className="flex items-center">
+                {/* Community Image - Left */}
+                <div className="flex-shrink-0 p-3 bg-primary/5 border-r border-border">
+                  <img 
+                    src={communityPhotoUrl} 
+                    alt={communityName}
+                    className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20"
+                  />
+                </div>
                 
-                {/* Inline Stats */}
+                {/* Stats Cells - Spread Across */}
                 {(communityStats || socialProofStats) && (
-                  <div className="flex items-center gap-2 text-sm flex-1 min-w-0">
-                    <Users className="h-3.5 w-3.5 text-primary flex-shrink-0" />
-                    <span className="font-medium text-foreground">
-                      {(communityStats?.active_users ?? socialProofStats?.neighbors) || 0} neighbors
-                    </span>
-                    <span className="text-muted-foreground">•</span>
-                    <Star className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
-                    <span className="font-medium text-foreground">
-                      {(communityStats?.total_reviews ?? socialProofStats?.reviews) || 0} reviews
-                    </span>
+                  <div className="flex-1 flex divide-x divide-border">
+                    {/* Neighbors Cell */}
+                    <div className="flex-1 flex flex-col items-center justify-center p-3 min-w-0">
+                      <Users className="h-4 w-4 text-primary mb-1" />
+                      <span className="text-lg font-bold text-foreground leading-none">
+                        {(communityStats?.active_users ?? socialProofStats?.neighbors) || 0}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wide">
+                        Neighbors
+                      </span>
+                    </div>
+                    
+                    {/* Reviews Cell */}
+                    <div className="flex-1 flex flex-col items-center justify-center p-3 min-w-0">
+                      <Star className="h-4 w-4 text-amber-500 mb-1" />
+                      <span className="text-lg font-bold text-foreground leading-none">
+                        {(communityStats?.total_reviews ?? socialProofStats?.reviews) || 0}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wide">
+                        Reviews
+                      </span>
+                    </div>
                   </div>
                 )}
                 
                 {/* Loading state for stats */}
                 {!socialProofStats && isLoading && (
-                  <div className="text-sm text-muted-foreground">
+                  <div className="flex-1 text-sm text-muted-foreground text-center py-4">
                     Loading...
                   </div>
                 )}
