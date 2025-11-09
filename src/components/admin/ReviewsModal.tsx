@@ -14,6 +14,7 @@ interface ReviewsModalProps {
   sessionToken: string;
   totalVendors: number;
   completedVendors: number;
+  community: string;
 }
 
 export function ReviewsModal({
@@ -23,12 +24,20 @@ export function ReviewsModal({
   sessionToken,
   totalVendors,
   completedVendors,
+  community,
 }: ReviewsModalProps) {
   const { toast } = useToast();
   const { data: ratings, isLoading } = useSurveyRatings(sessionToken);
 
   const handleCopyLink = () => {
-    const link = `https://courtneys-list.com/bridges/rate-vendors?token=${sessionToken}`;
+    const communityToSlug: Record<string, string> = {
+      'Boca Bridges': 'boca-bridges',
+      'The Bridges': 'the-bridges',
+      'The Oaks': 'the-oaks',
+      'Woodfield Country Club': 'woodfield-country-club',
+    };
+    const slug = communityToSlug[community] || 'boca-bridges';
+    const link = `https://courtneys-list.com/communities/${slug}/rate-vendors?token=${sessionToken}`;
     navigator.clipboard.writeText(link);
     toast({ title: "Link copied!", description: link });
   };

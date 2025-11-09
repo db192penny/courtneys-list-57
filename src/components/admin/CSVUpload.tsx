@@ -33,7 +33,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
   const [showPreview, setShowPreview] = useState(false);
   const [parsedData, setParsedData] = useState<ParsedRespondent[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedLinks, setUploadedLinks] = useState<Array<{ name: string; token: string }>>([]);
+  const [uploadedLinks, setUploadedLinks] = useState<Array<{ name: string; token: string; community: string }>>([]);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,7 +178,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
     }
 
     setIsUploading(true);
-    const links: Array<{ name: string; token: string }> = [];
+    const links: Array<{ name: string; token: string; community: string }> = [];
     const batchId = `batch_${Date.now()}`;
 
     try {
@@ -289,7 +289,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
           }
         }
 
-        links.push({ name: person.name, token });
+        links.push({ name: person.name, token, community: person.community });
       }
 
       setUploadedLinks(links);
@@ -319,15 +319,31 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
     }
   };
 
-  const copyLink = (token: string) => {
-    const link = `https://courtneys-list.com/bridges/rate-vendors?token=${token}`;
+  const copyLink = (token: string, community: string) => {
+    const communityToSlug: Record<string, string> = {
+      'Boca Bridges': 'boca-bridges',
+      'The Bridges': 'the-bridges',
+      'The Oaks': 'the-oaks',
+      'Woodfield Country Club': 'woodfield-country-club',
+    };
+    const slug = communityToSlug[community] || 'boca-bridges';
+    const link = `https://courtneys-list.com/communities/${slug}/rate-vendors?token=${token}`;
     navigator.clipboard.writeText(link);
     toast({ title: "Link copied!" });
   };
 
   const copyAllLinks = () => {
+    const communityToSlug: Record<string, string> = {
+      'Boca Bridges': 'boca-bridges',
+      'The Bridges': 'the-bridges',
+      'The Oaks': 'the-oaks',
+      'Woodfield Country Club': 'woodfield-country-club',
+    };
     const allLinks = uploadedLinks
-      .map(l => `${l.name}: https://courtneys-list.com/bridges/rate-vendors?token=${l.token}`)
+      .map(l => {
+        const slug = communityToSlug[l.community] || 'boca-bridges';
+        return `${l.name}: https://courtneys-list.com/communities/${slug}/rate-vendors?token=${l.token}`;
+      })
       .join('\n');
     navigator.clipboard.writeText(allLinks);
     toast({ title: "All links copied!" });
@@ -525,7 +541,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
                   <code className="flex-1 text-xs bg-muted p-2 rounded overflow-x-auto">
                     courtneys-list.com/bridges/rate-vendors?token={link.token}
                   </code>
-                  <Button size="sm" variant="outline" onClick={() => copyLink(link.token)}>
+                  <Button size="sm" variant="outline" onClick={() => copyLink(link.token, link.community)}>
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>

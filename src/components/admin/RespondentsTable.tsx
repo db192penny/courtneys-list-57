@@ -68,8 +68,15 @@ export function RespondentsTable() {
     }
   };
 
-  const handleCopyLink = (token: string, name: string) => {
-    const link = `https://courtneys-list.com/bridges/rate-vendors?token=${token}`;
+  const handleCopyLink = (token: string, name: string, community: string) => {
+    const communityToSlug: Record<string, string> = {
+      'Boca Bridges': 'boca-bridges',
+      'The Bridges': 'the-bridges',
+      'The Oaks': 'the-oaks',
+      'Woodfield Country Club': 'woodfield-country-club',
+    };
+    const slug = communityToSlug[community] || 'boca-bridges';
+    const link = `https://courtneys-list.com/communities/${slug}/rate-vendors?token=${token}`;
     navigator.clipboard.writeText(link);
     toast({ title: "Link copied!", description: `Link for ${name}` });
   };
@@ -385,7 +392,7 @@ export function RespondentsTable() {
                       setSelectedRespondent(respondent);
                       setShowReviewsModal(true);
                     }}
-                    onCopyLink={() => handleCopyLink(respondent.sessionToken, respondent.name)}
+                    onCopyLink={() => handleCopyLink(respondent.sessionToken, respondent.name, respondent.community)}
                     onReset={() => handleReset(respondent.sessionToken, respondent.name)}
                     onDelete={() => handleDelete(respondent.sessionToken, respondent.name)}
                   />
@@ -485,7 +492,7 @@ export function RespondentsTable() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => handleCopyLink(respondent.sessionToken, respondent.name)}
+                            onClick={() => handleCopyLink(respondent.sessionToken, respondent.name, respondent.community)}
                           >
                             <Copy className="h-4 w-4" />
                           </Button>
@@ -535,7 +542,7 @@ export function RespondentsTable() {
                               <Eye className="h-4 w-4 mr-2" /> View Reviews
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleCopyLink(respondent.sessionToken, respondent.name)}
+                              onClick={() => handleCopyLink(respondent.sessionToken, respondent.name, respondent.community)}
                             >
                               <Copy className="h-4 w-4 mr-2" /> Copy Link
                             </DropdownMenuItem>
@@ -571,6 +578,7 @@ export function RespondentsTable() {
           sessionToken={selectedRespondent.sessionToken}
           totalVendors={selectedRespondent.totalVendors}
           completedVendors={selectedRespondent.completedVendors}
+          community={selectedRespondent.community}
         />
       )}
 
