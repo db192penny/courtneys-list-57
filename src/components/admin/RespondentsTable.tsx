@@ -151,37 +151,40 @@ export function RespondentsTable() {
     if (!confirmed) return;
 
     try {
-      // Delete from BOTH table systems to ensure complete removal
-      
-      // Delete from old system (preview_sessions)
-      const { error: oldError } = await supabase
+      // First delete the preview session (source of truth)
+      const { error: previewErr } = await supabase
         .from('preview_sessions' as any)
         .delete()
         .eq('session_token', sessionToken);
-      
-      // Delete from new system (survey_responses)
-      const { error: newError } = await supabase
+
+      if (previewErr) {
+        console.error('Delete error (preview_sessions):', previewErr);
+        throw new Error(previewErr.message || 'Failed to delete preview session');
+      }
+
+      // Best-effort cleanup of any mirrored data
+      const { error: responseErr } = await supabase
         .from('survey_responses' as any)
         .delete()
         .eq('session_token', sessionToken);
-      
-      // At least one should succeed
-      if (oldError && newError) {
-        throw oldError || newError;
+      if (responseErr) {
+        console.warn('Delete warning (survey_responses):', responseErr);
       }
 
       toast({
         title: "Deleted",
         description: `${respondentName} removed from system`,
       });
-      
-      queryClient.invalidateQueries({ queryKey: ['survey-stats'] });
-      queryClient.invalidateQueries({ queryKey: ['survey-respondents'] });
-    } catch (error) {
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['survey-stats'] }),
+        queryClient.invalidateQueries({ queryKey: ['survey-respondents'] })
+      ]);
+    } catch (error: any) {
       console.error('Delete error:', error);
       toast({
-        title: "Error",
-        description: "Failed to delete. Please try again.",
+        title: "Delete Failed",
+        description: error.message || "Failed to delete. Please try again.",
         variant: "destructive",
       });
     }
