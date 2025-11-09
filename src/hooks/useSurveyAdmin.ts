@@ -17,6 +17,7 @@ export interface Respondent {
   contact: string;
   contactMethod: string;
   email: string | null;
+  emailSentAt: string | null;
   community: string;
   totalVendors: number;
   completedVendors: number;
@@ -206,6 +207,7 @@ export function useSurveyRespondents() {
             contact: contact,
             contactMethod: s.metadata?.contact_method || "Unknown",
             email: s.email,
+            emailSentAt: s.email_sent_at,
             community: s.community || "Unknown",
             totalVendors: totalVendors,
             completedVendors: completedVendors,

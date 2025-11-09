@@ -39,7 +39,7 @@ import { ReviewsModal } from "./ReviewsModal";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Search, Eye, Copy, Mail, RotateCcw, Trash2, Loader2, MoreVertical } from "lucide-react";
+import { Search, Eye, Copy, Mail, RotateCcw, Trash2, Loader2, MoreVertical, Send, Link2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { RespondentCard } from "./RespondentCard";
 
@@ -187,6 +187,80 @@ export function RespondentsTable() {
     }
   };
 
+  const handleSendEmail = async (email: string, name: string, sessionToken: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('send-survey-review-emails', {
+        body: { 
+          community: communityFilter === "all" ? null : communityFilter,
+          test_mode: false,
+          single_email: email
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email Sent",
+        description: `Survey email sent to ${name}`
+      });
+      
+      await refetch();
+    } catch (error: any) {
+      console.error('Send email error:', error);
+      toast({
+        title: "Send Failed",
+        description: error.message || "Failed to send email",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSendAllPending = async () => {
+    const confirmed = window.confirm(
+      `Send survey emails to all pending respondents${communityFilter !== "all" ? ` in ${communityFilter}` : ""}?`
+    );
+    if (!confirmed) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-survey-review-emails', {
+        body: { 
+          community: communityFilter === "all" ? null : communityFilter,
+          test_mode: false 
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Emails Sent",
+        description: `${data?.sent || 0} emails sent successfully`
+      });
+      
+      await refetch();
+    } catch (error: any) {
+      console.error('Send all error:', error);
+      toast({
+        title: "Send Failed",
+        description: error.message || "Failed to send emails",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleMatchVendors = async (sessionId: string, name: string) => {
+    toast({
+      title: "Auto-match unavailable",
+      description: "Vendor matching temporarily disabled. Contact admin for manual matching.",
+    });
+  };
+
+  const handleAutoMatchAll = async () => {
+    toast({
+      title: "Auto-match unavailable",
+      description: "Bulk vendor matching temporarily disabled. Use individual row actions when available.",
+    });
+  };
+
   const filteredData = respondents
     ?.filter((r) => {
       if (statusFilter !== "all" && r.status !== statusFilter) return false;
@@ -237,7 +311,27 @@ export function RespondentsTable() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Respondents</CardTitle>
+          <div className="flex items-center justify-between mb-4">
+            <CardTitle>Respondents</CardTitle>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleSendAllPending}
+                variant="default"
+                size="sm"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Send All Pending
+              </Button>
+              <Button
+                onClick={handleAutoMatchAll}
+                variant="outline"
+                size="sm"
+              >
+                <Link2 className="h-4 w-4 mr-2" />
+                Auto-Match All
+              </Button>
+            </div>
+          </div>
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -311,13 +405,14 @@ export function RespondentsTable() {
                     Vendors {sortColumn === "totalVendors" && (sortDirection === "asc" ? "↑" : "↓")}
                   </TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {!filteredData || filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                       No respondents found
                     </TableCell>
                   </TableRow>
@@ -342,8 +437,37 @@ export function RespondentsTable() {
                       <TableCell>
                         {getStatusBadge(respondent.status, respondent.completedVendors, respondent.totalVendors)}
                       </TableCell>
+                      <TableCell>
+                        {respondent.emailSentAt ? (
+                          <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-900/20">
+                            ✓ Sent
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-amber-50 text-amber-700 dark:bg-amber-900/20">
+                            Pending
+                          </Badge>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="hidden lg:flex gap-1 justify-end">
+                          {respondent.email && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleSendEmail(respondent.email, respondent.name, respondent.sessionToken)}
+                              title={respondent.emailSentAt ? "Resend email" : "Send email"}
+                            >
+                              <Mail className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleMatchVendors(respondent.id, respondent.name)}
+                            title="Match vendors"
+                          >
+                            <Link2 className="h-4 w-4" />
+                          </Button>
                           <Button
                             size="sm"
                             variant="ghost"
@@ -386,6 +510,18 @@ export function RespondentsTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            {respondent.email && (
+                              <DropdownMenuItem
+                                onClick={() => handleSendEmail(respondent.email, respondent.name, respondent.sessionToken)}
+                              >
+                                <Mail className="h-4 w-4 mr-2" /> {respondent.emailSentAt ? "Resend Email" : "Send Email"}
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              onClick={() => handleMatchVendors(respondent.id, respondent.name)}
+                            >
+                              <Link2 className="h-4 w-4 mr-2" /> Match Vendors
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
                                 setSelectedRespondent(respondent);

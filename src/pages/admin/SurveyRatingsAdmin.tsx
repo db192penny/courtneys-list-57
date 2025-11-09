@@ -7,9 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { SurveyStatsCard } from "@/components/admin/SurveyStatsCard";
 import { RespondentsTable } from "@/components/admin/RespondentsTable";
 import { CSVUpload } from "@/components/admin/CSVUpload";
-import { SurveyEmailSender } from "@/components/admin/SurveyEmailSender";
 import { SurveyEmailStatus } from "@/components/admin/SurveyEmailStatus";
-import { SurveyVendorMatcher } from "@/components/admin/SurveyVendorMatcher";
 import { useSurveyRespondents } from "@/hooks/useSurveyAdmin";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, ArrowLeft, Download } from "lucide-react";
@@ -151,13 +149,13 @@ export default function SurveyRatingsAdmin() {
         
         <CSVUpload onUploadSuccess={refetch} />
         
-        <div className="space-y-6 mt-6">
-          <SurveyEmailSender />
+        <div className="mt-6">
           <SurveyEmailStatus />
-          <SurveyVendorMatcher />
         </div>
         
-        <RespondentsTable />
+        <div className="mt-6">
+          <RespondentsTable />
+        </div>
       </div>
     </div>
   );
