@@ -44,6 +44,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { RespondentCard } from "./RespondentCard";
 
 type StatusFilter = "all" | "complete" | "in_progress" | "not_started";
+type CommunityFilter = "all" | "The Oaks" | "Woodfield Country Club" | "Boca Bridges";
 
 export function RespondentsTable() {
   const { toast } = useToast();
@@ -52,6 +53,7 @@ export function RespondentsTable() {
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [communityFilter, setCommunityFilter] = useState<CommunityFilter>("all");
   const [sortColumn, setSortColumn] = useState<string>("createdAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [selectedRespondent, setSelectedRespondent] = useState<any>(null);
@@ -188,6 +190,7 @@ export function RespondentsTable() {
   const filteredData = respondents
     ?.filter((r) => {
       if (statusFilter !== "all" && r.status !== statusFilter) return false;
+      if (communityFilter !== "all" && r.community !== communityFilter) return false;
       if (search && !r.name.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     })
@@ -245,6 +248,17 @@ export function RespondentsTable() {
                 className="pl-10"
               />
             </div>
+            <Select value={communityFilter} onValueChange={(v) => setCommunityFilter(v as CommunityFilter)}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Communities</SelectItem>
+                <SelectItem value="The Oaks">The Oaks</SelectItem>
+                <SelectItem value="Woodfield Country Club">Woodfield Country Club</SelectItem>
+                <SelectItem value="Boca Bridges">Boca Bridges</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue />
@@ -284,10 +298,13 @@ export function RespondentsTable() {
           ) : (
             <div className="rounded-md border overflow-x-auto">
               <Table>
-              <TableHeader>
+               <TableHeader>
                 <TableRow>
                   <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
                     Name {sortColumn === "name" && (sortDirection === "asc" ? "↑" : "↓")}
+                  </TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => handleSort("community")}>
+                    Community {sortColumn === "community" && (sortDirection === "asc" ? "↑" : "↓")}
                   </TableHead>
                   <TableHead className="hidden md:table-cell">Contact</TableHead>
                   <TableHead className="cursor-pointer" onClick={() => handleSort("totalVendors")}>
@@ -300,7 +317,7 @@ export function RespondentsTable() {
               <TableBody>
                 {!filteredData || filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                       No respondents found
                     </TableCell>
                   </TableRow>
@@ -308,6 +325,11 @@ export function RespondentsTable() {
                   filteredData.map((respondent) => (
                     <TableRow key={respondent.id}>
                       <TableCell className="font-medium">{respondent.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs">
+                          {respondent.community}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <div className="text-sm">
                           <div>{respondent.contactMethod}</div>

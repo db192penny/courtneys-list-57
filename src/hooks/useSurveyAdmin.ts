@@ -17,6 +17,7 @@ export interface Respondent {
   contact: string;
   contactMethod: string;
   email: string | null;
+  community: string;
   totalVendors: number;
   completedVendors: number;
   status: "complete" | "in_progress" | "not_started";
@@ -180,6 +181,7 @@ export function useSurveyRespondents() {
             contact: contact,
             contactMethod: s.metadata?.contact_method || "Unknown",
             email: s.email,
+            community: s.community || "Unknown",
             totalVendors: totalVendors,
             completedVendors: completedVendors,
             status,

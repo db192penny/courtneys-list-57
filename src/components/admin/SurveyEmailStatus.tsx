@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, TrendingUp } from "lucide-react";
 
 const COMMUNITIES = [
+  "ALL",
   "The Oaks",
   "Woodfield Country Club",
   "Boca Bridges"

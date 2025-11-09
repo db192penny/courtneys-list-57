@@ -116,7 +116,7 @@ export default function SurveyRatingsAdmin() {
         <div className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold">Survey Ratings Admin</h1>
-            <p className="text-muted-foreground mt-2">Manage Bridges survey responses and ratings</p>
+            <p className="text-muted-foreground mt-2">Manage survey responses and ratings</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={handleExportCSV} variant="outline" size="sm" disabled={isExporting}>

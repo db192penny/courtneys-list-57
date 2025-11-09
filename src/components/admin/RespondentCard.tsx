@@ -10,6 +10,7 @@ interface RespondentCardProps {
     name: string;
     contact: string;
     contactMethod: string;
+    community: string;
     sessionToken: string;
     totalVendors: number;
     completedVendors: number;
@@ -54,6 +55,11 @@ export function RespondentCard({
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-base truncate">{respondent.name}</h3>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="outline" className="text-xs">
+                  {respondent.community}
+                </Badge>
+              </div>
               <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                 {respondent.contactMethod === "Email" ? (
                   <Mail className="h-3 w-3" />
