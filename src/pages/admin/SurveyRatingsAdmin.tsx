@@ -49,10 +49,13 @@ export default function SurveyRatingsAdmin() {
         return;
       }
 
-      // Then fetch survey_ratings for those session tokens
+      // Then fetch survey_ratings with community from preview_sessions
       const { data: surveyData, error } = await (supabase as any)
         .from("survey_ratings")
-        .select("*")
+        .select(`
+          *,
+          preview_sessions!inner(community)
+        `)
         .in("session_token", activeSessionTokens)
         .order("created_at", { ascending: false });
 
@@ -70,7 +73,13 @@ export default function SurveyRatingsAdmin() {
         return;
       }
 
-      const csvContent = exportSurveyRatingsToCSV(surveyData);
+      // Transform data to include community field
+      const transformedData = surveyData.map((row: any) => ({
+        ...row,
+        community: row.preview_sessions?.community || 'N/A'
+      }));
+      
+      const csvContent = exportSurveyRatingsToCSV(transformedData);
       const filename = `survey-ratings-${new Date().toISOString().split('T')[0]}.csv`;
       downloadCSV(csvContent, filename);
 

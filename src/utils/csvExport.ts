@@ -17,6 +17,7 @@ export interface SurveyRatingRow {
   current_vendor: boolean | null;
   vendor_phone: string | null;
   created_at: string | null;
+  community: string | null;
 }
 
 const escapeCsvValue = (value: any): string => {
@@ -51,7 +52,8 @@ export const exportSurveyRatingsToCSV = (data: SurveyRatingRow[]): string => {
     'Show Name',
     'Current Vendor',
     'Vendor Phone',
-    'Created At'
+    'Created At',
+    'Community'
   ];
 
   const csvRows = [headers.join(',')];
@@ -75,7 +77,8 @@ export const exportSurveyRatingsToCSV = (data: SurveyRatingRow[]): string => {
       escapeCsvValue(row.show_name),
       escapeCsvValue(row.current_vendor),
       escapeCsvValue(row.vendor_phone),
-      escapeCsvValue(row.created_at)
+      escapeCsvValue(row.created_at),
+      escapeCsvValue(row.community)
     ];
     csvRows.push(values.join(','));
   });
