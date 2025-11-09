@@ -187,13 +187,13 @@ export function RespondentsTable() {
     }
   };
 
-  const handleSendEmail = async (email: string, name: string, sessionToken: string) => {
+  const handleSendEmail = async (respondent: any) => {
     try {
       const { error } = await supabase.functions.invoke('send-survey-review-emails', {
         body: { 
-          community: communityFilter === "all" ? null : communityFilter,
+          community: respondent.community,
           test_mode: false,
-          single_email: email
+          session_ids: [respondent.id]
         }
       });
 
@@ -201,7 +201,7 @@ export function RespondentsTable() {
 
       toast({
         title: "Email Sent",
-        description: `Survey email sent to ${name}`
+        description: `Survey email sent to ${respondent.name}`
       });
       
       await refetch();
@@ -454,7 +454,7 @@ export function RespondentsTable() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleSendEmail(respondent.email, respondent.name, respondent.sessionToken)}
+                              onClick={() => handleSendEmail(respondent)}
                               title={respondent.emailSentAt ? "Resend email" : "Send email"}
                             >
                               <Mail className="h-4 w-4" />
@@ -512,7 +512,7 @@ export function RespondentsTable() {
                           <DropdownMenuContent align="end">
                             {respondent.email && (
                               <DropdownMenuItem
-                                onClick={() => handleSendEmail(respondent.email, respondent.name, respondent.sessionToken)}
+                                onClick={() => handleSendEmail(respondent)}
                               >
                                 <Mail className="h-4 w-4 mr-2" /> {respondent.emailSentAt ? "Resend Email" : "Send Email"}
                               </DropdownMenuItem>
