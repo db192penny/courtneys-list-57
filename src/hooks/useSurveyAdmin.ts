@@ -54,7 +54,7 @@ export function useSurveyStats() {
       const { data: sessions, error: sessError } = await supabase
         .from("preview_sessions" as any)
         .select("id, session_token")
-        .in("source", ["survey_oct_2024", "admin_csv_upload"]);
+        .not("source", "like", "archived_%");
 
       if (sessError) throw sessError;
 
@@ -126,7 +126,7 @@ export function useSurveyRespondents() {
       const { data: sessions, error: sessError } = await supabase
         .from("preview_sessions" as any)
         .select("*")
-        .in("source", ["survey_oct_2024", "admin_csv_upload"])
+        .not("source", "like", "archived_%")
         .order("created_at", { ascending: false });
 
       if (sessError) throw sessError;

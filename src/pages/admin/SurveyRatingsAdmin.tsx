@@ -33,22 +33,34 @@ export default function SurveyRatingsAdmin() {
   const handleExportCSV = async () => {
     setIsExporting(true);
     try {
-      // Direct query using the REST API to fetch survey_ratings
-      const response = await fetch(
-        `https://iuxacgyocpwblpmmbwwc.supabase.co/rest/v1/survey_ratings?select=*&order=created_at.desc`,
-        {
-          headers: {
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1eGFjZ3lvY3B3YmxwbW1id3djIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NzM4MzQsImV4cCI6MjA3MDM0OTgzNH0.ZmpBGKTwsEW4nctU_elOF2XY-n0-hOgaIvDrrneAS1Q',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-          }
-        }
-      );
+      // First, get non-archived session tokens
+      const { data: sessions } = await supabase
+        .from("preview_sessions" as any)
+        .select("session_token")
+        .not("source", "like", "archived_%");
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch survey ratings');
+      const activeSessionTokens = (sessions as any[])?.map((s: any) => s.session_token) || [];
+
+      if (activeSessionTokens.length === 0) {
+        toast({
+          title: "No data",
+          description: "No active survey sessions found",
+          variant: "destructive"
+        });
+        setIsExporting(false);
+        return;
       }
 
-      const surveyData = await response.json();
+      // Then fetch survey_ratings for those session tokens
+      const { data: surveyData, error } = await (supabase as any)
+        .from("survey_ratings")
+        .select("*")
+        .in("session_token", activeSessionTokens)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        throw error;
+      }
 
       if (!surveyData || surveyData.length === 0) {
         toast({
@@ -56,6 +68,7 @@ export default function SurveyRatingsAdmin() {
           description: "No survey ratings found to export",
           variant: "destructive"
         });
+        setIsExporting(false);
         return;
       }
 
