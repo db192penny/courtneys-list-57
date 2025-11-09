@@ -4,8 +4,11 @@
 export const communityNames: Record<string, string> = {
   'boca-bridges': 'Boca Bridges',
   'the-bridges': 'The Bridges',
+  'bridges': 'The Bridges',
   'the-oaks': 'The Oaks',
+  'oaks': 'The Oaks',
   'woodfield-country-club': 'Woodfield Country Club',
+  'woodfield': 'Woodfield Country Club',
 };
 
 /**
