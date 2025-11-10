@@ -4,150 +4,71 @@ import { supabase } from "@/integrations/supabase/client";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { RatingStars } from "@/components/ui/rating-stars";
 import { formatDistanceToNow } from "date-fns";
-import { usePreviewSession } from "@/hooks/usePreviewSession";
-import { capitalizeStreetName, extractStreetName } from "@/utils/address";
-import { formatNameWithLastInitial } from "@/utils/nameFormatting";
 
-interface PreviewReview {
-  id: string;
-  rating: number;
-  comments?: string;
-  created_at: string;
-  anonymous: boolean;
-  session_id: string;
-}
-
-interface PreviewSession {
-  name: string;
-  street_name?: string;
-}
-
-export default function PreviewReviewsHover({ 
+export default function PreviewReviewsHover({
   vendorId, 
   children 
 }: { 
   vendorId: string; 
   children: ReactNode;
 }) {
-  const { session: currentSession } = usePreviewSession();
-
   const { data: reviews, isLoading } = useQuery({
     queryKey: ["preview-vendor-reviews", vendorId],
     queryFn: async () => {
-      let formattedRealReviews: any[] = [];
+      const { data: session } = await supabase.auth.getSession();
       
-      // Try to fetch real reviews, but handle RLS errors gracefully
-      try {
-        const realReviewsResponse = await supabase
-          .from("reviews")
-          .select(`
-            id,
-            rating,
-            recommended,
-            comments,
-            created_at,
-            anonymous,
-            users!inner(name, street_name, show_name_public)
-          `)
-          .eq("vendor_id", vendorId)
-          .order("created_at", { ascending: false });
-
-        if (!realReviewsResponse.error) {
-          const realReviews = realReviewsResponse.data || [];
-          formattedRealReviews = realReviews.map((review: any) => {
-            // Generate author label similar to the RPC function
-            const user = review.users;
-            let authorLabel = "Neighbor";
-            
-            if (!review.anonymous && user?.show_name_public && user?.name?.trim()) {
-              const formattedName = formatNameWithLastInitial(user.name.trim());
-              authorLabel = formattedName;
-              
-              if (user.street_name?.trim()) {
-                const cleanStreet = capitalizeStreetName(extractStreetName(user.street_name.trim()));
-                authorLabel += ` on ${cleanStreet}`;
-              }
-            }
-
-            return {
-              id: review.id,
-              rating: review.rating,
-              comments: review.comments,
-              created_at: review.created_at,
-              anonymous: review.anonymous,
-              author_label: authorLabel,
-              type: 'real'
-            };
-          });
-        }
-      } catch (error) {
-        // Silently handle RLS errors for logged-out users
-        console.log("Cannot fetch real reviews (user not authenticated)");
-      }
-
-      // Fetch preview reviews (always accessible)
-      const previewReviewsResponse = await supabase
-        .from("preview_reviews")
-        .select("*")
-        .eq("vendor_id", vendorId)
-        .order("created_at", { ascending: false });
-
-      if (previewReviewsResponse.error) {
-        console.error("Failed to fetch preview reviews:", previewReviewsResponse.error);
-        return formattedRealReviews;
-      }
-
-      const previewReviewsData = previewReviewsResponse.data || [];
+      console.log('[VendorReviews] Fetching reviews for vendor:', vendorId);
       
-      // Get unique session IDs for preview reviews
-      const sessionIds = [...new Set(previewReviewsData.map(r => r.session_id))];
-      
-      // Fetch session data for author labels
-      const { data: sessionsData } = await supabase
-        .from("preview_sessions")
-        .select("id, name, street_name")
-        .in("id", sessionIds);
+      // Fetch both verified and pending reviews using RPC functions
+      const [verifiedResult, pendingResult] = await Promise.all([
+        supabase.rpc('list_vendor_reviews_preview', {
+          _vendor_id: vendorId
+        }),
+        supabase.rpc('list_pending_survey_reviews' as any, {
+          p_vendor_id: vendorId,
+          p_viewer_user_id: session?.session?.user?.id || null
+        })
+      ]);
 
-      const sessionsMap = new Map(sessionsData?.map(s => [s.id, s]) || []);
+      console.log('[VendorReviews] Verified:', verifiedResult.data?.length || 0);
+      console.log('[VendorReviews] Pending:', pendingResult.data?.length || 0);
 
-      // Format preview reviews
-      const formattedPreviewReviews = previewReviewsData.map(review => ({
-        id: `preview-${review.id}`,
+      // Format verified reviews
+      const formattedVerifiedReviews = (verifiedResult.data || []).map((review: any) => ({
+        id: review.id,
         rating: review.rating,
         comments: review.comments,
         created_at: review.created_at,
-        anonymous: review.anonymous,
-        session: sessionsMap.get(review.session_id),
-        type: 'preview'
+        author_label: review.author_label,
+        type: 'verified'
+      }));
+
+      // Format pending survey reviews
+      const formattedPendingReviews = (pendingResult.data || []).map((review: any) => ({
+        id: review.id,
+        rating: review.rating,
+        comments: review.comments,
+        created_at: review.created_at,
+        author_label: review.author_label,
+        type: 'pending'
       }));
 
       // Combine both types of reviews and sort by creation date
-      const allReviews = [...formattedRealReviews, ...formattedPreviewReviews];
-      return allReviews.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      const allReviews = [...formattedVerifiedReviews, ...formattedPendingReviews];
+      const sortedReviews = allReviews.sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      
+      console.log('[VendorReviews] Combined:', sortedReviews.length);
+      
+      return sortedReviews;
     },
     enabled: !!vendorId,
   });
 
   const getAuthorLabel = (review: any) => {
-    // If it's a real review, use the provided author_label
-    if (review.type === 'real') {
-      return review.author_label;
-    }
-    
-    // For preview reviews, generate the label from session data
-    if (review.anonymous || !review.session?.name) {
-      return "Neighbor";
-    }
-    
-    const formattedName = formatNameWithLastInitial(review.session.name.trim());
-    const street = review.session.street_name;
-    
-    if (street?.trim()) {
-      const cleanStreet = capitalizeStreetName(extractStreetName(street.trim()));
-      return `${formattedName} on ${cleanStreet}`;
-    }
-    
-    return formattedName;
+    // Use the author_label directly from the RPC function
+    return review.author_label || "Neighbor";
   };
 
   return (
