@@ -52,13 +52,24 @@ export function NeighborReviewPreview({
   const { data: reviews, isLoading, error } = useQuery({
     queryKey: ["vendor-reviews", vendorId],
     queryFn: async () => {
-      // Fetch verified user reviews
+      const { data: session } = await supabase.auth.getSession();
+
+      // Fetch verified user reviews and pending survey reviews in parallel
       const functionName = isAuthenticated ? 'list_vendor_reviews' : 'list_vendor_reviews_preview';
-      const { data: verifiedReviews, error: verifiedError } = await supabase
-        .rpc(functionName as any, { _vendor_id: vendorId });
+      const [{ data: verifiedReviews, error: verifiedError }, { data: pendingReviews, error: pendingError }] = await Promise.all([
+        supabase.rpc(functionName as any, { _vendor_id: vendorId }),
+        supabase.rpc('list_pending_survey_reviews' as any, {
+          p_vendor_id: vendorId,
+          p_viewer_user_id: session.session?.user?.id || null
+        })
+      ]);
       
       if (verifiedError) {
         console.error("Error fetching verified reviews:", verifiedError);
+      }
+
+      if (pendingError) {
+        console.error("Error fetching pending survey reviews:", pendingError);
       }
       
       // First get the vendor name to match preview reviews (use maybeSingle to handle RLS gracefully)
@@ -87,24 +98,7 @@ export function NeighborReviewPreview({
         console.error("Error fetching preview reviews:", previewError);
       }
 
-      // Fetch survey ratings by vendor ID (more reliable than name matching for anonymous users)
-      let surveyReviews: any[] = [];
-      try {
-        const result = await supabase
-          .from("survey_ratings" as any)
-          .select("id, rating, comments, created_at, respondent_name, show_name")
-          .eq("vendor_id", vendorId)
-          .not("rating", "is", null);
-        
-        if (result.error) {
-          console.error("Error fetching survey reviews:", result.error);
-        } else {
-          surveyReviews = result.data || [];
-          console.log(`[NeighborReviewPreview] Found ${surveyReviews.length} survey reviews for vendor ${vendorId}`);
-        }
-      } catch (err) {
-        console.error("Error fetching survey reviews:", err);
-      }
+      console.log(`[NeighborReviewPreview] Found ${(pendingReviews || []).length} pending survey reviews for vendor ${vendorId}`);
       
       // Format and tag verified reviews
       const taggedVerifiedReviews = (verifiedReviews || []).map(vr => ({
@@ -124,8 +118,8 @@ export function NeighborReviewPreview({
         is_pending: true
       }));
 
-      // Format and tag survey reviews as pending
-      const formattedSurveyReviews = (surveyReviews || []).map(sr => {
+      // Format and tag survey reviews as pending (from list_pending_survey_reviews RPC)
+      const formattedSurveyReviews = (pendingReviews || []).map((sr: any) => {
         const authorLabel = sr.show_name && sr.respondent_name
           ? `${sr.respondent_name}|in The Bridges`
           : "Neighbor|in The Bridges";
