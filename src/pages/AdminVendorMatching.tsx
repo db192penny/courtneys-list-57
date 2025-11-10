@@ -51,11 +51,12 @@ interface FuzzyMatch {
 }
 
 interface UnmatchedVendor {
-  survey_vendor_name: string;
-  category: string;
+  survey_rating_id: string;
+  vendor_name: string;
+  vendor_category: string;
+  vendor_phone: string | null;
   mention_count: number;
-  phone_from_survey: string | null;
-  rating_ids: string[];
+  all_rating_ids: string[];
 }
 
 export default function AdminVendorMatching() {
@@ -589,8 +590,8 @@ function UnmatchedVendorCard({
   processingId: string | null;
 }) {
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [vendorName, setVendorName] = useState(vendor.survey_vendor_name);
-  const [vendorPhone, setVendorPhone] = useState(vendor.phone_from_survey || "");
+  const [vendorName, setVendorName] = useState(vendor.vendor_name);
+  const [vendorPhone, setVendorPhone] = useState(vendor.vendor_phone || "");
   const [vendorCommunity, setVendorCommunity] = useState(community);
   const [googlePlaceId, setGooglePlaceId] = useState<string | undefined>();
 
@@ -601,7 +602,7 @@ function UnmatchedVendorCard({
   };
 
   const handleCreate = () => {
-    onCreateVendor(vendor.survey_vendor_name, vendor.category, vendor.rating_ids, {
+    onCreateVendor(vendor.vendor_name, vendor.vendor_category, vendor.all_rating_ids, {
       name: vendorName,
       phone: vendorPhone || null,
       community: vendorCommunity,
@@ -614,14 +615,15 @@ function UnmatchedVendorCard({
     <Card>
       <CardContent className="pt-6 space-y-4">
         <div>
-          <div className="font-semibold text-lg">{vendor.survey_vendor_name}</div>
-          <div className="text-sm text-muted-foreground">{vendor.category}</div>
-          <div className="text-sm text-muted-foreground mt-1">
-            {vendor.mention_count} mention(s)
-          </div>
-          {vendor.phone_from_survey && (
+          <div className="font-semibold text-lg">{vendor.vendor_name}</div>
+          <div className="text-sm text-muted-foreground">📂 {vendor.vendor_category} | 👥 {vendor.mention_count} mention(s)</div>
+          {vendor.vendor_phone ? (
             <div className="text-sm text-muted-foreground mt-1">
-              Phone: {vendor.phone_from_survey}
+              📞 {vendor.vendor_phone}
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground mt-1">
+              📞 No phone
             </div>
           )}
         </div>
@@ -633,7 +635,7 @@ function UnmatchedVendorCard({
             </Button>
             <Button
               variant="outline"
-              onClick={() => onSearchVendors(vendor.category, vendor.rating_ids)}
+              onClick={() => onSearchVendors(vendor.vendor_category, vendor.all_rating_ids)}
             >
               Search Existing
             </Button>
@@ -683,7 +685,7 @@ function UnmatchedVendorCard({
             <div className="flex gap-2">
               <Button
                 onClick={handleCreate}
-                disabled={!vendorName || processingId === vendor.survey_vendor_name}
+                disabled={!vendorName || processingId === vendor.vendor_name}
               >
                 Create & Match
               </Button>
