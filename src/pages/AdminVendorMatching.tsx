@@ -79,6 +79,23 @@ export default function AdminVendorMatching() {
     refreshData();
   }, [community]);
 
+  // Fetch data when tab changes
+  useEffect(() => {
+    const fetchTabData = async () => {
+      setLoading(true);
+      try {
+        if (activeTab === "exact") await fetchExactMatches();
+        else if (activeTab === "fuzzy") await fetchFuzzyMatches();
+        else if (activeTab === "unmatched") await fetchUnmatched();
+      } catch (error) {
+        console.error(`Error fetching ${activeTab} data:`, error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTabData();
+  }, [activeTab]);
+
   const refreshData = async () => {
     setLoading(true);
     try {
@@ -123,10 +140,12 @@ export default function AdminVendorMatching() {
   };
 
   const fetchUnmatched = async () => {
+    console.log('[Unmatched] Fetching vendors for:', community);
     const { data, error } = await (supabase.rpc as any)("get_unmatched_vendors", {
       p_community: community
     });
     if (error) throw error;
+    console.log('[Unmatched] Received data:', data);
     setUnmatchedVendors((data as UnmatchedVendor[]) || []);
   };
 
