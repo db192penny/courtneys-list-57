@@ -35,8 +35,8 @@ interface Review {
   is_pending: boolean;
 }
 
-export function NeighborReviewPreview({ 
-  vendorId, 
+export function NeighborReviewPreview({
+  vendorId,
   vendor,
   onOpenModal,
   onRate,
@@ -44,26 +44,31 @@ export function NeighborReviewPreview({
   className,
   communityName,
   isAuthenticated = false,
-  communityPhotoUrl
+  communityPhotoUrl,
 }: NeighborReviewPreviewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isMobile = useIsMobile();
   const { data: userData } = useUserData();
-  const { data: reviews, isLoading, error } = useQuery({
+  const {
+    data: reviews,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["vendor-reviews", vendorId],
     queryFn: async () => {
       const { data: session } = await supabase.auth.getSession();
 
       // Fetch verified user reviews and pending survey reviews in parallel
-      const functionName = isAuthenticated ? 'list_vendor_reviews' : 'list_vendor_reviews_preview';
-      const [{ data: verifiedReviews, error: verifiedError }, { data: pendingReviews, error: pendingError }] = await Promise.all([
-        supabase.rpc(functionName as any, { _vendor_id: vendorId }),
-        supabase.rpc('list_pending_survey_reviews' as any, {
-          p_vendor_id: vendorId,
-          p_viewer_user_id: session.session?.user?.id || null
-        })
-      ]);
-      
+      const functionName = isAuthenticated ? "list_vendor_reviews" : "list_vendor_reviews_preview";
+      const [{ data: verifiedReviews, error: verifiedError }, { data: pendingReviews, error: pendingError }] =
+        await Promise.all([
+          supabase.rpc(functionName as any, { _vendor_id: vendorId }),
+          supabase.rpc("list_pending_survey_reviews" as any, {
+            p_vendor_id: vendorId,
+            p_viewer_user_id: session.session?.user?.id || null,
+          }),
+        ]);
+
       if (verifiedError) {
         console.error("Error fetching verified reviews:", verifiedError);
       }
@@ -72,17 +77,19 @@ export function NeighborReviewPreview({
         console.error("Error fetching pending survey reviews:", pendingError);
       }
 
-      console.log(`[NeighborReviewPreview] Found ${(pendingReviews || []).length} pending survey reviews for vendor ${vendorId}`);
-      console.log('[PendingReviews] Full data:', pendingReviews);
-      console.log('[PendingReviews] First review:', pendingReviews?.[0]);
-      console.log('[PendingReviews] Rating:', pendingReviews?.[0]?.rating);
-      console.log('[PendingReviews] Author label:', pendingReviews?.[0]?.author_label);
-      console.log('[PendingReviews] Comments:', pendingReviews?.[0]?.comments);
-      
+      console.log(
+        `[NeighborReviewPreview] Found ${(pendingReviews || []).length} pending survey reviews for vendor ${vendorId}`,
+      );
+      console.log("[PendingReviews] Full data:", pendingReviews);
+      console.log("[PendingReviews] First review:", pendingReviews?.[0]);
+      console.log("[PendingReviews] Rating:", pendingReviews?.[0]?.rating);
+      console.log("[PendingReviews] Author label:", pendingReviews?.[0]?.author_label);
+      console.log("[PendingReviews] Comments:", pendingReviews?.[0]?.comments);
+
       // Format and tag verified reviews
-      const taggedVerifiedReviews = (verifiedReviews || []).map(vr => ({
+      const taggedVerifiedReviews = (verifiedReviews || []).map((vr) => ({
         ...vr,
-        is_pending: false
+        is_pending: false,
       }));
 
       // Format and tag survey reviews as pending (from list_pending_survey_reviews RPC)
@@ -95,21 +102,18 @@ export function NeighborReviewPreview({
         author_label: sr.author_label, // Use the pre-formatted label from the database
         is_pending: true,
       }));
-      
+
       // Combine verified and survey reviews
-      const allReviews = [
-        ...taggedVerifiedReviews,
-        ...formattedSurveyReviews
-      ];
-      
+      const allReviews = [...taggedVerifiedReviews, ...formattedSurveyReviews];
+
       // Deduplicate by ID (survey reviews may appear in both list_vendor_reviews and survey_ratings)
       const uniqueReviewsMap = new Map<string, Review>();
-      allReviews.forEach(review => {
+      allReviews.forEach((review) => {
         if (!uniqueReviewsMap.has(review.id)) {
           uniqueReviewsMap.set(review.id, review);
         }
       });
-      
+
       return Array.from(uniqueReviewsMap.values()) as Review[];
     },
     enabled: !!vendorId,
@@ -118,109 +122,65 @@ export function NeighborReviewPreview({
   // Smart review selection: prioritize verified over pending, then substantial content, then date
   const selectBestReview = (reviews: Review[]): Review | null => {
     if (!reviews || reviews.length === 0) return null;
-    
+
     // Sort by: verified first, then substantial comments, then date
     const sorted = [...reviews].sort((a, b) => {
       // 1. Prioritize verified reviews over pending
       if (!a.is_pending && b.is_pending) return -1;
       if (a.is_pending && !b.is_pending) return 1;
-      
+
       // 2. Then prioritize reviews with substantial comments
       const aHasComment = a.comments && a.comments.trim().length > 10;
       const bHasComment = b.comments && b.comments.trim().length > 10;
-      
+
       if (aHasComment && !bHasComment) return -1;
       if (!aHasComment && bHasComment) return 1;
-      
+
       // 3. Finally sort by most recent
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
-    
-    return sorted[0];
-  };
 
-  const formatAuthorDisplay = (authorLabel: string): string => {
-    if (!authorLabel) return 'Neighbor';
-    
-    // Extract name and street from the incoming format
-    let nameOrNeighbor = '';
-    let streetPart = '';
-    
-    // Parse "Name on Street" format (from database)
-    if (authorLabel.includes(' on ')) {
-      const onIndex = authorLabel.indexOf(' on ');
-      nameOrNeighbor = authorLabel.substring(0, onIndex).trim();
-      streetPart = authorLabel.substring(onIndex); // Keep " on Street" part with leading space
-    }
-    // Parse pipe format if present
-    else if (authorLabel.includes('|')) {
-      const parts = authorLabel.split('|');
-      nameOrNeighbor = parts[0].trim();
-      streetPart = parts[1] ? ' on ' + extractStreetName(parts[1].trim()) : '';
-    }
-    // Parse "in The Bridges" format
-    else if (authorLabel.includes(' in ')) {
-      const inIndex = authorLabel.indexOf(' in ');
-      nameOrNeighbor = authorLabel.substring(0, inIndex).trim();
-      // No street for survey format, just return community
-    }
-    else {
-      nameOrNeighbor = authorLabel;
-    }
-    
-    // Apply privacy rules
-    
-    // Logged out OR different community: Show "Neighbor on [Street]"
-    if (!isAuthenticated || (userData?.communityName && communityName && userData.communityName !== communityName)) {
-      // Simply show "Neighbor on [Street]"
-      if (streetPart) {
-        return `Neighbor${streetPart}`;
-      }
-      return 'Neighbor';
-    }
-    
-    // Same community: Show as-is from database
-    return authorLabel;
+    return sorted[0];
   };
 
   const truncateComment = (comment: string) => {
     const limit = isMobile ? 140 : 250;
     if (!comment || comment.length <= limit) return { text: comment, wasTruncated: false };
-    
+
     // Find a good breaking point near the limit (prefer word boundaries)
     let breakPoint = limit;
     for (let i = limit; i > limit - 20 && i < comment.length; i++) {
-      if (comment[i] === ' ') {
+      if (comment[i] === " ") {
         breakPoint = i;
         break;
       }
     }
-    
-    return { 
-      text: comment.substring(0, breakPoint), 
+
+    return {
+      text: comment.substring(0, breakPoint),
       wasTruncated: true,
-      remainingLength: comment.length - breakPoint
+      remainingLength: comment.length - breakPoint,
     };
   };
 
   const handleInteraction = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.preventDefault();
-    
+
     // Track read all reviews click in Mixpanel
-    if (typeof window !== 'undefined' && window.mixpanel) {
+    if (typeof window !== "undefined" && window.mixpanel) {
       try {
-        window.mixpanel.track('Clicked Read All Reviews', {
+        window.mixpanel.track("Clicked Read All Reviews", {
           vendor_id: vendorId,
           review_count: totalReviews,
           is_authenticated: isAuthenticated,
           community: communityName,
         });
-        console.log('📊 Tracked read all reviews click for vendor:', vendorId);
+        console.log("📊 Tracked read all reviews click for vendor:", vendorId);
       } catch (error) {
-        console.error('Mixpanel tracking error:', error);
+        console.error("Mixpanel tracking error:", error);
       }
     }
-    
+
     if (onOpenModal) {
       onOpenModal();
     } else {
@@ -229,24 +189,16 @@ export function NeighborReviewPreview({
   };
 
   if (isLoading) {
-    return (
-      <div className={cn("text-xs text-muted-foreground", className)}>
-        Loading reviews...
-      </div>
-    );
+    return <div className={cn("text-xs text-muted-foreground", className)}>Loading reviews...</div>;
   }
 
   if (error) {
-    return (
-      <div className={cn("text-xs text-muted-foreground", className)}>
-        Unable to load reviews
-      </div>
-    );
+    return <div className={cn("text-xs text-muted-foreground", className)}>Unable to load reviews</div>;
   }
 
   const selectedReview = selectBestReview(reviews || []);
   const totalReviews: number = reviews?.length || 0;
-  
+
   // Calculate if we should show the CTA box
   const shouldShowCTA = (() => {
     const reviewCount = totalReviews as number;
@@ -262,8 +214,11 @@ export function NeighborReviewPreview({
 
   if (totalReviews === 0) {
     return (
-      <div 
-        className={cn("bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 cursor-pointer hover:scale-[1.02] hover:shadow-md hover:border-blue-300 transition-all duration-200 active:scale-[0.98]", className)}
+      <div
+        className={cn(
+          "bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 cursor-pointer hover:scale-[1.02] hover:shadow-md hover:border-blue-300 transition-all duration-200 active:scale-[0.98]",
+          className,
+        )}
         onClick={() => {
           if (isAuthenticated && onRate) {
             onRate();
@@ -274,7 +229,7 @@ export function NeighborReviewPreview({
         role="button"
         tabIndex={0}
         onKeyPress={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             if (isAuthenticated && onRate) {
               onRate();
@@ -286,26 +241,24 @@ export function NeighborReviewPreview({
       >
         {/* Header with Rating Summary */}
         <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <ReviewSourceIcon source="bb" size="lg" communityPhotoUrl={communityPhotoUrl} />
             <div>
-              <div className="text-sm font-bold text-blue-800">{communityName || 'Community'} Reviews</div>
+              <div className="text-sm font-bold text-blue-800">{communityName || "Community"} Reviews</div>
               <div className="text-xs text-blue-600">From your neighbors</div>
             </div>
           </div>
           <div className="text-right">
             <div className="flex items-center gap-1">
               <RatingStars rating={vendor?.hoa_rating || 0} />
-              <span className="text-base font-bold text-blue-800">
-                {vendor?.hoa_rating?.toFixed(1) || '0.0'}
-              </span>
+              <span className="text-base font-bold text-blue-800">{vendor?.hoa_rating?.toFixed(1) || "0.0"}</span>
             </div>
             <div className="text-sm text-blue-600 font-medium">
-              {totalReviews} {(totalReviews as number) !== 1 ? 'reviews' : 'review'}
+              {totalReviews} {(totalReviews as number) !== 1 ? "reviews" : "review"}
             </div>
           </div>
         </div>
-        
+
         {/* Call to Action */}
         <div className="bg-white/60 rounded-lg p-3 border border-blue-100 hover:bg-white/80 transition-colors">
           <div className="flex items-center gap-2 text-blue-800">
@@ -319,7 +272,10 @@ export function NeighborReviewPreview({
 
   const TriggerContent = () => (
     <div
-      className={cn("bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-md hover:border-blue-300 active:scale-[0.98]", className)}
+      className={cn(
+        "bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-md hover:border-blue-300 active:scale-[0.98]",
+        className,
+      )}
       onClick={handleInteraction}
       onKeyPress={handleInteraction}
       role="button"
@@ -330,19 +286,19 @@ export function NeighborReviewPreview({
         <div className="flex items-center gap-3">
           <ReviewSourceIcon source="bb" size="lg" communityPhotoUrl={communityPhotoUrl} />
           <div>
-            <div className="text-sm font-bold text-blue-800">{communityName || 'Community'} Reviews</div>
+            <div className="text-sm font-bold text-blue-800">{communityName || "Community"} Reviews</div>
             <div className="text-xs text-blue-600">From your neighbors</div>
           </div>
         </div>
         <div className="text-right">
           <div className="flex items-center gap-1">
-            <RatingStars rating={vendor?.hoa_rating || 0} />
+            <RatingStars rating={selectedReview?.rating || vendor?.hoa_rating || 0} />
             <span className="text-base font-bold text-blue-800">
-              {vendor?.hoa_rating?.toFixed(1) || '0.0'}
+              {selectedReview?.rating?.toFixed(1) || vendor?.hoa_rating?.toFixed(1) || "0.0"}
             </span>
           </div>
           <div className="text-sm text-blue-600 font-medium">
-            {totalReviews} {(totalReviews as number) !== 1 ? 'reviews' : 'review'}
+            {totalReviews} {(totalReviews as number) !== 1 ? "reviews" : "review"}
           </div>
         </div>
       </div>
@@ -351,13 +307,12 @@ export function NeighborReviewPreview({
       {selectedReview.comments && selectedReview.comments.trim() ? (
         <div className="bg-white/60 rounded-lg p-3 mb-3 border border-blue-100">
           <p className="text-base text-blue-800 font-medium leading-snug mb-2 italic">
-            "{truncateComment(selectedReview.comments).text}{truncateComment(selectedReview.comments).wasTruncated && '...'}"
+            "{truncateComment(selectedReview.comments).text}
+            {truncateComment(selectedReview.comments).wasTruncated && "..."}"
           </p>
           {/* Right-aligned attribution */}
           <div className="flex justify-end">
-            <p className="text-sm font-semibold text-blue-700">
-              — {formatAuthorDisplay(selectedReview.author_label)}
-            </p>
+            <p className="text-sm font-semibold text-blue-700">— {selectedReview.author_label}</p>
           </div>
         </div>
       ) : (
@@ -366,19 +321,17 @@ export function NeighborReviewPreview({
             <RatingStars rating={selectedReview.rating} />
             <span className="font-bold text-lg">{selectedReview.rating}/5</span>
           </div>
-          <div className="text-sm text-blue-600">
-            by {formatAuthorDisplay(selectedReview.author_label)}
-          </div>
+          <div className="text-sm text-blue-600">by {selectedReview.author_label}</div>
         </div>
       )}
-      
+
       {/* Footer with CTA - Compact Inline */}
       {shouldShowCTA && (
         <div className="mt-3 bg-white/40 border border-blue-300 rounded-lg px-3 py-2 hover:bg-white/60 hover:border-blue-400 transition-all duration-200">
           <div className="flex items-center justify-center gap-2 text-sm">
             <span className="text-lg">👀</span>
             <span className="font-semibold text-blue-900">
-              {totalReviews === 1 ? 'Read this review' : `Read all ${totalReviews} reviews`}
+              {totalReviews === 1 ? "Read this review" : `Read all ${totalReviews} reviews`}
             </span>
             <span className="text-base font-bold text-blue-700">→</span>
           </div>
@@ -402,7 +355,7 @@ export function NeighborReviewPreview({
         <DialogHeader>
           <DialogTitle>{communityName || "Boca Bridges"}</DialogTitle>
         </DialogHeader>
-        <MobileReviewsModal 
+        <MobileReviewsModal
           open={true}
           onOpenChange={() => {}}
           vendor={{ id: vendorId }}
