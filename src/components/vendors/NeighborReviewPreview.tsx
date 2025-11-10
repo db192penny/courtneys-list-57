@@ -86,20 +86,15 @@ export function NeighborReviewPreview({
       }));
 
       // Format and tag survey reviews as pending (from list_pending_survey_reviews RPC)
-      const formattedSurveyReviews = (pendingReviews || []).map((sr: any) => {
-        const authorLabel = sr.show_name && sr.respondent_name
-          ? `${sr.respondent_name}|in The Bridges`
-          : "Neighbor|in The Bridges";
-
-        return {
-          id: sr.id,
-          rating: sr.rating,
-          comments: sr.comments,
-          created_at: sr.created_at,
-          author_label: authorLabel,
-          is_pending: true,
-        };
-      });
+      // Use author_label directly from the RPC - it's already formatted correctly!
+      const formattedSurveyReviews = (pendingReviews || []).map((sr: any) => ({
+        id: sr.id,
+        rating: sr.rating,
+        comments: sr.comments,
+        created_at: sr.created_at,
+        author_label: sr.author_label, // Use the pre-formatted label from the database
+        is_pending: true,
+      }));
       
       // Combine verified and survey reviews
       const allReviews = [
