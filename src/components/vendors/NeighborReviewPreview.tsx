@@ -143,6 +143,29 @@ export function NeighborReviewPreview({
     return sorted[0];
   };
 
+  const applyPrivacyRules = (authorLabel: string): string => {
+    if (!authorLabel) return 'Neighbor';
+    
+    // Extract the parts we need
+    const hasName = !authorLabel.startsWith('Neighbor');
+    const streetMatch = authorLabel.match(/on ([^(]+)/);
+    const streetPart = streetMatch ? ` on ${streetMatch[1].trim()}` : '';
+    
+    // Logged out users: Always show "Neighbor on Street"
+    if (!isAuthenticated) {
+      return streetPart ? `Neighbor${streetPart}` : 'Neighbor';
+    }
+    
+    // Logged in but different community: Show "Neighbor on Street"
+    if (userData?.communityName && communityName && userData.communityName !== communityName) {
+      return streetPart ? `Neighbor${streetPart}` : 'Neighbor';
+    }
+    
+    // Same community: Use what the database returned
+    // (Database already checks show_name preference)
+    return authorLabel;
+  };
+
   const truncateComment = (comment: string) => {
     const limit = isMobile ? 140 : 250;
     if (!comment || comment.length <= limit) return { text: comment, wasTruncated: false };
@@ -312,7 +335,7 @@ export function NeighborReviewPreview({
           </p>
           {/* Right-aligned attribution */}
           <div className="flex justify-end">
-            <p className="text-sm font-semibold text-blue-700">— {selectedReview.author_label}</p>
+            <p className="text-sm font-semibold text-blue-700">— {applyPrivacyRules(selectedReview.author_label)}</p>
           </div>
         </div>
       ) : (
@@ -321,7 +344,7 @@ export function NeighborReviewPreview({
             <RatingStars rating={selectedReview.rating} />
             <span className="font-bold text-lg">{selectedReview.rating}/5</span>
           </div>
-          <div className="text-sm text-blue-600">by {selectedReview.author_label}</div>
+          <div className="text-sm text-blue-600">by {applyPrivacyRules(selectedReview.author_label)}</div>
         </div>
       )}
 
