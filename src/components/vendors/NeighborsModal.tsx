@@ -50,11 +50,24 @@ export function NeighborsModal({
   const { data: reviews, isLoading, error } = useQuery({
     queryKey: ["neighbors-reviews", vendorId],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("list_vendor_reviews", { 
-        _vendor_id: vendorId 
-      });
-      if (error) throw error;
-      return data as Review[];
+      const { data: session } = await supabase.auth.getSession();
+
+      const [{ data: verifiedReviews }, { data: pendingReviews }] = await Promise.all([
+        supabase.rpc("list_vendor_reviews", { 
+          _vendor_id: vendorId 
+        }),
+        supabase.rpc("list_pending_survey_reviews" as any, {
+          p_vendor_id: vendorId,
+          p_viewer_user_id: session?.session?.user?.id || null
+        })
+      ]);
+
+      const allReviews = [
+        ...(verifiedReviews || []),
+        ...(pendingReviews || [])
+      ].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      
+      return allReviews as Review[];
     },
     enabled: !!vendorId && open,
   });

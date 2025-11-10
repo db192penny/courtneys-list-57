@@ -37,12 +37,24 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate, communi
   const { data, isLoading, error } = useQuery<Review[]>({
     queryKey: ["mobile-reviews", vendor?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("list_vendor_reviews", { 
-        _vendor_id: vendor?.id 
-      });
-      if (error) throw error;
+      const { data: session } = await supabase.auth.getSession();
+
+      const [{ data: verifiedReviews }, { data: pendingReviews }] = await Promise.all([
+        supabase.rpc("list_vendor_reviews", { 
+          _vendor_id: vendor?.id 
+        }),
+        supabase.rpc("list_pending_survey_reviews" as any, {
+          p_vendor_id: vendor?.id,
+          p_viewer_user_id: session?.session?.user?.id || null
+        })
+      ]);
+
+      const allReviews = [
+        ...(verifiedReviews || []),
+        ...(pendingReviews || [])
+      ].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       
-      return (data || []) as Review[];
+      return allReviews as Review[];
     },
     enabled: isVerified && !!vendor?.id,
   });
