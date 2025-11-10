@@ -338,6 +338,9 @@ const [householdLoading, setHouseholdLoading] = useState<Record<string, boolean>
                     <Link to="/admin/survey-ratings">Survey Ratings</Link>
                   </Button>
                   <Button asChild variant="outline" size="sm" className={isMobile ? "w-full" : ""}>
+                    <Link to="/admin/vendor-matching">🔗 Vendor Matching</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm" className={isMobile ? "w-full" : ""}>
                     <Link to="/admin/vendors/seed">Seed Vendor</Link>
                   </Button>
                   <Button asChild variant="outline" size="sm" className={isMobile ? "w-full" : ""}>
