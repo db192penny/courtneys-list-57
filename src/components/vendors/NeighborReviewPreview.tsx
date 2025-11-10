@@ -71,32 +71,6 @@ export function NeighborReviewPreview({
       if (pendingError) {
         console.error("Error fetching pending survey reviews:", pendingError);
       }
-      
-      // First get the vendor name to match preview reviews (use maybeSingle to handle RLS gracefully)
-      const { data: vendorData } = await supabase
-        .from("vendors")
-        .select("name")
-        .eq("id", vendorId)
-        .maybeSingle();
-      
-      // Fetch preview reviews by vendor NAME (not vendor_id which is often NULL)
-      const { data: previewReviews, error: previewError } = vendorData ? await supabase
-        .from("preview_reviews")
-        .select(`
-          id, 
-          rating, 
-          comments, 
-          created_at, 
-          anonymous,
-          preview_sessions!inner(name),
-          vendors!inner(name)
-        `)
-        .eq("vendors.name", vendorData.name)
-        : { data: [], error: null };
-      
-      if (previewError) {
-        console.error("Error fetching preview reviews:", previewError);
-      }
 
       console.log(`[NeighborReviewPreview] Found ${(pendingReviews || []).length} pending survey reviews for vendor ${vendorId}`);
       
@@ -104,18 +78,6 @@ export function NeighborReviewPreview({
       const taggedVerifiedReviews = (verifiedReviews || []).map(vr => ({
         ...vr,
         is_pending: false
-      }));
-      
-      // Format and tag preview reviews as pending
-      const formattedPreviewReviews = (previewReviews || []).map(pr => ({
-        id: pr.id,
-        rating: pr.rating,
-        comments: pr.comments,
-        created_at: pr.created_at,
-        author_label: pr.anonymous 
-          ? "Neighbor|in The Bridges"
-          : `${pr.preview_sessions.name}|in The Bridges`,
-        is_pending: true
       }));
 
       // Format and tag survey reviews as pending (from list_pending_survey_reviews RPC)
@@ -134,10 +96,9 @@ export function NeighborReviewPreview({
         };
       });
       
-      // Combine all three sources: verified reviews, preview reviews, and survey ratings
+      // Combine verified and survey reviews
       const allReviews = [
         ...taggedVerifiedReviews,
-        ...formattedPreviewReviews,
         ...formattedSurveyReviews
       ];
       
