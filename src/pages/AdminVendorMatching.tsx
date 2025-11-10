@@ -78,7 +78,9 @@ export default function AdminVendorMatching() {
   const { toast } = useToast();
 
   useEffect(() => {
-    refreshData();
+    if (community) {
+      refreshData();
+    }
   }, [community]);
 
   // Fetch available communities from database
@@ -213,7 +215,7 @@ export default function AdminVendorMatching() {
           p_rating_ids: match.rating_ids,
           p_vendor_id: match.matched_vendor_id
         });
-        if (!error) successCount += match.rating_ids.length;
+        if (!error) successCount += (match.rating_ids?.length || 0);
       }
       
       toast({
@@ -545,7 +547,7 @@ export default function AdminVendorMatching() {
             <AlertDialogTitle>Approve All Exact Matches?</AlertDialogTitle>
             <AlertDialogDescription>
               This will approve {exactMatches.length} exact matches and link{" "}
-              {exactMatches.reduce((sum, m) => sum + m.rating_ids.length, 0)} reviews.
+              {exactMatches.reduce((sum, m) => sum + (m.rating_ids?.length || 0), 0)} reviews.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
