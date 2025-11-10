@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import VendorNameInput from "@/components/VendorNameInput";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const COMMUNITIES = ["The Oaks", "Boca Bridges", "The Bridges"];
+
 
 interface ProgressData {
   percent_complete: number;
@@ -60,7 +60,8 @@ interface UnmatchedVendor {
 }
 
 export default function AdminVendorMatching() {
-  const [community, setCommunity] = useState<string>(COMMUNITIES[0]);
+  const [availableCommunities, setAvailableCommunities] = useState<string[]>([]);
+  const [community, setCommunity] = useState<string>("");
   const [activeTab, setActiveTab] = useState<string>("exact");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<ProgressData | null>(null);
@@ -79,6 +80,32 @@ export default function AdminVendorMatching() {
   useEffect(() => {
     refreshData();
   }, [community]);
+
+  // Fetch available communities from database
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      const { data, error } = await supabase
+        .from('communities')
+        .select('name')
+        .order('name');
+      
+      if (data && !error) {
+        setAvailableCommunities(data.map(c => c.name));
+      } else {
+        // Fallback to hardcoded list if query fails
+        setAvailableCommunities(['Boca Bridges', 'The Bridges', 'The Oaks', 'Woodfield Country Club']);
+      }
+    };
+    
+    fetchCommunities();
+  }, []);
+
+  // Set default community once communities are loaded
+  useEffect(() => {
+    if (availableCommunities.length > 0 && !community) {
+      setCommunity(availableCommunities[0]);
+    }
+  }, [availableCommunities, community]);
 
   // Fetch data when tab changes
   useEffect(() => {
@@ -289,7 +316,7 @@ export default function AdminVendorMatching() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {COMMUNITIES.map((comm) => (
+            {availableCommunities.map((comm) => (
               <SelectItem key={comm} value={comm}>
                 {comm}
               </SelectItem>
@@ -495,6 +522,7 @@ export default function AdminVendorMatching() {
                 key={idx}
                 vendor={vendor}
                 community={community}
+                availableCommunities={availableCommunities}
                 onCreateVendor={handleCreateVendor}
                 onSearchVendors={handleSearchVendors}
                 processingId={processingId}
@@ -574,12 +602,14 @@ export default function AdminVendorMatching() {
 function UnmatchedVendorCard({
   vendor,
   community,
+  availableCommunities,
   onCreateVendor,
   onSearchVendors,
   processingId
 }: {
   vendor: UnmatchedVendor;
   community: string;
+  availableCommunities: string[];
   onCreateVendor: (
     surveyName: string,
     category: string,
@@ -673,7 +703,7 @@ function UnmatchedVendorCard({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {COMMUNITIES.map((comm) => (
+                  {availableCommunities.map((comm) => (
                     <SelectItem key={comm} value={comm}>
                       {comm}
                     </SelectItem>
