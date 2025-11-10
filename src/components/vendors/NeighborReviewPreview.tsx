@@ -73,6 +73,11 @@ export function NeighborReviewPreview({
       }
 
       console.log(`[NeighborReviewPreview] Found ${(pendingReviews || []).length} pending survey reviews for vendor ${vendorId}`);
+      console.log('[PendingReviews] Full data:', pendingReviews);
+      console.log('[PendingReviews] First review:', pendingReviews?.[0]);
+      console.log('[PendingReviews] Rating:', pendingReviews?.[0]?.rating);
+      console.log('[PendingReviews] Author label:', pendingReviews?.[0]?.author_label);
+      console.log('[PendingReviews] Comments:', pendingReviews?.[0]?.comments);
       
       // Format and tag verified reviews
       const taggedVerifiedReviews = (verifiedReviews || []).map(vr => ({
