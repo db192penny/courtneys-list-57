@@ -44,6 +44,7 @@ import {
   Key,
   FrameIcon,
   Scissors,
+  Dog,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -103,6 +104,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Flooring": Layers,
   "Locksmith": Key,
   "Tailoring & Alterations": Scissors,
+  "Dog Walking": Dog,
 };
 
 export function getCategoryIcon(category: Category): LucideIcon {

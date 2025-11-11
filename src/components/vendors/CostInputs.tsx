@@ -315,6 +315,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "one_time", amount: null, unit: "item", notes: "Per garment altered" },
     ];
   }
+
+  // Dog Walking: Per walk + Monthly package
+  if (c === "dog walking") {
+    return [
+      { cost_kind: "service_call", amount: null, unit: "walk", notes: null },
+      { cost_kind: "monthly_plan", amount: null, period: "monthly", unit: "month", quantity: null, notes: null },
+    ];
+  }
   
   // General Contractor: No structured fields
   if (c === "general contractor") {
@@ -388,7 +396,7 @@ export default function CostInputs({
         "Maintenance Plan";
 
       const unitDisplay = 
-        entry.cost_kind === "service_call" ? (entry.unit === "panel" ? " per Panel" : " per Visit") :
+        entry.cost_kind === "service_call" ? (entry.unit === "panel" ? " per Panel" : entry.unit === "walk" ? " per Walk" : " per Visit") :
         entry.cost_kind === "hourly" ? (entry.unit === "person" ? " per Person" : entry.unit === "room" ? " per Room" : entry.unit === "mile" ? " per Mile" : " per Hour") :
         entry.cost_kind === "yearly_plan" ? (entry.unit === "season" ? " per Season" : " per Year") :
         entry.cost_kind === "installation" ? (entry.unit === "sq ft" ? " per Sq Ft" : entry.unit === "linear ft" ? " per Linear Ft" : entry.unit === "window" ? " per Window" : " (one-time)") :
@@ -427,12 +435,12 @@ export default function CostInputs({
             />
             <span className="text-sm text-muted-foreground">{unitDisplay}</span>
           </div>
-          {/* Show visits quantity for Pool/Landscaping/Pest Control monthly plans, HVAC yearly plans, and Power Washing/Car Wash & Detail/Window Cleaning */}
-          {((entry.cost_kind === "monthly_plan" && (c === "pool" || c === "pool service" || c === "landscaping" || c === "pest control")) ||
+          {/* Show visits quantity for Pool/Landscaping/Pest Control/Dog Walking monthly plans, HVAC yearly plans, and Power Washing/Car Wash & Detail/Window Cleaning */}
+          {((entry.cost_kind === "monthly_plan" && (c === "pool" || c === "pool service" || c === "landscaping" || c === "pest control" || c === "dog walking")) ||
             (entry.cost_kind === "yearly_plan" && c === "hvac") ||
             (entry.cost_kind === "service_call" && (c === "power washing" || c === "car wash & detail" || c === "window cleaning"))) && (
             <div className="grid gap-2">
-              <Label># of Visits: {entry.cost_kind === "monthly_plan" ? "visits per Month" : entry.cost_kind === "service_call" && (c === "power washing" || c === "car wash & detail" || c === "window cleaning") ? "visits per Year" : "visits per Year"}</Label>
+              <Label># of {c === "dog walking" && entry.cost_kind === "monthly_plan" ? "Walks" : "Visits"}: {entry.cost_kind === "monthly_plan" ? (c === "dog walking" ? "walks per Month" : "visits per Month") : entry.cost_kind === "service_call" && (c === "power washing" || c === "car wash & detail" || c === "window cleaning") ? "visits per Year" : "visits per Year"}</Label>
               <Input
                 type="number"
                 inputMode="numeric"
