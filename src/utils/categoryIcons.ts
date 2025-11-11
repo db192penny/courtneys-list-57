@@ -107,6 +107,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Tailoring & Alterations": Scissors,
   "Dog Walking": Dog,
   "Tutoring": GraduationCap,
+  "Hair & Beauty (At Home)": Sparkles,
 };
 
 export function getCategoryIcon(category: Category): LucideIcon {
