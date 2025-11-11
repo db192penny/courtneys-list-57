@@ -59,7 +59,8 @@ export const categoryEmojiMap: Record<string, string> = {
   'Flooring': '🪵',
   'Locksmith': '🔑',
   'Tailoring & Alterations': '✂️',
-  'Dog Walking': '🐾'
+  'Dog Walking': '🐾',
+  'Tutoring': '📚'
 };
 
 export function getCategoryEmoji(category: string): string {

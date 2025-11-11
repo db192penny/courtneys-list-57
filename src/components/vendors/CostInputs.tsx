@@ -90,6 +90,13 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
   
+  // Tutoring: Hourly Rate
+  if (c === "tutoring") {
+    return [
+      { cost_kind: "hourly", amount: null, unit: "hour", notes: null },
+    ];
+  }
+  
   // Handyman: Hourly Rate
   if (c === "handyman") {
     return [
