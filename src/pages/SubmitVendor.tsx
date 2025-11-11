@@ -23,6 +23,10 @@ import VendorNameInput, { type VendorSelectedPayload } from "@/components/Vendor
 import SubmitCostModal from "@/components/vendors/SubmitCostModal";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+// Categories requiring 18+ age verification
+const AGE_VERIFICATION_CATEGORIES = ['Dog Walking', 'Tutoring'];
+
 const SubmitVendor = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -49,6 +53,7 @@ const SubmitVendor = () => {
   const [showCostConfirm, setShowCostConfirm] = useState(false);
   const [showCostModal, setShowCostModal] = useState(false);
   const [submittedVendorId, setSubmittedVendorId] = useState<string | null>(null);
+  const [ageVerified, setAgeVerified] = useState(false);
   const isMobile = useIsMobile();
   const { data: isAdmin } = useIsAdmin();
   const { data: canSeed } = useCanSeedVendors(communityParam);
@@ -148,6 +153,11 @@ const SubmitVendor = () => {
     loadMyReview();
   }, [vendorId]);
 
+  // Reset age verification when category changes
+  useEffect(() => {
+    setAgeVerified(false);
+  }, [category]);
+
   const handleVendorSelected = async (payload: VendorSelectedPayload) => {
     setName(payload.name);
     setGooglePlaceId(payload.place_id);
@@ -186,6 +196,16 @@ const SubmitVendor = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting) return;
+
+    // Age verification check - MUST happen before any database operations
+    if (AGE_VERIFICATION_CATEGORIES.includes(category) && !ageVerified && !vendorId) {
+      toast({ 
+        title: "Age verification required", 
+        description: "Please confirm the contact person is 18 years or older.", 
+        variant: "destructive" 
+      });
+      return;
+    }
 
     if (!vendorId || canEditCore) {
       if (!category) {
@@ -454,6 +474,11 @@ const SubmitVendor = () => {
           rating: rating,
           comments: comments.trim() || null,
           anonymous: !showNameInReview,
+          // Add age verification fields if category requires it
+          ...(AGE_VERIFICATION_CATEGORIES.includes(category) && {
+            contact_age_verified_at: new Date().toISOString(),
+            contact_age_verified_by_email: authData.user.email || null
+          })
         },
       ]);
 
@@ -517,7 +542,17 @@ const SubmitVendor = () => {
           category: category,
           has_google_place_id: !!googlePlaceId,
           community: communityParam,
+          age_verified: AGE_VERIFICATION_CATEGORIES.includes(category) ? ageVerified : undefined,
         });
+        
+        // Track age verification if applicable
+        if (AGE_VERIFICATION_CATEGORIES.includes(category) && ageVerified) {
+          window.mixpanel.track('vendor_age_verification_accepted', {
+            category,
+            vendor_name: name.trim(),
+            verified_by: authData.user.email
+          });
+        }
         
         // Track vendors added by user
         window.mixpanel.people.increment('vendors_added', 1);
@@ -591,6 +626,31 @@ const SubmitVendor = () => {
               <Label htmlFor="contact">Provider Contact Info</Label>
               <Input id="contact" placeholder="phone or email" value={contact} onChange={(e) => setContact(e.currentTarget.value)} disabled={!!(vendorId && !canEditCore)} />
             </div>
+
+            {/* Age Verification Checkbox - Only for specific categories */}
+            {AGE_VERIFICATION_CATEGORIES.includes(category) && !vendorId && (
+              <div className="space-y-2 p-4 border rounded-lg bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+                <div className="flex items-start gap-3">
+                  <Checkbox 
+                    id="age-verification"
+                    checked={ageVerified} 
+                    onCheckedChange={(checked) => setAgeVerified(!!checked)}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <Label 
+                      htmlFor="age-verification"
+                      className="text-sm font-medium leading-none cursor-pointer"
+                    >
+                      I confirm that the contact person listed above is 18 years of age or older
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      We do not publish contact information for anyone under 18.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {(!isAdminUser || vendorId) && (
               <div className="grid gap-2">
