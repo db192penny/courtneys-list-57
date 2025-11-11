@@ -308,6 +308,13 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "one_time", amount: null, unit: "service", notes: "Per lock/rekey/service" },
     ];
   }
+
+  // Tailoring & Alterations: Per item
+  if (c === "tailoring & alterations") {
+    return [
+      { cost_kind: "one_time", amount: null, unit: "item", notes: "Per garment altered" },
+    ];
+  }
   
   // General Contractor: No structured fields
   if (c === "general contractor") {
