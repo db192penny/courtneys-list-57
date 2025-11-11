@@ -49,7 +49,6 @@ export const CATEGORIES = [
   "Window Treatment",
   "Masseuse",
   "General Contractor",
-  "Babysitting",
   "Flooring",
   "Locksmith",
   "Tailoring & Alterations",

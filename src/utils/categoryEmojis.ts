@@ -55,7 +55,6 @@ export const categoryEmojiMap: Record<string, string> = {
   'Wallpaper Installation': '📜',
   'Window Treatment': '🪟',
   'Masseuse': '💆',
-  'Babysitting': '👶',
   'Flooring': '🪵',
   'Locksmith': '🔑',
   'Tailoring & Alterations': '✂️',
