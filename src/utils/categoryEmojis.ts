@@ -58,7 +58,8 @@ export const categoryEmojiMap: Record<string, string> = {
   'Babysitting': '👶',
   'Flooring': '🪵',
   'Locksmith': '🔑',
-  'Tailoring & Alterations': '✂️'
+  'Tailoring & Alterations': '✂️',
+  'Dog Walking': '🐕'
 };
 
 export function getCategoryEmoji(category: string): string {
