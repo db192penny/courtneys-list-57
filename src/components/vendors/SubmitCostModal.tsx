@@ -142,7 +142,10 @@ export default function SubmitCostModal({
         <div className="flex justify-end gap-2 pt-4 border-t">
           <Button
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => {
+              onOpenChange(false);
+              onSuccess();
+            }}
             disabled={submitting}
           >
             Skip
