@@ -274,8 +274,8 @@ export default function VendorMobileCard({
             <h3 className="text-lg font-bold break-words leading-tight flex-1">{vendor.name}</h3>
           </div>
 
-          {/* Category, Secondary Categories, and Neighbors */}
-          <div className="flex items-center justify-between gap-3">
+          {/* Category, Neighbors, and Rate Button */}
+          <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex items-center gap-3 flex-1 flex-wrap">
               <Badge variant="secondary" className="text-sm px-3 py-1">
                 {getCategoryEmoji(vendor.category)} {vendor.category}
@@ -284,6 +284,28 @@ export default function VendorMobileCard({
                 <Badge variant="outline" className="text-xs text-muted-foreground">
                   Also does: {vendor.secondary_categories.join(", ")}
                 </Badge>
+              )}
+              {vendor.category === "Tutoring" && vendor.tutoring_subjects && vendor.tutoring_subjects.length > 0 && (
+                <div className="w-full flex flex-wrap gap-1 mt-2">
+                  {vendor.tutoring_subjects.map((subject) => (
+                    <Badge key={subject} variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                      {subject}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              {vendor.category === "Tutoring" && vendor.grade_levels && vendor.grade_levels.length > 0 && (
+                <div className="w-full flex flex-wrap gap-1">
+                  {vendor.grade_levels.map((level) => (
+                    <Badge
+                      key={level}
+                      variant="outline"
+                      className="text-xs bg-purple-50 text-purple-700 border-purple-200"
+                    >
+                      {level}
+                    </Badge>
+                  ))}
+                </div>
               )}
               {vendor.homes_serviced > 0 && (
                 <button
@@ -378,47 +400,9 @@ export default function VendorMobileCard({
             </Button>
           </div>
 
-          {/* Tutoring Subjects & Grade Levels - Separate prominent section */}
-          {vendor.category === "Tutoring" && (vendor.tutoring_subjects?.length || vendor.grade_levels?.length) && (
-            <div className="space-y-2 bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg border border-blue-100">
-              {vendor.tutoring_subjects && vendor.tutoring_subjects.length > 0 && (
-                <div>
-                  <div className="text-xs font-semibold text-gray-600 mb-1.5">📚 Subjects</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {vendor.tutoring_subjects.map((subject) => (
-                      <Badge
-                        key={subject}
-                        variant="outline"
-                        className="text-xs bg-white border-blue-300 text-blue-700 font-medium"
-                      >
-                        {subject}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {vendor.grade_levels && vendor.grade_levels.length > 0 && (
-                <div>
-                  <div className="text-xs font-semibold text-gray-600 mb-1.5">🎓 Grade Levels</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {vendor.grade_levels.map((level) => (
-                      <Badge
-                        key={level}
-                        variant="outline"
-                        className="text-xs bg-white border-purple-300 text-purple-700 font-medium"
-                      >
-                        {level}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Status Badges */}
           {(vendor.homes_serviced === 0 || userHomeVendors?.has(vendor.id)) && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-4">
               {vendor.homes_serviced === 0 && (
                 <Badge variant="secondary" className="bg-orange-100 text-orange-800">
                   🆕 New Provider
