@@ -77,6 +77,8 @@ export type CommunityVendorRow = {
   market_amount: number | null;
   market_unit: string | null;
   secondary_categories?: string[] | null;
+  tutoring_subjects?: string[] | null;
+  grade_levels?: string[] | null;
 };
 
 const getSorts = (communityName: string) => [

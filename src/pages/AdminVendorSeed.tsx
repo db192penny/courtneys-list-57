@@ -11,6 +11,59 @@ import { useNavigate } from "react-router-dom";
 import { useCanSeedVendors } from "@/hooks/useCanSeedVendors";
 import VendorNameInput, { type VendorSelectedPayload } from "@/components/VendorNameInput";
 import { ArrowLeft } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+
+// Tutoring subject options organized by category
+const TUTORING_SUBJECTS = [
+  // Math
+  'Math (Elementary K-5)',
+  'Math (Middle School 6-8)',
+  'Math (High School 9-12)',
+  'Math (College/Advanced)',
+  
+  // Science
+  'Science (Elementary)',
+  'Science (Middle School)',
+  'Biology',
+  'Chemistry',
+  'Physics',
+  
+  // English
+  'English/Language Arts',
+  'Reading Comprehension',
+  'Writing & Composition',
+  'Grammar & Vocabulary',
+  
+  // Languages
+  'Spanish',
+  'French',
+  'Mandarin Chinese',
+  'Other Languages',
+  
+  // Test Prep
+  'SAT Prep',
+  'ACT Prep',
+  'AP Exams',
+  'PSAT/Pre-ACT',
+  
+  // Specialized
+  'Special Needs/IEP Support',
+  'ADHD/Executive Function',
+  'ESL/English as Second Language',
+  'Study Skills & Organization',
+  'Homework Help (All Subjects)',
+  
+  // Other
+  'History/Social Studies',
+  'Computer Science/Coding',
+];
+
+const GRADE_LEVELS = [
+  'Elementary (K-5)',
+  'Middle School (6-8)',
+  'High School (9-12)',
+  'College/Adult',
+];
 
 const AdminVendorSeed = () => {
   const { toast } = useToast();
@@ -27,6 +80,8 @@ const AdminVendorSeed = () => {
   const [adminCommunity, setAdminCommunity] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [availableCommunities, setAvailableCommunities] = useState<string[]>([]);
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [selectedGradeLevels, setSelectedGradeLevels] = useState<string[]>([]);
   
   const { data: canSeed, isLoading: adminLoading } = useCanSeedVendors();
   
@@ -89,6 +144,12 @@ const AdminVendorSeed = () => {
     fetchCommunities();
   }, []);
 
+  // Reset tutoring selections when category changes
+  useEffect(() => {
+    setSelectedSubjects([]);
+    setSelectedGradeLevels([]);
+  }, [category]);
+
   const handleVendorSelected = async (payload: VendorSelectedPayload) => {
     setName(payload.name);
     setGooglePlaceId(payload.place_id);
@@ -127,6 +188,16 @@ const AdminVendorSeed = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting) return;
+
+    // Tutoring validation
+    if (category === 'Tutoring' && (selectedSubjects.length === 0 || selectedGradeLevels.length === 0)) {
+      toast({
+        title: "Tutoring information required",
+        description: "Please select at least one subject and one grade level for tutoring vendors.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     // Validation
     if (!category) {
@@ -204,6 +275,11 @@ const AdminVendorSeed = () => {
       created_by: userId,
       community: community.trim(),
       google_place_id: googlePlaceId || null,
+      // Add tutoring fields if category is Tutoring
+      ...(category === 'Tutoring' && {
+        tutoring_subjects: selectedSubjects,
+        grade_levels: selectedGradeLevels
+      })
     };
 
     // If we have Google place data, fetch and store Google ratings
@@ -254,6 +330,8 @@ const AdminVendorSeed = () => {
     setContact("");
     setGooglePlaceId("");
     setIsManualEntry(false);
+    setSelectedSubjects([]);
+    setSelectedGradeLevels([]);
     setCommunity(adminCommunity || "Boca Bridges");
     setSubmitting(false);
   };
@@ -356,6 +434,220 @@ const AdminVendorSeed = () => {
                 <p className="text-xs text-green-600">✓ Verified business from Google</p>
               )}
             </div>
+
+            {/* Tutoring Subject and Grade Level Selection */}
+            {category === 'Tutoring' && (
+              <div className="space-y-4 p-4 border rounded-lg bg-blue-50/50">
+                {/* Subjects */}
+                <div>
+                  <Label className="text-base font-semibold">Subjects Offered <span className="text-red-500">*</span></Label>
+                  <p className="text-sm text-muted-foreground mb-3">Select all that apply</p>
+                  
+                  <div className="space-y-4">
+                    {/* Mathematics */}
+                    <div>
+                      <p className="font-medium text-sm mb-2">Mathematics</p>
+                      <div className="space-y-2 ml-2">
+                        {['Math (Elementary K-5)', 'Math (Middle School 6-8)', 'Math (High School 9-12)', 'Math (College/Advanced)'].map((subject) => (
+                          <div key={subject} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`subject-${subject}`}
+                              checked={selectedSubjects.includes(subject)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedSubjects([...selectedSubjects, subject]);
+                                } else {
+                                  setSelectedSubjects(selectedSubjects.filter(s => s !== subject));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`subject-${subject}`} className="text-sm font-normal cursor-pointer">
+                              {subject}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Science */}
+                    <div>
+                      <p className="font-medium text-sm mb-2">Science</p>
+                      <div className="space-y-2 ml-2">
+                        {['Science (Elementary)', 'Science (Middle School)', 'Biology', 'Chemistry', 'Physics'].map((subject) => (
+                          <div key={subject} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`subject-${subject}`}
+                              checked={selectedSubjects.includes(subject)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedSubjects([...selectedSubjects, subject]);
+                                } else {
+                                  setSelectedSubjects(selectedSubjects.filter(s => s !== subject));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`subject-${subject}`} className="text-sm font-normal cursor-pointer">
+                              {subject}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* English/Language Arts */}
+                    <div>
+                      <p className="font-medium text-sm mb-2">English/Language Arts</p>
+                      <div className="space-y-2 ml-2">
+                        {['English/Language Arts', 'Reading Comprehension', 'Writing & Composition', 'Grammar & Vocabulary'].map((subject) => (
+                          <div key={subject} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`subject-${subject}`}
+                              checked={selectedSubjects.includes(subject)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedSubjects([...selectedSubjects, subject]);
+                                } else {
+                                  setSelectedSubjects(selectedSubjects.filter(s => s !== subject));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`subject-${subject}`} className="text-sm font-normal cursor-pointer">
+                              {subject}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Languages */}
+                    <div>
+                      <p className="font-medium text-sm mb-2">Languages</p>
+                      <div className="space-y-2 ml-2">
+                        {['Spanish', 'French', 'Mandarin Chinese', 'Other Languages'].map((subject) => (
+                          <div key={subject} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`subject-${subject}`}
+                              checked={selectedSubjects.includes(subject)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedSubjects([...selectedSubjects, subject]);
+                                } else {
+                                  setSelectedSubjects(selectedSubjects.filter(s => s !== subject));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`subject-${subject}`} className="text-sm font-normal cursor-pointer">
+                              {subject}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Test Preparation */}
+                    <div>
+                      <p className="font-medium text-sm mb-2">Test Preparation</p>
+                      <div className="space-y-2 ml-2">
+                        {['SAT Prep', 'ACT Prep', 'AP Exams', 'PSAT/Pre-ACT'].map((subject) => (
+                          <div key={subject} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`subject-${subject}`}
+                              checked={selectedSubjects.includes(subject)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedSubjects([...selectedSubjects, subject]);
+                                } else {
+                                  setSelectedSubjects(selectedSubjects.filter(s => s !== subject));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`subject-${subject}`} className="text-sm font-normal cursor-pointer">
+                              {subject}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Specialized Support */}
+                    <div>
+                      <p className="font-medium text-sm mb-2">Specialized Support</p>
+                      <div className="space-y-2 ml-2">
+                        {['Special Needs/IEP Support', 'ADHD/Executive Function', 'ESL/English as Second Language', 'Study Skills & Organization', 'Homework Help (All Subjects)'].map((subject) => (
+                          <div key={subject} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`subject-${subject}`}
+                              checked={selectedSubjects.includes(subject)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedSubjects([...selectedSubjects, subject]);
+                                } else {
+                                  setSelectedSubjects(selectedSubjects.filter(s => s !== subject));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`subject-${subject}`} className="text-sm font-normal cursor-pointer">
+                              {subject}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Other Subjects */}
+                    <div>
+                      <p className="font-medium text-sm mb-2">Other Subjects</p>
+                      <div className="space-y-2 ml-2">
+                        {['History/Social Studies', 'Computer Science/Coding'].map((subject) => (
+                          <div key={subject} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`subject-${subject}`}
+                              checked={selectedSubjects.includes(subject)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedSubjects([...selectedSubjects, subject]);
+                                } else {
+                                  setSelectedSubjects(selectedSubjects.filter(s => s !== subject));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`subject-${subject}`} className="text-sm font-normal cursor-pointer">
+                              {subject}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Grade Levels */}
+                <div>
+                  <Label className="text-base font-semibold">Grade Levels <span className="text-red-500">*</span></Label>
+                  <p className="text-sm text-muted-foreground mb-3">Select all that apply</p>
+                  <div className="space-y-2">
+                    {GRADE_LEVELS.map((level) => (
+                      <div key={level} className="flex items-center gap-2">
+                        <Checkbox
+                          id={`grade-${level}`}
+                          checked={selectedGradeLevels.includes(level)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedGradeLevels([...selectedGradeLevels, level]);
+                            } else {
+                              setSelectedGradeLevels(selectedGradeLevels.filter(g => g !== level));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`grade-${level}`} className="text-sm font-normal cursor-pointer">
+                          {level}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="grid gap-2">
               <Label htmlFor="contact">Provider Contact Info</Label>

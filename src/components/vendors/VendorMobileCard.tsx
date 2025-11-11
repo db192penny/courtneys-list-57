@@ -285,6 +285,24 @@ export default function VendorMobileCard({
                 Also does: {vendor.secondary_categories.join(', ')}
               </Badge>
             )}
+            {vendor.category === 'Tutoring' && vendor.tutoring_subjects && vendor.tutoring_subjects.length > 0 && (
+              <div className="w-full flex flex-wrap gap-1 mt-2">
+                {vendor.tutoring_subjects.map((subject) => (
+                  <Badge key={subject} variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                    {subject}
+                  </Badge>
+                ))}
+              </div>
+            )}
+            {vendor.category === 'Tutoring' && vendor.grade_levels && vendor.grade_levels.length > 0 && (
+              <div className="w-full flex flex-wrap gap-1">
+                {vendor.grade_levels.map((level) => (
+                  <Badge key={level} variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                    {level}
+                  </Badge>
+                ))}
+              </div>
+            )}
             {vendor.homes_serviced > 0 && (
               <button
                 onClick={(e) => {
