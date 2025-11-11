@@ -315,14 +315,6 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "one_time", amount: null, unit: "item", notes: "Per garment altered" },
     ];
   }
-
-  // Dog Walking: Per walk or hourly
-  if (c === "dog walking") {
-    return [
-      { cost_kind: "one_time", amount: null, unit: "walk", notes: "Per walk" },
-      { cost_kind: "hourly", amount: null, unit: "hour", notes: "Hourly rate" },
-    ];
-  }
   
   // General Contractor: No structured fields
   if (c === "general contractor") {

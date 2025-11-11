@@ -53,7 +53,6 @@ export const CATEGORIES = [
   "Flooring",
   "Locksmith",
   "Tailoring & Alterations",
-  "Dog Walking",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];

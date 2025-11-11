@@ -49,7 +49,6 @@ const SubmitVendor = () => {
   const [showCostConfirm, setShowCostConfirm] = useState(false);
   const [showCostModal, setShowCostModal] = useState(false);
   const [submittedVendorId, setSubmittedVendorId] = useState<string | null>(null);
-  const [ageVerified, setAgeVerified] = useState(false);
   const isMobile = useIsMobile();
   const { data: isAdmin } = useIsAdmin();
   const { data: canSeed } = useCanSeedVendors(communityParam);
@@ -82,11 +81,6 @@ const SubmitVendor = () => {
       setCategory(urlCategory);
     }
   }, [searchParams, category, vendorId]);
-
-  // Reset age verification when category changes
-  useEffect(() => {
-    setAgeVerified(false);
-  }, [category]);
 
   useEffect(() => {
     console.log("[SubmitVendor] mounted");
@@ -204,15 +198,6 @@ const SubmitVendor = () => {
       }
       if (!contact.trim()) {
         toast({ title: "Contact info required", description: "Please enter phone or email.", variant: "destructive" });
-        return;
-      }
-      // Age verification for categories that commonly involve minors
-      if (category === "Dog Walking" && !ageVerified) {
-        toast({ 
-          title: "Age verification required", 
-          description: "Please confirm the contact person is 18 years of age or older.", 
-          variant: "destructive" 
-        });
         return;
       }
     }
@@ -532,18 +517,7 @@ const SubmitVendor = () => {
           category: category,
           has_google_place_id: !!googlePlaceId,
           community: communityParam,
-          age_verified: category === "Dog Walking" ? ageVerified : undefined,
         });
-        
-        // Track age verification if applicable
-        if (category === "Dog Walking" && ageVerified) {
-          window.mixpanel.track('Vendor Age Verification Accepted', {
-            submitter_name: userData?.name || 'Unknown',
-            vendor_name: name.trim(),
-            category: category,
-            community: communityParam,
-          });
-        }
         
         // Track vendors added by user
         window.mixpanel.people.increment('vendors_added', 1);
@@ -617,28 +591,6 @@ const SubmitVendor = () => {
               <Label htmlFor="contact">Provider Contact Info</Label>
               <Input id="contact" placeholder="phone or email" value={contact} onChange={(e) => setContact(e.currentTarget.value)} disabled={!!(vendorId && !canEditCore)} />
             </div>
-
-            {/* Age verification for categories involving minors */}
-            {category === "Dog Walking" && !vendorId && (
-              <div className="grid gap-2 p-4 border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-                <div className="flex items-start space-x-3">
-                  <Checkbox 
-                    id="age-verification"
-                    checked={ageVerified} 
-                    onCheckedChange={(v) => setAgeVerified(!!v)}
-                    className="mt-1"
-                  />
-                  <div className="space-y-1">
-                    <label htmlFor="age-verification" className="text-sm font-medium cursor-pointer">
-                      I confirm that the contact person listed above is 18 years of age or older <span className="text-red-500">*</span>
-                    </label>
-                    <p className="text-xs text-muted-foreground">
-                      We do not publish contact information for minors under 18
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {(!isAdminUser || vendorId) && (
               <div className="grid gap-2">
