@@ -477,7 +477,7 @@ export default function AdminVendorMatching() {
                         <div className="flex items-center gap-2 mb-2">
                           <span className="font-medium">Suggested: {match.suggested_vendor_name}</span>
                           <Badge variant={getConfidenceBadgeVariant(match.confidence_score)}>
-                            {match.confidence_score}% confidence
+                            {Math.round(match.confidence_score * 100)}% confidence
                           </Badge>
                         </div>
                         <div className="text-sm text-muted-foreground">{match.suggested_vendor_phone}</div>
@@ -518,25 +518,31 @@ export default function AdminVendorMatching() {
         <TabsContent value="unmatched" className="space-y-4">
           {loading ? (
             <Skeleton className="h-40 w-full" />
-          ) : unmatchedVendors.length > 0 ? (
-            unmatchedVendors.map((vendor, idx) => (
-              <UnmatchedVendorCard
-                key={idx}
-                vendor={vendor}
-                community={community}
-                availableCommunities={availableCommunities}
-                onCreateVendor={handleCreateVendor}
-                onSearchVendors={handleSearchVendors}
-                processingId={processingId}
-              />
-            ))
-          ) : (
-            <Card>
-              <CardContent className="pt-6 text-center text-muted-foreground">
-                No unmatched vendors
-              </CardContent>
-            </Card>
-          )}
+          ) : (() => {
+            // Filter out vendors that already have fuzzy matches
+            const fuzzyVendorNames = new Set(fuzzyMatches.map(m => m.survey_vendor_name));
+            const trueUnmatched = unmatchedVendors.filter(v => !fuzzyVendorNames.has(v.vendor_name));
+            
+            return trueUnmatched.length > 0 ? (
+              trueUnmatched.map((vendor, idx) => (
+                <UnmatchedVendorCard
+                  key={idx}
+                  vendor={vendor}
+                  community={community}
+                  availableCommunities={availableCommunities}
+                  onCreateVendor={handleCreateVendor}
+                  onSearchVendors={handleSearchVendors}
+                  processingId={processingId}
+                />
+              ))
+            ) : (
+              <Card>
+                <CardContent className="pt-6 text-center text-muted-foreground">
+                  No unmatched vendors
+                </CardContent>
+              </Card>
+            );
+          })()}
         </TabsContent>
       </Tabs>
 
