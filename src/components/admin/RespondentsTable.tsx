@@ -69,14 +69,18 @@ export function RespondentsTable() {
   };
 
   const handleCopyLink = (token: string, name: string, community: string) => {
-    const communityToSlug: Record<string, string> = {
-      'Boca Bridges': 'boca-bridges',
-      'The Bridges': 'the-bridges',
-      'The Oaks': 'the-oaks',
-      'Woodfield Country Club': 'woodfield-country-club',
+    const getCommunitySlug = (communityName: string) => {
+      switch(communityName) {
+        case 'The Oaks': return 'oaks';
+        case 'The Bridges': return 'bridges';
+        case 'Woodfield Country Club': return 'woodfield';
+        case 'Boca Bridges': return 'boca-bridges';
+        default: return communityName.toLowerCase().replace(/\s+/g, '-');
+      }
     };
-    const slug = communityToSlug[community] || 'boca-bridges';
-    const link = `https://courtneys-list.com/communities/${slug}/rate-vendors?token=${token}`;
+
+    const communitySlug = getCommunitySlug(community);
+    const link = `https://courtneys-list.com/${communitySlug}/rate-vendors?token=${token}`;
     navigator.clipboard.writeText(link);
     toast({ title: "Link copied!", description: `Link for ${name}` });
   };
