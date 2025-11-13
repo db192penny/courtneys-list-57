@@ -55,6 +55,7 @@ export const CATEGORIES = [
   "Dog Walking",
   "Tutoring",
   "Hair & Beauty (At Home)",
+  "Fence Installation & Repair",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
