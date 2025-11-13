@@ -330,6 +330,15 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
       { cost_kind: "monthly_plan", amount: null, period: "monthly", unit: "month", quantity: null, notes: null },
     ];
   }
+
+  // Fence Installation & Repair: Installation per linear foot + gate installation + repairs
+  if (c === "fence installation & repair") {
+    return [
+      { cost_kind: "installation", amount: null, unit: "linear ft", notes: null },
+      { cost_kind: "installation", amount: null, unit: "gate", notes: null },
+      { cost_kind: "service_call", amount: null, unit: "visit", notes: null },
+    ];
+  }
   
   // General Contractor: No structured fields
   if (c === "general contractor") {

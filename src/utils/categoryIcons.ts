@@ -45,6 +45,7 @@ import {
   Scissors,
   Dog,
   GraduationCap,
+  Fence,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -106,6 +107,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Dog Walking": Dog,
   "Tutoring": GraduationCap,
   "Hair & Beauty (At Home)": Sparkles,
+  "Fence Installation & Repair": Fence,
 };
 
 export function getCategoryIcon(category: Category): LucideIcon {
