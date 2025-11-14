@@ -158,7 +158,7 @@ export function VendorRatingCard({
           className="mt-0.5"
         />
         <Label htmlFor="use-for-home" className="text-base cursor-pointer select-none font-normal">
-          I currently use this vendor for my home
+          I currently use this provider
         </Label>
       </div>
 
@@ -170,7 +170,7 @@ export function VendorRatingCard({
           className="mt-0.5"
         />
         <Label htmlFor="show-name" className="text-base cursor-pointer select-none font-normal">
-          Show my name in review
+          Display my name with this review
         </Label>
       </div>
 
