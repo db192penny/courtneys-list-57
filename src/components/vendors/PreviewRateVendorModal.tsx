@@ -221,7 +221,7 @@ export default function PreviewRateVendorModal({ open, onOpenChange, vendor, onS
                 htmlFor="useForHome"
                 className="text-sm font-normal cursor-pointer"
               >
-                Do you currently use this vendor for your home?
+                I currently use this provider
               </Label>
             </div>
             
@@ -235,7 +235,7 @@ export default function PreviewRateVendorModal({ open, onOpenChange, vendor, onS
                 htmlFor="showName"
                 className="text-sm font-normal cursor-pointer"
               >
-                Show my name in this review
+                Display my name with this review
               </Label>
             </div>
           </div>

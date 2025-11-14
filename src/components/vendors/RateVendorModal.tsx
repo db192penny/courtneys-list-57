@@ -460,11 +460,11 @@ export default function RateVendorModal({ open, onOpenChange, vendor, onSuccess,
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Checkbox checked={useForHome} onCheckedChange={(v) => setUseForHome(!!v)} />
-                <label className="text-sm font-medium">Do you currently use this vendor for your home?</label>
+                <label className="text-sm font-medium">I currently use this provider</label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox checked={showNameInReview} onCheckedChange={(v) => setShowNameInReview(!!v)} />
-                <label className="text-sm font-medium">Show My Name in Review</label>
+                <label className="text-sm font-medium">Display my name with this review</label>
               </div>
               <ReviewPreview 
                 rating={rating}

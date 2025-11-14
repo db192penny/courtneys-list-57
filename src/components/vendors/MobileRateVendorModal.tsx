@@ -417,7 +417,7 @@ export default function MobileRateVendorModal({ open, onOpenChange, vendor, onSu
                           className="mt-0.5" 
                         />
                         <label className="text-sm font-medium leading-relaxed">
-                          Do you currently use this vendor for your home?
+                          I currently use this provider
                         </label>
                       </div>
                       
@@ -428,7 +428,7 @@ export default function MobileRateVendorModal({ open, onOpenChange, vendor, onSu
                           className="mt-0.5"
                         />
                         <label className="text-sm font-medium leading-relaxed">
-                          Show My Name in Review
+                          Display my name with this review
                         </label>
                       </div>
                       
