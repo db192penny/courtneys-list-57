@@ -2567,6 +2567,10 @@ export type Database = {
           vendor_name: string
         }[]
       }
+      copy_vendor_to_community: {
+        Args: { p_source_vendor_id: string; p_target_community: string }
+        Returns: string
+      }
       count_my_costs: { Args: never; Returns: number }
       create_vendor_from_survey: {
         Args: {
