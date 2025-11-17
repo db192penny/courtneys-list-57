@@ -57,6 +57,7 @@ interface UnmatchedVendor {
   vendor_phone: string | null;
   mention_count: number;
   all_rating_ids: string[];
+  respondent_community: string;
 }
 
 export default function AdminVendorMatching() {
@@ -176,7 +177,36 @@ export default function AdminVendorMatching() {
     });
     if (error) throw error;
     console.log('[Unmatched] Received data:', data);
-    setUnmatchedVendors((data as UnmatchedVendor[]) || []);
+    
+    // Enrich with respondent community from preview_sessions
+    const enrichedData = await Promise.all(
+      (data || []).map(async (vendor: any) => {
+        // Get the first rating ID to look up the session
+        if (vendor.all_rating_ids && vendor.all_rating_ids.length > 0) {
+          const { data: rating } = await supabase
+            .from('survey_ratings')
+            .select('session_id')
+            .eq('id', vendor.all_rating_ids[0])
+            .single();
+          
+          if (rating) {
+            const { data: session } = await supabase
+              .from('preview_sessions')
+              .select('community')
+              .eq('id', rating.session_id)
+              .single();
+            
+            return {
+              ...vendor,
+              respondent_community: session?.community || community
+            };
+          }
+        }
+        return { ...vendor, respondent_community: community };
+      })
+    );
+    
+    setUnmatchedVendors(enrichedData as UnmatchedVendor[]);
   };
 
   const handleApproveMatch = async (ratingIds: string[], vendorId: string, vendorName: string) => {
@@ -634,7 +664,7 @@ function UnmatchedVendorCard({
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [vendorName, setVendorName] = useState(vendor.vendor_name);
   const [vendorPhone, setVendorPhone] = useState(vendor.vendor_phone || "");
-  const [vendorCommunity, setVendorCommunity] = useState(community);
+  const [vendorCommunity, setVendorCommunity] = useState(vendor.respondent_community);
   const [googlePlaceId, setGooglePlaceId] = useState<string | undefined>();
 
   const handleGoogleSelect = (payload: any) => {
@@ -710,7 +740,7 @@ function UnmatchedVendorCard({
 
             <div className="space-y-2">
               <Label>Community</Label>
-              <Select value={vendorCommunity} onValueChange={setVendorCommunity}>
+              <Select value={vendorCommunity} onValueChange={setVendorCommunity} disabled={true}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -722,6 +752,9 @@ function UnmatchedVendorCard({
                   ))}
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                ✓ Using community from survey respondent
+              </p>
             </div>
 
             <div className="flex gap-2">
