@@ -70,6 +70,10 @@ export default function AdminVendorMatching() {
   const [fuzzyMatches, setFuzzyMatches] = useState<FuzzyMatch[]>([]);
   const [unmatchedVendors, setUnmatchedVendors] = useState<UnmatchedVendor[]>([]);
   const [showApproveAllDialog, setShowApproveAllDialog] = useState(false);
+  
+  // Filter out vendors that already have fuzzy matches to get true unmatched count
+  const fuzzyVendorNames = new Set(fuzzyMatches.map(m => m.survey_vendor_name));
+  const trueUnmatched = unmatchedVendors.filter(v => !fuzzyVendorNames.has(v.vendor_name));
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [currentSearchCategory, setCurrentSearchCategory] = useState<string>("");
   const [currentRatingIds, setCurrentRatingIds] = useState<string[]>([]);
@@ -417,8 +421,8 @@ export default function AdminVendorMatching() {
           </TabsTrigger>
           <TabsTrigger value="unmatched">
             Unmatched
-            {unmatchedVendors.length > 0 && (
-              <Badge variant="outline" className="ml-2">{unmatchedVendors.length}</Badge>
+            {trueUnmatched.length > 0 && (
+              <Badge variant="outline" className="ml-2">{trueUnmatched.length}</Badge>
             )}
           </TabsTrigger>
         </TabsList>
@@ -539,12 +543,7 @@ export default function AdminVendorMatching() {
         <TabsContent value="unmatched" className="space-y-4">
           {loading ? (
             <Skeleton className="h-40 w-full" />
-          ) : (() => {
-            // Filter out vendors that already have fuzzy matches
-            const fuzzyVendorNames = new Set(fuzzyMatches.map(m => m.survey_vendor_name));
-            const trueUnmatched = unmatchedVendors.filter(v => !fuzzyVendorNames.has(v.vendor_name));
-            
-            return trueUnmatched.length > 0 ? (
+          ) : trueUnmatched.length > 0 ? (
               trueUnmatched.map((vendor, idx) => (
                 <UnmatchedVendorCard
                   key={idx}
@@ -559,11 +558,10 @@ export default function AdminVendorMatching() {
             ) : (
               <Card>
                 <CardContent className="pt-6 text-center text-muted-foreground">
-                  No unmatched vendors
+                  All vendors have been matched! 🎉
                 </CardContent>
               </Card>
-            );
-          })()}
+            )}
         </TabsContent>
       </Tabs>
 
