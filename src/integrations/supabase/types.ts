@@ -1,2398 +1,3172 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4";
-  };
+    PostgrestVersion: "13.0.4"
+  }
   public: {
     Tables: {
       address_change_log: {
         Row: {
-          created_at: string | null;
-          id: string;
-          metadata: Json | null;
-          new_address: string | null;
-          new_street_name: string | null;
-          old_address: string | null;
-          old_street_name: string | null;
-          source: string | null;
-          user_id: string | null;
-        };
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          new_address: string | null
+          new_street_name: string | null
+          old_address: string | null
+          old_street_name: string | null
+          source: string | null
+          user_id: string | null
+        }
         Insert: {
-          created_at?: string | null;
-          id?: string;
-          metadata?: Json | null;
-          new_address?: string | null;
-          new_street_name?: string | null;
-          old_address?: string | null;
-          old_street_name?: string | null;
-          source?: string | null;
-          user_id?: string | null;
-        };
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          new_address?: string | null
+          new_street_name?: string | null
+          old_address?: string | null
+          old_street_name?: string | null
+          source?: string | null
+          user_id?: string | null
+        }
         Update: {
-          created_at?: string | null;
-          id?: string;
-          metadata?: Json | null;
-          new_address?: string | null;
-          new_street_name?: string | null;
-          old_address?: string | null;
-          old_street_name?: string | null;
-          source?: string | null;
-          user_id?: string | null;
-        };
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          new_address?: string | null
+          new_street_name?: string | null
+          old_address?: string | null
+          old_street_name?: string | null
+          source?: string | null
+          user_id?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "address_change_log_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            foreignKeyName: "address_change_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       address_change_requests: {
         Row: {
-          admin_notes: string | null;
-          approved_at: string | null;
-          approved_by: string | null;
-          created_at: string;
-          current_address: string;
-          current_normalized_address: string;
-          id: string;
-          metadata: Json | null;
-          reason: string | null;
-          rejection_reason: string | null;
-          requested_address: string;
-          requested_formatted_address: string | null;
-          requested_normalized_address: string;
-          requested_place_id: string | null;
-          status: string;
-          updated_at: string;
-          user_id: string;
-        };
+          admin_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          current_address: string
+          current_normalized_address: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          rejection_reason: string | null
+          requested_address: string
+          requested_formatted_address: string | null
+          requested_normalized_address: string
+          requested_place_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
         Insert: {
-          admin_notes?: string | null;
-          approved_at?: string | null;
-          approved_by?: string | null;
-          created_at?: string;
-          current_address: string;
-          current_normalized_address: string;
-          id?: string;
-          metadata?: Json | null;
-          reason?: string | null;
-          rejection_reason?: string | null;
-          requested_address: string;
-          requested_formatted_address?: string | null;
-          requested_normalized_address: string;
-          requested_place_id?: string | null;
-          status?: string;
-          updated_at?: string;
-          user_id: string;
-        };
+          admin_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          current_address: string
+          current_normalized_address: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          rejection_reason?: string | null
+          requested_address: string
+          requested_formatted_address?: string | null
+          requested_normalized_address: string
+          requested_place_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
         Update: {
-          admin_notes?: string | null;
-          approved_at?: string | null;
-          approved_by?: string | null;
-          created_at?: string;
-          current_address?: string;
-          current_normalized_address?: string;
-          id?: string;
-          metadata?: Json | null;
-          reason?: string | null;
-          rejection_reason?: string | null;
-          requested_address?: string;
-          requested_formatted_address?: string | null;
-          requested_normalized_address?: string;
-          requested_place_id?: string | null;
-          status?: string;
-          updated_at?: string;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
+          admin_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          current_address?: string
+          current_normalized_address?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          rejection_reason?: string | null
+          requested_address?: string
+          requested_formatted_address?: string | null
+          requested_normalized_address?: string
+          requested_place_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       address_mismatch_log: {
         Row: {
-          created_at: string;
-          id: string;
-          normalized_address: string;
-          original_address: string;
-          resolved_at: string | null;
-          resolved_by: string | null;
-          status: string | null;
-          suggested_hoa: string | null;
-          user_id: string | null;
-        };
+          created_at: string
+          id: string
+          normalized_address: string
+          original_address: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+          suggested_hoa: string | null
+          user_id: string | null
+        }
         Insert: {
-          created_at?: string;
-          id?: string;
-          normalized_address: string;
-          original_address: string;
-          resolved_at?: string | null;
-          resolved_by?: string | null;
-          status?: string | null;
-          suggested_hoa?: string | null;
-          user_id?: string | null;
-        };
+          created_at?: string
+          id?: string
+          normalized_address: string
+          original_address: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          suggested_hoa?: string | null
+          user_id?: string | null
+        }
         Update: {
-          created_at?: string;
-          id?: string;
-          normalized_address?: string;
-          original_address?: string;
-          resolved_at?: string | null;
-          resolved_by?: string | null;
-          status?: string | null;
-          suggested_hoa?: string | null;
-          user_id?: string | null;
-        };
-        Relationships: [];
-      };
+          created_at?: string
+          id?: string
+          normalized_address?: string
+          original_address?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          suggested_hoa?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
-          action: string;
-          actor_id: string;
-          created_at: string;
-          id: string;
-          metadata: Json | null;
-          target_id: string | null;
-        };
+          action: string
+          actor_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          target_id: string | null
+        }
         Insert: {
-          action: string;
-          actor_id: string;
-          created_at?: string;
-          id?: string;
-          metadata?: Json | null;
-          target_id?: string | null;
-        };
+          action: string
+          actor_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+        }
         Update: {
-          action?: string;
-          actor_id?: string;
-          created_at?: string;
-          id?: string;
-          metadata?: Json | null;
-          target_id?: string | null;
-        };
-        Relationships: [];
-      };
+          action?: string
+          actor_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+        }
+        Relationships: []
+      }
+      admin_phones: {
+        Row: {
+          admin_name: string | null
+          community_id: string | null
+          created_at: string | null
+          id: string
+          phone_number: string
+        }
+        Insert: {
+          admin_name?: string | null
+          community_id?: string | null
+          created_at?: string | null
+          id?: string
+          phone_number: string
+        }
+        Update: {
+          admin_name?: string | null
+          community_id?: string | null
+          created_at?: string | null
+          id?: string
+          phone_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_phones_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       approved_households: {
         Row: {
-          approved_at: string;
-          approved_by: string;
-          hoa_name: string;
-          household_address: string;
-        };
+          approved_at: string
+          approved_by: string
+          hoa_name: string
+          household_address: string
+        }
         Insert: {
-          approved_at?: string;
-          approved_by: string;
-          hoa_name: string;
-          household_address: string;
-        };
+          approved_at?: string
+          approved_by: string
+          hoa_name: string
+          household_address: string
+        }
         Update: {
-          approved_at?: string;
-          approved_by?: string;
-          hoa_name?: string;
-          household_address?: string;
-        };
+          approved_at?: string
+          approved_by?: string
+          hoa_name?: string
+          household_address?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "approved_households_approved_by_fkey";
-            columns: ["approved_by"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            foreignKeyName: "approved_households_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       badge_levels: {
         Row: {
-          color: string;
-          created_at: string;
-          icon: string;
-          id: string;
-          min_points: number;
-          name: string;
-          updated_at: string;
-        };
+          color: string
+          created_at: string
+          icon: string
+          id: string
+          min_points: number
+          name: string
+          updated_at: string
+        }
         Insert: {
-          color?: string;
-          created_at?: string;
-          icon?: string;
-          id?: string;
-          min_points: number;
-          name: string;
-          updated_at?: string;
-        };
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          min_points: number
+          name: string
+          updated_at?: string
+        }
         Update: {
-          color?: string;
-          created_at?: string;
-          icon?: string;
-          id?: string;
-          min_points?: number;
-          name?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          min_points?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      category_suggestions: {
+        Row: {
+          admin_notes: string | null
+          community: string
+          created_at: string | null
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          suggested_category: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          community: string
+          created_at?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          suggested_category: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          community?: string
+          created_at?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          suggested_category?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       communities: {
         Row: {
-          created_at: string | null;
-          id: string;
-          name: string;
-        };
+          created_at: string | null
+          id: string
+          name: string
+        }
         Insert: {
-          created_at?: string | null;
-          id?: string;
-          name: string;
-        };
+          created_at?: string | null
+          id?: string
+          name: string
+        }
         Update: {
-          created_at?: string | null;
-          id?: string;
-          name?: string;
-        };
-        Relationships: [];
-      };
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       community_assets: {
         Row: {
-          address_line: string | null;
-          contact_phone: string | null;
-          hoa_name: string;
-          photo_path: string | null;
-          total_homes: number | null;
-          updated_at: string;
-          updated_by: string | null;
-        };
+          address_line: string | null
+          contact_phone: string | null
+          hoa_name: string
+          photo_path: string | null
+          total_homes: number | null
+          updated_at: string
+          updated_by: string | null
+        }
         Insert: {
-          address_line?: string | null;
-          contact_phone?: string | null;
-          hoa_name: string;
-          photo_path?: string | null;
-          total_homes?: number | null;
-          updated_at?: string;
-          updated_by?: string | null;
-        };
+          address_line?: string | null
+          contact_phone?: string | null
+          hoa_name: string
+          photo_path?: string | null
+          total_homes?: number | null
+          updated_at?: string
+          updated_by?: string | null
+        }
         Update: {
-          address_line?: string | null;
-          contact_phone?: string | null;
-          hoa_name?: string;
-          photo_path?: string | null;
-          total_homes?: number | null;
-          updated_at?: string;
-          updated_by?: string | null;
-        };
-        Relationships: [];
-      };
+          address_line?: string | null
+          contact_phone?: string | null
+          hoa_name?: string
+          photo_path?: string | null
+          total_homes?: number | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       costs: {
         Row: {
-          admin_modified: boolean | null;
-          admin_modified_at: string | null;
-          admin_modified_by: string | null;
-          amount: number | null;
-          anonymous: boolean;
-          cost_kind: string | null;
-          created_at: string;
-          created_by: string | null;
-          currency: string;
-          deleted_at: string | null;
-          deleted_by: string | null;
-          household_address: string;
-          id: string;
-          normalized_address: string;
-          notes: string | null;
-          period: string | null;
-          quantity: number | null;
-          unit: string | null;
-          updated_at: string;
-          vendor_id: string;
-        };
+          admin_modified: boolean | null
+          admin_modified_at: string | null
+          admin_modified_by: string | null
+          amount: number | null
+          anonymous: boolean
+          cost_kind: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          deleted_at: string | null
+          deleted_by: string | null
+          household_address: string
+          id: string
+          normalized_address: string
+          notes: string | null
+          period: string | null
+          quantity: number | null
+          unit: string | null
+          updated_at: string
+          vendor_id: string
+        }
         Insert: {
-          admin_modified?: boolean | null;
-          admin_modified_at?: string | null;
-          admin_modified_by?: string | null;
-          amount?: number | null;
-          anonymous?: boolean;
-          cost_kind?: string | null;
-          created_at?: string;
-          created_by?: string | null;
-          currency?: string;
-          deleted_at?: string | null;
-          deleted_by?: string | null;
-          household_address: string;
-          id?: string;
-          normalized_address: string;
-          notes?: string | null;
-          period?: string | null;
-          quantity?: number | null;
-          unit?: string | null;
-          updated_at?: string;
-          vendor_id: string;
-        };
+          admin_modified?: boolean | null
+          admin_modified_at?: string | null
+          admin_modified_by?: string | null
+          amount?: number | null
+          anonymous?: boolean
+          cost_kind?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          household_address: string
+          id?: string
+          normalized_address: string
+          notes?: string | null
+          period?: string | null
+          quantity?: number | null
+          unit?: string | null
+          updated_at?: string
+          vendor_id: string
+        }
         Update: {
-          admin_modified?: boolean | null;
-          admin_modified_at?: string | null;
-          admin_modified_by?: string | null;
-          amount?: number | null;
-          anonymous?: boolean;
-          cost_kind?: string | null;
-          created_at?: string;
-          created_by?: string | null;
-          currency?: string;
-          deleted_at?: string | null;
-          deleted_by?: string | null;
-          household_address?: string;
-          id?: string;
-          normalized_address?: string;
-          notes?: string | null;
-          period?: string | null;
-          quantity?: number | null;
-          unit?: string | null;
-          updated_at?: string;
-          vendor_id?: string;
-        };
+          admin_modified?: boolean | null
+          admin_modified_at?: string | null
+          admin_modified_by?: string | null
+          amount?: number | null
+          anonymous?: boolean
+          cost_kind?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          household_address?: string
+          id?: string
+          normalized_address?: string
+          notes?: string | null
+          period?: string | null
+          quantity?: number | null
+          unit?: string | null
+          updated_at?: string
+          vendor_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "costs_vendor_id_fkey";
-            columns: ["vendor_id"];
-            isOneToOne: false;
-            referencedRelation: "vendors";
-            referencedColumns: ["id"];
+            foreignKeyName: "costs_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       email_queue: {
         Row: {
-          created_at: string | null;
-          data: Json | null;
-          id: string;
-          sent: boolean | null;
-          template: string;
-          to_email: string;
-        };
+          created_at: string | null
+          data: Json | null
+          id: string
+          sent: boolean | null
+          template: string
+          to_email: string
+        }
         Insert: {
-          created_at?: string | null;
-          data?: Json | null;
-          id?: string;
-          sent?: boolean | null;
-          template: string;
-          to_email: string;
-        };
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          sent?: boolean | null
+          template: string
+          to_email: string
+        }
         Update: {
-          created_at?: string | null;
-          data?: Json | null;
-          id?: string;
-          sent?: boolean | null;
-          template?: string;
-          to_email?: string;
-        };
-        Relationships: [];
-      };
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          sent?: boolean | null
+          template?: string
+          to_email?: string
+        }
+        Relationships: []
+      }
       email_tracking: {
         Row: {
-          action: string | null;
-          email_type: string | null;
-          id: string;
-          recipient_email: string | null;
-          tracked_at: string | null;
-          tracking_id: string;
-        };
+          action: string | null
+          email_type: string | null
+          id: string
+          recipient_email: string | null
+          tracked_at: string | null
+          tracking_id: string
+        }
         Insert: {
-          action?: string | null;
-          email_type?: string | null;
-          id?: string;
-          recipient_email?: string | null;
-          tracked_at?: string | null;
-          tracking_id: string;
-        };
+          action?: string | null
+          email_type?: string | null
+          id?: string
+          recipient_email?: string | null
+          tracked_at?: string | null
+          tracking_id: string
+        }
         Update: {
-          action?: string | null;
-          email_type?: string | null;
-          id?: string;
-          recipient_email?: string | null;
-          tracked_at?: string | null;
-          tracking_id?: string;
-        };
-        Relationships: [];
-      };
+          action?: string | null
+          email_type?: string | null
+          id?: string
+          recipient_email?: string | null
+          tracked_at?: string | null
+          tracking_id?: string
+        }
+        Relationships: []
+      }
       hoa_admins: {
         Row: {
-          hoa_name: string;
-          user_id: string;
-        };
+          hoa_name: string
+          user_id: string
+        }
         Insert: {
-          hoa_name: string;
-          user_id: string;
-        };
+          hoa_name: string
+          user_id: string
+        }
         Update: {
-          hoa_name?: string;
-          user_id?: string;
-        };
+          hoa_name?: string
+          user_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "hoa_admins_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            foreignKeyName: "hoa_admins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       home_vendors: {
         Row: {
-          amount: number | null;
-          contact_override: string | null;
-          created_at: string;
-          currency: string;
-          id: string;
-          my_comments: string | null;
-          my_rating: number | null;
-          period: string;
-          share_review_public: boolean;
-          updated_at: string;
-          user_id: string;
-          vendor_id: string;
-        };
+          amount: number | null
+          contact_override: string | null
+          created_at: string
+          currency: string
+          id: string
+          my_comments: string | null
+          my_rating: number | null
+          period: string
+          share_review_public: boolean
+          updated_at: string
+          user_id: string
+          vendor_id: string
+        }
         Insert: {
-          amount?: number | null;
-          contact_override?: string | null;
-          created_at?: string;
-          currency?: string;
-          id?: string;
-          my_comments?: string | null;
-          my_rating?: number | null;
-          period?: string;
-          share_review_public?: boolean;
-          updated_at?: string;
-          user_id: string;
-          vendor_id: string;
-        };
+          amount?: number | null
+          contact_override?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          my_comments?: string | null
+          my_rating?: number | null
+          period?: string
+          share_review_public?: boolean
+          updated_at?: string
+          user_id: string
+          vendor_id: string
+        }
         Update: {
-          amount?: number | null;
-          contact_override?: string | null;
-          created_at?: string;
-          currency?: string;
-          id?: string;
-          my_comments?: string | null;
-          my_rating?: number | null;
-          period?: string;
-          share_review_public?: boolean;
-          updated_at?: string;
-          user_id?: string;
-          vendor_id?: string;
-        };
-        Relationships: [];
-      };
+          amount?: number | null
+          contact_override?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          my_comments?: string | null
+          my_rating?: number | null
+          period?: string
+          share_review_public?: boolean
+          updated_at?: string
+          user_id?: string
+          vendor_id?: string
+        }
+        Relationships: []
+      }
       household_hoa: {
         Row: {
-          created_at: string;
-          created_by: string | null;
-          hoa_name: string;
-          household_address: string;
-          id: string;
-          mapping_source: string | null;
-          normalized_address: string;
-          updated_at: string;
-        };
+          created_at: string
+          created_by: string | null
+          hoa_name: string
+          household_address: string
+          id: string
+          mapping_source: string | null
+          normalized_address: string
+          updated_at: string
+        }
         Insert: {
-          created_at?: string;
-          created_by?: string | null;
-          hoa_name: string;
-          household_address: string;
-          id?: string;
-          mapping_source?: string | null;
-          normalized_address: string;
-          updated_at?: string;
-        };
+          created_at?: string
+          created_by?: string | null
+          hoa_name: string
+          household_address: string
+          id?: string
+          mapping_source?: string | null
+          normalized_address: string
+          updated_at?: string
+        }
         Update: {
-          created_at?: string;
-          created_by?: string | null;
-          hoa_name?: string;
-          household_address?: string;
-          id?: string;
-          mapping_source?: string | null;
-          normalized_address?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
+          created_at?: string
+          created_by?: string | null
+          hoa_name?: string
+          household_address?: string
+          id?: string
+          mapping_source?: string | null
+          normalized_address?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       point_rewards: {
         Row: {
-          activity: string;
-          created_at: string;
-          description: string | null;
-          id: string;
-          points: number;
-          updated_at: string;
-        };
+          activity: string
+          created_at: string
+          description: string | null
+          id: string
+          points: number
+          updated_at: string
+        }
         Insert: {
-          activity: string;
-          created_at?: string;
-          description?: string | null;
-          id?: string;
-          points: number;
-          updated_at?: string;
-        };
+          activity: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          points: number
+          updated_at?: string
+        }
         Update: {
-          activity?: string;
-          created_at?: string;
-          description?: string | null;
-          id?: string;
-          points?: number;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
+          activity?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          points?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       preview_costs: {
         Row: {
-          amount: number | null;
-          anonymous: boolean;
-          cost_kind: string | null;
-          created_at: string;
-          currency: string;
-          id: string;
-          notes: string | null;
-          period: string | null;
-          quantity: number | null;
-          session_id: string;
-          unit: string | null;
-          updated_at: string;
-          vendor_id: string;
-        };
+          amount: number | null
+          anonymous: boolean
+          cost_kind: string | null
+          created_at: string
+          currency: string
+          id: string
+          notes: string | null
+          period: string | null
+          quantity: number | null
+          session_id: string
+          unit: string | null
+          updated_at: string
+          vendor_id: string
+        }
         Insert: {
-          amount?: number | null;
-          anonymous?: boolean;
-          cost_kind?: string | null;
-          created_at?: string;
-          currency?: string;
-          id?: string;
-          notes?: string | null;
-          period?: string | null;
-          quantity?: number | null;
-          session_id: string;
-          unit?: string | null;
-          updated_at?: string;
-          vendor_id: string;
-        };
+          amount?: number | null
+          anonymous?: boolean
+          cost_kind?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          period?: string | null
+          quantity?: number | null
+          session_id: string
+          unit?: string | null
+          updated_at?: string
+          vendor_id: string
+        }
         Update: {
-          amount?: number | null;
-          anonymous?: boolean;
-          cost_kind?: string | null;
-          created_at?: string;
-          currency?: string;
-          id?: string;
-          notes?: string | null;
-          period?: string | null;
-          quantity?: number | null;
-          session_id?: string;
-          unit?: string | null;
-          updated_at?: string;
-          vendor_id?: string;
-        };
+          amount?: number | null
+          anonymous?: boolean
+          cost_kind?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          period?: string | null
+          quantity?: number | null
+          session_id?: string
+          unit?: string | null
+          updated_at?: string
+          vendor_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "preview_costs_session_id_fkey";
-            columns: ["session_id"];
-            isOneToOne: false;
-            referencedRelation: "preview_sessions";
-            referencedColumns: ["id"];
+            foreignKeyName: "preview_costs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "preview_sessions"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       preview_links: {
         Row: {
-          community: string;
-          created_at: string;
-          created_by: string;
-          description: string | null;
-          id: string;
-          is_active: boolean;
-          slug: string;
-          title: string;
-          updated_at: string;
-        };
+          community: string
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_active: boolean
+          slug: string
+          title: string
+          updated_at: string
+        }
         Insert: {
-          community: string;
-          created_at?: string;
-          created_by: string;
-          description?: string | null;
-          id?: string;
-          is_active?: boolean;
-          slug: string;
-          title: string;
-          updated_at?: string;
-        };
+          community: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          slug: string
+          title: string
+          updated_at?: string
+        }
         Update: {
-          community?: string;
-          created_at?: string;
-          created_by?: string;
-          description?: string | null;
-          id?: string;
-          is_active?: boolean;
-          slug?: string;
-          title?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
+          community?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       preview_metrics: {
         Row: {
-          created_at: string;
-          event_type: string;
-          id: string;
-          metadata: Json | null;
-          session_id: string | null;
-          vendor_id: string | null;
-        };
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          session_id: string | null
+          vendor_id: string | null
+        }
         Insert: {
-          created_at?: string;
-          event_type: string;
-          id?: string;
-          metadata?: Json | null;
-          session_id?: string | null;
-          vendor_id?: string | null;
-        };
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          session_id?: string | null
+          vendor_id?: string | null
+        }
         Update: {
-          created_at?: string;
-          event_type?: string;
-          id?: string;
-          metadata?: Json | null;
-          session_id?: string | null;
-          vendor_id?: string | null;
-        };
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          session_id?: string | null
+          vendor_id?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "preview_metrics_session_id_fkey";
-            columns: ["session_id"];
-            isOneToOne: false;
-            referencedRelation: "preview_sessions";
-            referencedColumns: ["id"];
+            foreignKeyName: "preview_metrics_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "preview_sessions"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       preview_reviews: {
         Row: {
-          anonymous: boolean;
-          comments: string | null;
-          created_at: string | null;
-          id: string;
-          metadata: Json | null;
-          rating: number;
-          recommended: boolean | null;
-          session_id: string;
-          use_for_home: boolean | null;
-          vendor_category: string | null;
-          vendor_id: string | null;
-          vendor_name: string | null;
-        };
+          anonymous: boolean
+          comments: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          rating: number
+          recommended: boolean | null
+          session_id: string
+          use_for_home: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+        }
         Insert: {
-          anonymous?: boolean;
-          comments?: string | null;
-          created_at?: string | null;
-          id?: string;
-          metadata?: Json | null;
-          rating: number;
-          recommended?: boolean | null;
-          session_id: string;
-          use_for_home?: boolean | null;
-          vendor_category?: string | null;
-          vendor_id?: string | null;
-          vendor_name?: string | null;
-        };
+          anonymous?: boolean
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          rating: number
+          recommended?: boolean | null
+          session_id: string
+          use_for_home?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+        }
         Update: {
-          anonymous?: boolean;
-          comments?: string | null;
-          created_at?: string | null;
-          id?: string;
-          metadata?: Json | null;
-          rating?: number;
-          recommended?: boolean | null;
-          session_id?: string;
-          use_for_home?: boolean | null;
-          vendor_category?: string | null;
-          vendor_id?: string | null;
-          vendor_name?: string | null;
-        };
+          anonymous?: boolean
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          rating?: number
+          recommended?: boolean | null
+          session_id?: string
+          use_for_home?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "preview_reviews_session_id_fkey";
-            columns: ["session_id"];
-            isOneToOne: false;
-            referencedRelation: "preview_sessions";
-            referencedColumns: ["id"];
+            foreignKeyName: "preview_reviews_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "preview_sessions"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       preview_sessions: {
         Row: {
-          address: string | null;
-          community: string;
-          created_at: string;
-          email: string | null;
-          expires_at: string;
-          formatted_address: string | null;
-          google_place_id: string | null;
-          id: string;
-          metadata: Json | null;
-          name: string;
-          normalized_address: string | null;
-          session_token: string;
-          source: string | null;
-          street_name: string | null;
-        };
+          address: string | null
+          community: string
+          created_at: string
+          email: string | null
+          email_opened_at: string | null
+          email_sent_at: string | null
+          email_sent_status: string | null
+          expires_at: string
+          formatted_address: string | null
+          google_place_id: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          normalized_address: string | null
+          review_form_completed_at: string | null
+          session_token: string
+          source: string | null
+          street_name: string | null
+        }
         Insert: {
-          address?: string | null;
-          community: string;
-          created_at?: string;
-          email?: string | null;
-          expires_at?: string;
-          formatted_address?: string | null;
-          google_place_id?: string | null;
-          id?: string;
-          metadata?: Json | null;
-          name: string;
-          normalized_address?: string | null;
-          session_token: string;
-          source?: string | null;
-          street_name?: string | null;
-        };
+          address?: string | null
+          community: string
+          created_at?: string
+          email?: string | null
+          email_opened_at?: string | null
+          email_sent_at?: string | null
+          email_sent_status?: string | null
+          expires_at?: string
+          formatted_address?: string | null
+          google_place_id?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          normalized_address?: string | null
+          review_form_completed_at?: string | null
+          session_token: string
+          source?: string | null
+          street_name?: string | null
+        }
         Update: {
-          address?: string | null;
-          community?: string;
-          created_at?: string;
-          email?: string | null;
-          expires_at?: string;
-          formatted_address?: string | null;
-          google_place_id?: string | null;
-          id?: string;
-          metadata?: Json | null;
-          name?: string;
-          normalized_address?: string | null;
-          session_token?: string;
-          source?: string | null;
-          street_name?: string | null;
-        };
-        Relationships: [];
-      };
+          address?: string | null
+          community?: string
+          created_at?: string
+          email?: string | null
+          email_opened_at?: string | null
+          email_sent_at?: string | null
+          email_sent_status?: string | null
+          expires_at?: string
+          formatted_address?: string | null
+          google_place_id?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          normalized_address?: string | null
+          review_form_completed_at?: string | null
+          session_token?: string
+          source?: string | null
+          street_name?: string | null
+        }
+        Relationships: []
+      }
       rating_history: {
         Row: {
-          change_type: string;
-          changed_at: string;
-          id: string;
-          new_comments: string | null;
-          new_rating: number;
-          old_comments: string | null;
-          old_rating: number | null;
-          review_id: string | null;
-          user_email: string | null;
-          user_id: string | null;
-          vendor_category: string | null;
-          vendor_id: string | null;
-          vendor_name: string | null;
-        };
+          change_type: string
+          changed_at: string
+          id: string
+          new_comments: string | null
+          new_rating: number
+          old_comments: string | null
+          old_rating: number | null
+          review_id: string | null
+          user_email: string | null
+          user_id: string | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+        }
         Insert: {
-          change_type: string;
-          changed_at?: string;
-          id?: string;
-          new_comments?: string | null;
-          new_rating: number;
-          old_comments?: string | null;
-          old_rating?: number | null;
-          review_id?: string | null;
-          user_email?: string | null;
-          user_id?: string | null;
-          vendor_category?: string | null;
-          vendor_id?: string | null;
-          vendor_name?: string | null;
-        };
+          change_type: string
+          changed_at?: string
+          id?: string
+          new_comments?: string | null
+          new_rating: number
+          old_comments?: string | null
+          old_rating?: number | null
+          review_id?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+        }
         Update: {
-          change_type?: string;
-          changed_at?: string;
-          id?: string;
-          new_comments?: string | null;
-          new_rating?: number;
-          old_comments?: string | null;
-          old_rating?: number | null;
-          review_id?: string | null;
-          user_email?: string | null;
-          user_id?: string | null;
-          vendor_category?: string | null;
-          vendor_id?: string | null;
-          vendor_name?: string | null;
-        };
+          change_type?: string
+          changed_at?: string
+          id?: string
+          new_comments?: string | null
+          new_rating?: number
+          old_comments?: string | null
+          old_rating?: number | null
+          review_id?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "rating_history_review_id_fkey";
-            columns: ["review_id"];
-            isOneToOne: false;
-            referencedRelation: "reviews";
-            referencedColumns: ["id"];
+            foreignKeyName: "rating_history_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "rating_history_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            foreignKeyName: "rating_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "rating_history_vendor_id_fkey";
-            columns: ["vendor_id"];
-            isOneToOne: false;
-            referencedRelation: "vendors";
-            referencedColumns: ["id"];
+            foreignKeyName: "rating_history_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       reviews: {
         Row: {
-          anonymous: boolean;
-          comments: string | null;
-          created_at: string | null;
-          id: string;
-          rating: number;
-          recommended: boolean | null;
-          user_id: string | null;
-          vendor_id: string;
-        };
+          anonymous: boolean
+          comments: string | null
+          contact_age_verified_at: string | null
+          contact_age_verified_by_email: string | null
+          created_at: string | null
+          id: string
+          rating: number
+          recommended: boolean | null
+          user_id: string | null
+          vendor_id: string
+        }
         Insert: {
-          anonymous?: boolean;
-          comments?: string | null;
-          created_at?: string | null;
-          id?: string;
-          rating: number;
-          recommended?: boolean | null;
-          user_id?: string | null;
-          vendor_id: string;
-        };
+          anonymous?: boolean
+          comments?: string | null
+          contact_age_verified_at?: string | null
+          contact_age_verified_by_email?: string | null
+          created_at?: string | null
+          id?: string
+          rating: number
+          recommended?: boolean | null
+          user_id?: string | null
+          vendor_id: string
+        }
         Update: {
-          anonymous?: boolean;
-          comments?: string | null;
-          created_at?: string | null;
-          id?: string;
-          rating?: number;
-          recommended?: boolean | null;
-          user_id?: string | null;
-          vendor_id?: string;
-        };
+          anonymous?: boolean
+          comments?: string | null
+          contact_age_verified_at?: string | null
+          contact_age_verified_by_email?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number
+          recommended?: boolean | null
+          user_id?: string | null
+          vendor_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "reviews_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "reviews_vendor_id_fkey";
-            columns: ["vendor_id"];
-            isOneToOne: false;
-            referencedRelation: "vendors";
-            referencedColumns: ["id"];
+            foreignKeyName: "reviews_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       simple_invites: {
         Row: {
-          code: string;
-          created_at: string | null;
-          id: string;
-          inviter_id: string | null;
-          used_at: string | null;
-          used_by: string | null;
-        };
+          code: string
+          created_at: string | null
+          id: string
+          inviter_id: string | null
+          used_at: string | null
+          used_by: string | null
+        }
         Insert: {
-          code: string;
-          created_at?: string | null;
-          id?: string;
-          inviter_id?: string | null;
-          used_at?: string | null;
-          used_by?: string | null;
-        };
+          code: string
+          created_at?: string | null
+          id?: string
+          inviter_id?: string | null
+          used_at?: string | null
+          used_by?: string | null
+        }
         Update: {
-          code?: string;
-          created_at?: string | null;
-          id?: string;
-          inviter_id?: string | null;
-          used_at?: string | null;
-          used_by?: string | null;
-        };
-        Relationships: [];
-      };
+          code?: string
+          created_at?: string | null
+          id?: string
+          inviter_id?: string | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: []
+      }
       street_name_fix_backup: {
         Row: {
-          address: string | null;
-          email: string | null;
-          id: string | null;
-          name: string | null;
-          street_name: string | null;
-        };
+          address: string | null
+          email: string | null
+          id: string | null
+          name: string | null
+          street_name: string | null
+        }
         Insert: {
-          address?: string | null;
-          email?: string | null;
-          id?: string | null;
-          name?: string | null;
-          street_name?: string | null;
-        };
+          address?: string | null
+          email?: string | null
+          id?: string | null
+          name?: string | null
+          street_name?: string | null
+        }
         Update: {
-          address?: string | null;
-          email?: string | null;
-          id?: string | null;
-          name?: string | null;
-          street_name?: string | null;
-        };
-        Relationships: [];
-      };
+          address?: string | null
+          email?: string | null
+          id?: string | null
+          name?: string | null
+          street_name?: string | null
+        }
+        Relationships: []
+      }
       survey_pending_ratings: {
         Row: {
-          category: string;
-          created_at: string | null;
-          id: string;
-          rated: boolean | null;
-          rated_at: string | null;
-          session_id: string | null;
-          vendor_name: string;
-        };
+          category: string
+          created_at: string | null
+          id: string
+          rated: boolean | null
+          rated_at: string | null
+          session_id: string | null
+          vendor_name: string
+        }
         Insert: {
-          category: string;
-          created_at?: string | null;
-          id?: string;
-          rated?: boolean | null;
-          rated_at?: string | null;
-          session_id?: string | null;
-          vendor_name: string;
-        };
+          category: string
+          created_at?: string | null
+          id?: string
+          rated?: boolean | null
+          rated_at?: string | null
+          session_id?: string | null
+          vendor_name: string
+        }
         Update: {
-          category?: string;
-          created_at?: string | null;
-          id?: string;
-          rated?: boolean | null;
-          rated_at?: string | null;
-          session_id?: string | null;
-          vendor_name?: string;
-        };
+          category?: string
+          created_at?: string | null
+          id?: string
+          rated?: boolean | null
+          rated_at?: string | null
+          session_id?: string | null
+          vendor_name?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "survey_pending_ratings_session_id_fkey";
-            columns: ["session_id"];
-            isOneToOne: false;
-            referencedRelation: "preview_sessions";
-            referencedColumns: ["id"];
+            foreignKeyName: "survey_pending_ratings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "preview_sessions"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       survey_pending_vendors: {
         Row: {
-          category: string;
-          created_at: string | null;
-          id: string;
-          rated: boolean | null;
-          rated_at: string | null;
-          survey_response_id: string | null;
-          vendor_name: string;
-        };
+          category: string
+          created_at: string | null
+          id: string
+          rated: boolean | null
+          rated_at: string | null
+          survey_response_id: string | null
+          vendor_name: string
+        }
         Insert: {
-          category: string;
-          created_at?: string | null;
-          id?: string;
-          rated?: boolean | null;
-          rated_at?: string | null;
-          survey_response_id?: string | null;
-          vendor_name: string;
-        };
+          category: string
+          created_at?: string | null
+          id?: string
+          rated?: boolean | null
+          rated_at?: string | null
+          survey_response_id?: string | null
+          vendor_name: string
+        }
         Update: {
-          category?: string;
-          created_at?: string | null;
-          id?: string;
-          rated?: boolean | null;
-          rated_at?: string | null;
-          survey_response_id?: string | null;
-          vendor_name?: string;
-        };
+          category?: string
+          created_at?: string | null
+          id?: string
+          rated?: boolean | null
+          rated_at?: string | null
+          survey_response_id?: string | null
+          vendor_name?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "survey_pending_vendors_survey_response_id_fkey";
-            columns: ["survey_response_id"];
-            isOneToOne: false;
-            referencedRelation: "survey_responses";
-            referencedColumns: ["id"];
+            foreignKeyName: "survey_pending_vendors_survey_response_id_fkey"
+            columns: ["survey_response_id"]
+            isOneToOne: false
+            referencedRelation: "survey_responses"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       survey_ratings: {
         Row: {
-          comments: string | null;
-          cost_amount: number | null;
-          cost_entries: Json | null;
-          cost_kind: string | null;
-          cost_notes: string | null;
-          cost_period: string | null;
-          cost_quantity: number | null;
-          cost_unit: string | null;
-          created_at: string | null;
-          current_vendor: boolean | null;
-          id: string;
-          rating: number;
-          respondent_email: string | null;
-          respondent_name: string | null;
-          session_id: string | null;
-          session_token: string;
-          show_name: boolean | null;
-          vendor_category: string | null;
-          vendor_id: string | null;
-          vendor_name: string;
-          vendor_phone: string | null;
-        };
+          comments: string | null
+          cost_amount: number | null
+          cost_entries: Json | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          cost_quantity: number | null
+          cost_unit: string | null
+          created_at: string | null
+          current_vendor: boolean | null
+          id: string
+          matched_at: string | null
+          rating: number
+          respondent_email: string | null
+          respondent_name: string | null
+          session_id: string | null
+          session_token: string
+          show_name: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string
+          vendor_phone: string | null
+        }
         Insert: {
-          comments?: string | null;
-          cost_amount?: number | null;
-          cost_entries?: Json | null;
-          cost_kind?: string | null;
-          cost_notes?: string | null;
-          cost_period?: string | null;
-          cost_quantity?: number | null;
-          cost_unit?: string | null;
-          created_at?: string | null;
-          current_vendor?: boolean | null;
-          id?: string;
-          rating: number;
-          respondent_email?: string | null;
-          respondent_name?: string | null;
-          session_id?: string | null;
-          session_token: string;
-          show_name?: boolean | null;
-          vendor_category?: string | null;
-          vendor_id?: string | null;
-          vendor_name: string;
-          vendor_phone?: string | null;
-        };
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string
+          matched_at?: string | null
+          rating: number
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token: string
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name: string
+          vendor_phone?: string | null
+        }
         Update: {
-          comments?: string | null;
-          cost_amount?: number | null;
-          cost_entries?: Json | null;
-          cost_kind?: string | null;
-          cost_notes?: string | null;
-          cost_period?: string | null;
-          cost_quantity?: number | null;
-          cost_unit?: string | null;
-          created_at?: string | null;
-          current_vendor?: boolean | null;
-          id?: string;
-          rating?: number;
-          respondent_email?: string | null;
-          respondent_name?: string | null;
-          session_id?: string | null;
-          session_token?: string;
-          show_name?: boolean | null;
-          vendor_category?: string | null;
-          vendor_id?: string | null;
-          vendor_name?: string;
-          vendor_phone?: string | null;
-        };
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string
+          matched_at?: string | null
+          rating?: number
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string
+          vendor_phone?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "survey_ratings_session_id_fkey";
-            columns: ["session_id"];
-            isOneToOne: false;
-            referencedRelation: "preview_sessions";
-            referencedColumns: ["id"];
+            foreignKeyName: "survey_ratings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "preview_sessions"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "survey_ratings_vendor_id_fkey";
-            columns: ["vendor_id"];
-            isOneToOne: false;
-            referencedRelation: "vendors";
-            referencedColumns: ["id"];
+            foreignKeyName: "survey_ratings_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
+      survey_ratings_backup_emily: {
+        Row: {
+          comments: string | null
+          cost_amount: number | null
+          cost_entries: Json | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          cost_quantity: number | null
+          cost_unit: string | null
+          created_at: string | null
+          current_vendor: boolean | null
+          id: string | null
+          rating: number | null
+          respondent_email: string | null
+          respondent_name: string | null
+          session_id: string | null
+          session_token: string | null
+          show_name: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+          vendor_phone: string | null
+        }
+        Insert: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Update: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Relationships: []
+      }
+      survey_ratings_backup_erin: {
+        Row: {
+          comments: string | null
+          cost_amount: number | null
+          cost_entries: Json | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          cost_quantity: number | null
+          cost_unit: string | null
+          created_at: string | null
+          current_vendor: boolean | null
+          id: string | null
+          rating: number | null
+          respondent_email: string | null
+          respondent_name: string | null
+          session_id: string | null
+          session_token: string | null
+          show_name: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+          vendor_phone: string | null
+        }
+        Insert: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Update: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Relationships: []
+      }
+      survey_ratings_backup_heather: {
+        Row: {
+          comments: string | null
+          cost_amount: number | null
+          cost_entries: Json | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          cost_quantity: number | null
+          cost_unit: string | null
+          created_at: string | null
+          current_vendor: boolean | null
+          id: string | null
+          rating: number | null
+          respondent_email: string | null
+          respondent_name: string | null
+          session_id: string | null
+          session_token: string | null
+          show_name: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+          vendor_phone: string | null
+        }
+        Insert: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Update: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Relationships: []
+      }
+      survey_ratings_backup_kira: {
+        Row: {
+          comments: string | null
+          cost_amount: number | null
+          cost_entries: Json | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          cost_quantity: number | null
+          cost_unit: string | null
+          created_at: string | null
+          current_vendor: boolean | null
+          id: string | null
+          rating: number | null
+          respondent_email: string | null
+          respondent_name: string | null
+          session_id: string | null
+          session_token: string | null
+          show_name: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+          vendor_phone: string | null
+        }
+        Insert: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Update: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Relationships: []
+      }
+      survey_ratings_backup_roz: {
+        Row: {
+          comments: string | null
+          cost_amount: number | null
+          cost_entries: Json | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          cost_quantity: number | null
+          cost_unit: string | null
+          created_at: string | null
+          current_vendor: boolean | null
+          id: string | null
+          rating: number | null
+          respondent_email: string | null
+          respondent_name: string | null
+          session_id: string | null
+          session_token: string | null
+          show_name: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+          vendor_phone: string | null
+        }
+        Insert: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Update: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Relationships: []
+      }
+      survey_ratings_backup_solange: {
+        Row: {
+          comments: string | null
+          cost_amount: number | null
+          cost_entries: Json | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          cost_quantity: number | null
+          cost_unit: string | null
+          created_at: string | null
+          current_vendor: boolean | null
+          id: string | null
+          rating: number | null
+          respondent_email: string | null
+          respondent_name: string | null
+          session_id: string | null
+          session_token: string | null
+          show_name: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+          vendor_phone: string | null
+        }
+        Insert: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Update: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Relationships: []
+      }
+      survey_ratings_backup_tova: {
+        Row: {
+          comments: string | null
+          cost_amount: number | null
+          cost_entries: Json | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          cost_quantity: number | null
+          cost_unit: string | null
+          created_at: string | null
+          current_vendor: boolean | null
+          id: string | null
+          rating: number | null
+          respondent_email: string | null
+          respondent_name: string | null
+          session_id: string | null
+          session_token: string | null
+          show_name: boolean | null
+          vendor_category: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+          vendor_phone: string | null
+        }
+        Insert: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Update: {
+          comments?: string | null
+          cost_amount?: number | null
+          cost_entries?: Json | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          cost_quantity?: number | null
+          cost_unit?: string | null
+          created_at?: string | null
+          current_vendor?: boolean | null
+          id?: string | null
+          rating?: number | null
+          respondent_email?: string | null
+          respondent_name?: string | null
+          session_id?: string | null
+          session_token?: string | null
+          show_name?: boolean | null
+          vendor_category?: string | null
+          vendor_id?: string | null
+          vendor_name?: string | null
+          vendor_phone?: string | null
+        }
+        Relationships: []
+      }
       survey_responses: {
         Row: {
-          created_at: string | null;
-          id: string;
-          metadata: Json | null;
-          respondent_contact: string;
-          respondent_contact_method: string;
-          respondent_email: string | null;
-          respondent_name: string;
-          session_token: string;
-          source: string | null;
-          updated_at: string | null;
-        };
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          respondent_contact: string
+          respondent_contact_method: string
+          respondent_email: string | null
+          respondent_name: string
+          session_token: string
+          source: string | null
+          updated_at: string | null
+        }
         Insert: {
-          created_at?: string | null;
-          id?: string;
-          metadata?: Json | null;
-          respondent_contact: string;
-          respondent_contact_method: string;
-          respondent_email?: string | null;
-          respondent_name: string;
-          session_token: string;
-          source?: string | null;
-          updated_at?: string | null;
-        };
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          respondent_contact: string
+          respondent_contact_method: string
+          respondent_email?: string | null
+          respondent_name: string
+          session_token: string
+          source?: string | null
+          updated_at?: string | null
+        }
         Update: {
-          created_at?: string | null;
-          id?: string;
-          metadata?: Json | null;
-          respondent_contact?: string;
-          respondent_contact_method?: string;
-          respondent_email?: string | null;
-          respondent_name?: string;
-          session_token?: string;
-          source?: string | null;
-          updated_at?: string | null;
-        };
-        Relationships: [];
-      };
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          respondent_contact?: string
+          respondent_contact_method?: string
+          respondent_email?: string | null
+          respondent_name?: string
+          session_token?: string
+          source?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       survey_vendor_ratings: {
         Row: {
-          category: string;
-          comments: string;
-          cost_amount: number | null;
-          cost_kind: string | null;
-          cost_notes: string | null;
-          cost_period: string | null;
-          created_at: string | null;
-          id: string;
-          rating: number;
-          show_name_in_review: boolean | null;
-          survey_response_id: string | null;
-          use_for_home: boolean | null;
-          vendor_contact: string | null;
-          vendor_name: string;
-        };
+          category: string
+          comments: string
+          cost_amount: number | null
+          cost_kind: string | null
+          cost_notes: string | null
+          cost_period: string | null
+          created_at: string | null
+          id: string
+          rating: number
+          show_name_in_review: boolean | null
+          survey_response_id: string | null
+          use_for_home: boolean | null
+          vendor_contact: string | null
+          vendor_name: string
+        }
         Insert: {
-          category: string;
-          comments: string;
-          cost_amount?: number | null;
-          cost_kind?: string | null;
-          cost_notes?: string | null;
-          cost_period?: string | null;
-          created_at?: string | null;
-          id?: string;
-          rating: number;
-          show_name_in_review?: boolean | null;
-          survey_response_id?: string | null;
-          use_for_home?: boolean | null;
-          vendor_contact?: string | null;
-          vendor_name: string;
-        };
+          category: string
+          comments: string
+          cost_amount?: number | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          created_at?: string | null
+          id?: string
+          rating: number
+          show_name_in_review?: boolean | null
+          survey_response_id?: string | null
+          use_for_home?: boolean | null
+          vendor_contact?: string | null
+          vendor_name: string
+        }
         Update: {
-          category?: string;
-          comments?: string;
-          cost_amount?: number | null;
-          cost_kind?: string | null;
-          cost_notes?: string | null;
-          cost_period?: string | null;
-          created_at?: string | null;
-          id?: string;
-          rating?: number;
-          show_name_in_review?: boolean | null;
-          survey_response_id?: string | null;
-          use_for_home?: boolean | null;
-          vendor_contact?: string | null;
-          vendor_name?: string;
-        };
+          category?: string
+          comments?: string
+          cost_amount?: number | null
+          cost_kind?: string | null
+          cost_notes?: string | null
+          cost_period?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number
+          show_name_in_review?: boolean | null
+          survey_response_id?: string | null
+          use_for_home?: boolean | null
+          vendor_contact?: string | null
+          vendor_name?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "survey_vendor_ratings_survey_response_id_fkey";
-            columns: ["survey_response_id"];
-            isOneToOne: false;
-            referencedRelation: "survey_responses";
-            referencedColumns: ["id"];
+            foreignKeyName: "survey_vendor_ratings_survey_response_id_fkey"
+            columns: ["survey_response_id"]
+            isOneToOne: false
+            referencedRelation: "survey_responses"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       user_analytics: {
         Row: {
-          category: string | null;
-          community: string | null;
-          created_at: string;
-          device_type: string | null;
-          element_id: string | null;
-          element_text: string | null;
-          event_name: string;
-          event_type: string;
-          id: string;
-          metadata: Json | null;
-          page_path: string | null;
-          session_id: string | null;
-          user_id: string | null;
-          vendor_id: string | null;
-        };
+          category: string | null
+          community: string | null
+          created_at: string
+          device_type: string | null
+          element_id: string | null
+          element_text: string | null
+          event_name: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          page_path: string | null
+          session_id: string | null
+          user_id: string | null
+          vendor_id: string | null
+        }
         Insert: {
-          category?: string | null;
-          community?: string | null;
-          created_at?: string;
-          device_type?: string | null;
-          element_id?: string | null;
-          element_text?: string | null;
-          event_name: string;
-          event_type: string;
-          id?: string;
-          metadata?: Json | null;
-          page_path?: string | null;
-          session_id?: string | null;
-          user_id?: string | null;
-          vendor_id?: string | null;
-        };
+          category?: string | null
+          community?: string | null
+          created_at?: string
+          device_type?: string | null
+          element_id?: string | null
+          element_text?: string | null
+          event_name: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          page_path?: string | null
+          session_id?: string | null
+          user_id?: string | null
+          vendor_id?: string | null
+        }
         Update: {
-          category?: string | null;
-          community?: string | null;
-          created_at?: string;
-          device_type?: string | null;
-          element_id?: string | null;
-          element_text?: string | null;
-          event_name?: string;
-          event_type?: string;
-          id?: string;
-          metadata?: Json | null;
-          page_path?: string | null;
-          session_id?: string | null;
-          user_id?: string | null;
-          vendor_id?: string | null;
-        };
+          category?: string | null
+          community?: string | null
+          created_at?: string
+          device_type?: string | null
+          element_id?: string | null
+          element_text?: string | null
+          event_name?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          page_path?: string | null
+          session_id?: string | null
+          user_id?: string | null
+          vendor_id?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "user_analytics_session_id_fkey";
-            columns: ["session_id"];
-            isOneToOne: false;
-            referencedRelation: "user_sessions";
-            referencedColumns: ["id"];
+            foreignKeyName: "user_analytics_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "user_sessions"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       user_point_history: {
         Row: {
-          activity_type: string;
-          created_at: string;
-          description: string;
-          id: string;
-          points_earned: number;
-          related_id: string | null;
-          user_id: string;
-        };
+          activity_type: string
+          created_at: string
+          description: string
+          id: string
+          points_earned: number
+          related_id: string | null
+          user_id: string
+        }
         Insert: {
-          activity_type: string;
-          created_at?: string;
-          description: string;
-          id?: string;
-          points_earned: number;
-          related_id?: string | null;
-          user_id: string;
-        };
+          activity_type: string
+          created_at?: string
+          description: string
+          id?: string
+          points_earned: number
+          related_id?: string | null
+          user_id: string
+        }
         Update: {
-          activity_type?: string;
-          created_at?: string;
-          description?: string;
-          id?: string;
-          points_earned?: number;
-          related_id?: string | null;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
+          activity_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          points_earned?: number
+          related_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
-          created_at: string;
-          id: string;
-          role: Database["public"]["Enums"]["app_role"];
-          user_id: string;
-        };
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
         Insert: {
-          created_at?: string;
-          id?: string;
-          role: Database["public"]["Enums"]["app_role"];
-          user_id: string;
-        };
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
         Update: {
-          created_at?: string;
-          id?: string;
-          role?: Database["public"]["Enums"]["app_role"];
-          user_id?: string;
-        };
-        Relationships: [];
-      };
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_sessions: {
         Row: {
-          browser: string | null;
-          community: string | null;
-          country: string | null;
-          created_at: string;
-          device_type: string | null;
-          duration_seconds: number | null;
-          id: string;
-          ip_address: string | null;
-          is_bounce: boolean | null;
-          is_returning_user: boolean | null;
-          metadata: Json | null;
-          os: string | null;
-          page_path: string | null;
-          page_views: number | null;
-          referrer: string | null;
-          session_end: string | null;
-          session_start: string;
-          session_token: string;
-          user_id: string | null;
-          utm_campaign: string | null;
-          utm_medium: string | null;
-          utm_source: string | null;
-        };
+          browser: string | null
+          community: string | null
+          country: string | null
+          created_at: string
+          device_type: string | null
+          duration_seconds: number | null
+          id: string
+          ip_address: string | null
+          is_bounce: boolean | null
+          is_returning_user: boolean | null
+          metadata: Json | null
+          os: string | null
+          page_path: string | null
+          page_views: number | null
+          referrer: string | null
+          session_end: string | null
+          session_start: string
+          session_token: string
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
         Insert: {
-          browser?: string | null;
-          community?: string | null;
-          country?: string | null;
-          created_at?: string;
-          device_type?: string | null;
-          duration_seconds?: number | null;
-          id?: string;
-          ip_address?: string | null;
-          is_bounce?: boolean | null;
-          is_returning_user?: boolean | null;
-          metadata?: Json | null;
-          os?: string | null;
-          page_path?: string | null;
-          page_views?: number | null;
-          referrer?: string | null;
-          session_end?: string | null;
-          session_start?: string;
-          session_token: string;
-          user_id?: string | null;
-          utm_campaign?: string | null;
-          utm_medium?: string | null;
-          utm_source?: string | null;
-        };
+          browser?: string | null
+          community?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          duration_seconds?: number | null
+          id?: string
+          ip_address?: string | null
+          is_bounce?: boolean | null
+          is_returning_user?: boolean | null
+          metadata?: Json | null
+          os?: string | null
+          page_path?: string | null
+          page_views?: number | null
+          referrer?: string | null
+          session_end?: string | null
+          session_start?: string
+          session_token: string
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
         Update: {
-          browser?: string | null;
-          community?: string | null;
-          country?: string | null;
-          created_at?: string;
-          device_type?: string | null;
-          duration_seconds?: number | null;
-          id?: string;
-          ip_address?: string | null;
-          is_bounce?: boolean | null;
-          is_returning_user?: boolean | null;
-          metadata?: Json | null;
-          os?: string | null;
-          page_path?: string | null;
-          page_views?: number | null;
-          referrer?: string | null;
-          session_end?: string | null;
-          session_start?: string;
-          session_token?: string;
-          user_id?: string | null;
-          utm_campaign?: string | null;
-          utm_medium?: string | null;
-          utm_source?: string | null;
-        };
-        Relationships: [];
-      };
+          browser?: string | null
+          community?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          duration_seconds?: number | null
+          id?: string
+          ip_address?: string | null
+          is_bounce?: boolean | null
+          is_returning_user?: boolean | null
+          metadata?: Json | null
+          os?: string | null
+          page_path?: string | null
+          page_views?: number | null
+          referrer?: string | null
+          session_end?: string | null
+          session_start?: string
+          session_token?: string
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       users: {
         Row: {
-          address: string;
-          badges: string[] | null;
-          created_at: string | null;
-          email: string;
-          formatted_address: string | null;
-          google_place_id: string | null;
-          id: string;
-          invited_by: string | null;
-          is_verified: boolean | null;
-          name: string | null;
-          pending_invite_code: string | null;
-          points: number | null;
-          show_name_public: boolean | null;
-          signup_source: string | null;
-          street_name: string;
-          submissions_count: number | null;
-          updated_at: string;
-        };
+          address: string
+          badges: string[] | null
+          created_at: string | null
+          email: string
+          formatted_address: string | null
+          google_place_id: string | null
+          id: string
+          invited_by: string | null
+          is_verified: boolean | null
+          name: string | null
+          pending_invite_code: string | null
+          points: number | null
+          privacy_accepted_at: string | null
+          show_name_public: boolean | null
+          signup_source: string | null
+          street_name: string
+          submissions_count: number | null
+          terms_accepted_at: string | null
+          terms_version: string | null
+          updated_at: string
+        }
         Insert: {
-          address: string;
-          badges?: string[] | null;
-          created_at?: string | null;
-          email: string;
-          formatted_address?: string | null;
-          google_place_id?: string | null;
-          id?: string;
-          invited_by?: string | null;
-          is_verified?: boolean | null;
-          name?: string | null;
-          pending_invite_code?: string | null;
-          points?: number | null;
-          show_name_public?: boolean | null;
-          signup_source?: string | null;
-          street_name: string;
-          submissions_count?: number | null;
-          updated_at?: string;
-        };
+          address: string
+          badges?: string[] | null
+          created_at?: string | null
+          email: string
+          formatted_address?: string | null
+          google_place_id?: string | null
+          id?: string
+          invited_by?: string | null
+          is_verified?: boolean | null
+          name?: string | null
+          pending_invite_code?: string | null
+          points?: number | null
+          privacy_accepted_at?: string | null
+          show_name_public?: boolean | null
+          signup_source?: string | null
+          street_name: string
+          submissions_count?: number | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
+          updated_at?: string
+        }
         Update: {
-          address?: string;
-          badges?: string[] | null;
-          created_at?: string | null;
-          email?: string;
-          formatted_address?: string | null;
-          google_place_id?: string | null;
-          id?: string;
-          invited_by?: string | null;
-          is_verified?: boolean | null;
-          name?: string | null;
-          pending_invite_code?: string | null;
-          points?: number | null;
-          show_name_public?: boolean | null;
-          signup_source?: string | null;
-          street_name?: string;
-          submissions_count?: number | null;
-          updated_at?: string;
-        };
+          address?: string
+          badges?: string[] | null
+          created_at?: string | null
+          email?: string
+          formatted_address?: string | null
+          google_place_id?: string | null
+          id?: string
+          invited_by?: string | null
+          is_verified?: boolean | null
+          name?: string | null
+          pending_invite_code?: string | null
+          points?: number | null
+          privacy_accepted_at?: string | null
+          show_name_public?: boolean | null
+          signup_source?: string | null
+          street_name?: string
+          submissions_count?: number | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "users_invited_by_fkey";
-            columns: ["invited_by"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            foreignKeyName: "users_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       vendor_market_prices: {
         Row: {
-          amount: number;
-          unit: string;
-          updated_at: string;
-          updated_by: string;
-          vendor_id: string;
-        };
+          amount: number
+          unit: string
+          updated_at: string
+          updated_by: string
+          vendor_id: string
+        }
         Insert: {
-          amount: number;
-          unit: string;
-          updated_at?: string;
-          updated_by: string;
-          vendor_id: string;
-        };
+          amount: number
+          unit: string
+          updated_at?: string
+          updated_by: string
+          vendor_id: string
+        }
         Update: {
-          amount?: number;
-          unit?: string;
-          updated_at?: string;
-          updated_by?: string;
-          vendor_id?: string;
-        };
+          amount?: number
+          unit?: string
+          updated_at?: string
+          updated_by?: string
+          vendor_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "vendor_market_prices_vendor_id_fkey";
-            columns: ["vendor_id"];
-            isOneToOne: true;
-            referencedRelation: "vendors";
-            referencedColumns: ["id"];
+            foreignKeyName: "vendor_market_prices_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: true
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       vendors: {
         Row: {
-          category: string;
-          community: string | null;
-          contact_info: string;
-          created_at: string | null;
-          created_by: string | null;
-          google_last_updated: string | null;
-          google_place_id: string | null;
-          google_rating: number | null;
-          google_rating_count: number | null;
-          google_reviews_json: Json | null;
-          hidden: boolean | null;
-          id: string;
-          name: string;
-          typical_cost: number | null;
-          updated_at: string | null;
-        };
+          category: string
+          community: string | null
+          contact_info: string
+          created_at: string | null
+          created_by: string | null
+          google_last_updated: string | null
+          google_place_id: string | null
+          google_rating: number | null
+          google_rating_count: number | null
+          google_reviews_json: Json | null
+          grade_levels: string[] | null
+          hidden: boolean | null
+          id: string
+          name: string
+          secondary_categories: string[] | null
+          tutoring_subjects: string[] | null
+          typical_cost: number | null
+          updated_at: string | null
+        }
         Insert: {
-          category: string;
-          community?: string | null;
-          contact_info: string;
-          created_at?: string | null;
-          created_by?: string | null;
-          google_last_updated?: string | null;
-          google_place_id?: string | null;
-          google_rating?: number | null;
-          google_rating_count?: number | null;
-          google_reviews_json?: Json | null;
-          hidden?: boolean | null;
-          id?: string;
-          name: string;
-          typical_cost?: number | null;
-          updated_at?: string | null;
-        };
+          category: string
+          community?: string | null
+          contact_info: string
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          grade_levels?: string[] | null
+          hidden?: boolean | null
+          id?: string
+          name: string
+          secondary_categories?: string[] | null
+          tutoring_subjects?: string[] | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
         Update: {
-          category?: string;
-          community?: string | null;
-          contact_info?: string;
-          created_at?: string | null;
-          created_by?: string | null;
-          google_last_updated?: string | null;
-          google_place_id?: string | null;
-          google_rating?: number | null;
-          google_rating_count?: number | null;
-          google_reviews_json?: Json | null;
-          hidden?: boolean | null;
-          id?: string;
-          name?: string;
-          typical_cost?: number | null;
-          updated_at?: string | null;
-        };
+          category?: string
+          community?: string | null
+          contact_info?: string
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          grade_levels?: string[] | null
+          hidden?: boolean | null
+          id?: string
+          name?: string
+          secondary_categories?: string[] | null
+          tutoring_subjects?: string[] | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "vendors_created_by_fkey";
-            columns: ["created_by"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
+            foreignKeyName: "vendors_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       vendors_backup_category_fix: {
         Row: {
-          category: string | null;
-          community: string | null;
-          contact_info: string | null;
-          created_at: string | null;
-          created_by: string | null;
-          google_last_updated: string | null;
-          google_place_id: string | null;
-          google_rating: number | null;
-          google_rating_count: number | null;
-          google_reviews_json: Json | null;
-          hidden: boolean | null;
-          id: string | null;
-          name: string | null;
-          typical_cost: number | null;
-          updated_at: string | null;
-        };
+          category: string | null
+          community: string | null
+          contact_info: string | null
+          created_at: string | null
+          created_by: string | null
+          google_last_updated: string | null
+          google_place_id: string | null
+          google_rating: number | null
+          google_rating_count: number | null
+          google_reviews_json: Json | null
+          hidden: boolean | null
+          id: string | null
+          name: string | null
+          typical_cost: number | null
+          updated_at: string | null
+        }
         Insert: {
-          category?: string | null;
-          community?: string | null;
-          contact_info?: string | null;
-          created_at?: string | null;
-          created_by?: string | null;
-          google_last_updated?: string | null;
-          google_place_id?: string | null;
-          google_rating?: number | null;
-          google_rating_count?: number | null;
-          google_reviews_json?: Json | null;
-          hidden?: boolean | null;
-          id?: string | null;
-          name?: string | null;
-          typical_cost?: number | null;
-          updated_at?: string | null;
-        };
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
         Update: {
-          category?: string | null;
-          community?: string | null;
-          contact_info?: string | null;
-          created_at?: string | null;
-          created_by?: string | null;
-          google_last_updated?: string | null;
-          google_place_id?: string | null;
-          google_rating?: number | null;
-          google_rating_count?: number | null;
-          google_reviews_json?: Json | null;
-          hidden?: boolean | null;
-          id?: string | null;
-          name?: string | null;
-          typical_cost?: number | null;
-          updated_at?: string | null;
-        };
-        Relationships: [];
-      };
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       vendors_backup_duplicates: {
         Row: {
-          category: string | null;
-          community: string | null;
-          contact_info: string | null;
-          created_at: string | null;
-          created_by: string | null;
-          google_last_updated: string | null;
-          google_place_id: string | null;
-          google_rating: number | null;
-          google_rating_count: number | null;
-          google_reviews_json: Json | null;
-          hidden: boolean | null;
-          id: string | null;
-          name: string | null;
-          typical_cost: number | null;
-          updated_at: string | null;
-        };
+          category: string | null
+          community: string | null
+          contact_info: string | null
+          created_at: string | null
+          created_by: string | null
+          google_last_updated: string | null
+          google_place_id: string | null
+          google_rating: number | null
+          google_rating_count: number | null
+          google_reviews_json: Json | null
+          hidden: boolean | null
+          id: string | null
+          name: string | null
+          typical_cost: number | null
+          updated_at: string | null
+        }
         Insert: {
-          category?: string | null;
-          community?: string | null;
-          contact_info?: string | null;
-          created_at?: string | null;
-          created_by?: string | null;
-          google_last_updated?: string | null;
-          google_place_id?: string | null;
-          google_rating?: number | null;
-          google_rating_count?: number | null;
-          google_reviews_json?: Json | null;
-          hidden?: boolean | null;
-          id?: string | null;
-          name?: string | null;
-          typical_cost?: number | null;
-          updated_at?: string | null;
-        };
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
         Update: {
-          category?: string | null;
-          community?: string | null;
-          contact_info?: string | null;
-          created_at?: string | null;
-          created_by?: string | null;
-          google_last_updated?: string | null;
-          google_place_id?: string | null;
-          google_rating?: number | null;
-          google_rating_count?: number | null;
-          google_reviews_json?: Json | null;
-          hidden?: boolean | null;
-          id?: string | null;
-          name?: string | null;
-          typical_cost?: number | null;
-          updated_at?: string | null;
-        };
-        Relationships: [];
-      };
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      vendors_backup_tile_merge: {
+        Row: {
+          category: string | null
+          community: string | null
+          contact_info: string | null
+          created_at: string | null
+          created_by: string | null
+          google_last_updated: string | null
+          google_place_id: string | null
+          google_rating: number | null
+          google_rating_count: number | null
+          google_reviews_json: Json | null
+          hidden: boolean | null
+          id: string | null
+          name: string | null
+          secondary_categories: string[] | null
+          typical_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          secondary_categories?: string[] | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          secondary_categories?: string[] | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       vendors_bridges_backup: {
         Row: {
-          category: string | null;
-          community: string | null;
-          contact_info: string | null;
-          created_at: string | null;
-          created_by: string | null;
-          google_last_updated: string | null;
-          google_place_id: string | null;
-          google_rating: number | null;
-          google_rating_count: number | null;
-          google_reviews_json: Json | null;
-          hidden: boolean | null;
-          id: string | null;
-          name: string | null;
-          typical_cost: number | null;
-          updated_at: string | null;
-        };
+          category: string | null
+          community: string | null
+          contact_info: string | null
+          created_at: string | null
+          created_by: string | null
+          google_last_updated: string | null
+          google_place_id: string | null
+          google_rating: number | null
+          google_rating_count: number | null
+          google_reviews_json: Json | null
+          hidden: boolean | null
+          id: string | null
+          name: string | null
+          typical_cost: number | null
+          updated_at: string | null
+        }
         Insert: {
-          category?: string | null;
-          community?: string | null;
-          contact_info?: string | null;
-          created_at?: string | null;
-          created_by?: string | null;
-          google_last_updated?: string | null;
-          google_place_id?: string | null;
-          google_rating?: number | null;
-          google_rating_count?: number | null;
-          google_reviews_json?: Json | null;
-          hidden?: boolean | null;
-          id?: string | null;
-          name?: string | null;
-          typical_cost?: number | null;
-          updated_at?: string | null;
-        };
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
         Update: {
-          category?: string | null;
-          community?: string | null;
-          contact_info?: string | null;
-          created_at?: string | null;
-          created_by?: string | null;
-          google_last_updated?: string | null;
-          google_place_id?: string | null;
-          google_rating?: number | null;
-          google_rating_count?: number | null;
-          google_reviews_json?: Json | null;
-          hidden?: boolean | null;
-          id?: string | null;
-          name?: string | null;
-          typical_cost?: number | null;
-          updated_at?: string | null;
-        };
-        Relationships: [];
-      };
-    };
+          category?: string | null
+          community?: string | null
+          contact_info?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          google_last_updated?: string | null
+          google_place_id?: string | null
+          google_rating?: number | null
+          google_rating_count?: number | null
+          google_reviews_json?: Json | null
+          hidden?: boolean | null
+          id?: string | null
+          name?: string | null
+          typical_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+    }
     Views: {
       vendor_duplicate_monitor: {
         Row: {
-          category: string | null;
-          duplicate_count: number | null;
-          normalized_community: string | null;
-          normalized_name: string | null;
-          variations: string | null;
-        };
-        Relationships: [];
-      };
+          category: string | null
+          duplicate_count: number | null
+          normalized_community: string | null
+          normalized_name: string | null
+          variations: string | null
+        }
+        Relationships: []
+      }
       weekly_rating_changes: {
         Row: {
-          avg_change: number | null;
-          avg_rating: number | null;
-          downgrades: number | null;
-          new_ratings: number | null;
-          total_changes: number | null;
-          upgrades: number | null;
-          vendor_category: string | null;
-          vendor_name: string | null;
-        };
-        Relationships: [];
-      };
-    };
+          avg_change: number | null
+          avg_rating: number | null
+          downgrades: number | null
+          new_ratings: number | null
+          total_changes: number | null
+          upgrades: number | null
+          vendor_category: string | null
+          vendor_name: string | null
+        }
+        Relationships: []
+      }
+    }
     Functions: {
       admin_approve_household: {
-        Args: { _addr: string };
+        Args: { _addr: string }
         Returns: {
-          address: string;
-          approved: boolean;
-          hoa_name: string;
-        }[];
-      };
+          address: string
+          approved: boolean
+          hoa_name: string
+        }[]
+      }
       admin_check_missing_hoa_mappings: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          address: string;
-          email: string;
-          missing_mapping: boolean;
-          signup_source: string;
-          user_id: string;
-        }[];
-      };
+          address: string
+          email: string
+          missing_mapping: boolean
+          signup_source: string
+          user_id: string
+        }[]
+      }
       admin_cleanup_orphaned_user: {
-        Args: { _user_id: string };
-        Returns: boolean;
-      };
-      admin_complete_delete_user: {
-        Args: { _user_id: string };
-        Returns: Json;
-      };
+        Args: { _user_id: string }
+        Returns: boolean
+      }
+      admin_complete_delete_user: { Args: { _user_id: string }; Returns: Json }
       admin_delete_vendor_cascade: {
-        Args: { vendor_uuid: string };
-        Returns: Json;
-      };
+        Args: { vendor_uuid: string }
+        Returns: Json
+      }
       admin_fix_address_mismatch: {
-        Args: { _new_address: string; _new_hoa: string; _user_id: string };
-        Returns: boolean;
-      };
+        Args: { _new_address: string; _new_hoa: string; _user_id: string }
+        Returns: boolean
+      }
       admin_list_address_mismatches: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          address: string;
-          created_at: string;
-          email: string;
-          mismatch_status: string;
-          name: string;
-          normalized_address: string;
-          suggested_hoa: string;
-          user_id: string;
-        }[];
-      };
+          address: string
+          created_at: string
+          email: string
+          mismatch_status: string
+          name: string
+          normalized_address: string
+          suggested_hoa: string
+          user_id: string
+        }[]
+      }
       admin_list_all_users: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          address: string;
-          created_at: string;
-          email: string;
-          email_confirmed_at: string;
-          hoa_name: string;
-          id: string;
-          is_orphaned: boolean;
-          is_verified: boolean;
-          name: string;
-          points: number;
-          signup_source: string;
-        }[];
-      };
+          address: string
+          created_at: string
+          email: string
+          email_confirmed_at: string
+          hoa_name: string
+          id: string
+          is_orphaned: boolean
+          is_verified: boolean
+          name: string
+          points: number
+          signup_source: string
+        }[]
+      }
       admin_list_pending_households: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          first_seen: string;
-          hoa_name: string;
-          household_address: string;
-        }[];
-      };
+          first_seen: string
+          hoa_name: string
+          household_address: string
+        }[]
+      }
       admin_list_pending_users: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          created_at: string;
-          email: string;
-          id: string;
-          is_verified: boolean;
-          name: string;
-        }[];
-      };
+          created_at: string
+          email: string
+          id: string
+          is_verified: boolean
+          name: string
+        }[]
+      }
       admin_set_user_verification: {
-        Args: { _is_verified: boolean; _user_id: string };
+        Args: { _is_verified: boolean; _user_id: string }
         Returns: {
-          id: string;
-          is_verified: boolean;
-        }[];
-      };
+          id: string
+          is_verified: boolean
+        }[]
+      }
       admin_soft_delete_user: {
-        Args: { _reason?: string; _user_id: string };
-        Returns: boolean;
-      };
+        Args: { _reason?: string; _user_id: string }
+        Returns: boolean
+      }
       approve_address_change_request: {
-        Args: { _admin_notes?: string; _request_id: string };
+        Args: { _admin_notes?: string; _request_id: string }
         Returns: {
-          message: string;
-          success: boolean;
-        }[];
-      };
+          message: string
+          success: boolean
+        }[]
+      }
+      approve_vendor_matches: {
+        Args: { p_rating_ids: string[]; p_vendor_id: string }
+        Returns: number
+      }
       audit_and_fix_user_points: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          calculated_points: number;
-          cost_submissions: number;
-          old_points: number;
-          points_fixed: boolean;
-          reviews: number;
-          user_id: string;
-          vendor_submissions: number;
-        }[];
-      };
+          calculated_points: number
+          cost_submissions: number
+          old_points: number
+          points_fixed: boolean
+          reviews: number
+          user_id: string
+          vendor_submissions: number
+        }[]
+      }
       audit_user_points: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          calculated_points: number;
-          cost_count: number;
-          current_points: number;
-          discrepancy: boolean;
-          history_points: number;
-          review_count: number;
-          user_email: string;
-          vendor_count: number;
-        }[];
-      };
+          calculated_points: number
+          cost_count: number
+          current_points: number
+          discrepancy: boolean
+          history_points: number
+          review_count: number
+          user_email: string
+          vendor_count: number
+        }[]
+      }
       backfill_missing_hoa_mappings: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          email: string;
-          error_message: string;
-          fixed: boolean;
-          user_id: string;
-        }[];
-      };
-      can_seed_vendors: {
-        Args: Record<PropertyKey, never>;
-        Returns: boolean;
-      };
+          email: string
+          error_message: string
+          fixed: boolean
+          user_id: string
+        }[]
+      }
+      can_seed_vendors: { Args: { _community?: string }; Returns: boolean }
       check_orphaned_users: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          auth_created_at: string;
-          auth_email: string;
-          auth_user_id: string;
-          public_user_exists: boolean;
-        }[];
-      };
+          auth_created_at: string
+          auth_email: string
+          auth_user_id: string
+          public_user_exists: boolean
+        }[]
+      }
       check_vendor_duplicate: {
-        Args: { _community: string; _name: string };
+        Args: { _community: string; _name: string }
         Returns: {
-          vendor_category: string;
-          vendor_id: string;
-          vendor_name: string;
-        }[];
-      };
-      count_my_costs: {
-        Args: Record<PropertyKey, never>;
-        Returns: number;
-      };
-      current_user_normalized_address: {
-        Args: Record<PropertyKey, never>;
-        Returns: string;
-      };
+          vendor_category: string
+          vendor_id: string
+          vendor_name: string
+        }[]
+      }
+      count_my_costs: { Args: never; Returns: number }
+      create_vendor_from_survey: {
+        Args: {
+          p_category: string
+          p_community: string
+          p_google_data?: Json
+          p_google_place_id?: string
+          p_phone: string
+          p_survey_vendor_name: string
+          p_vendor_name: string
+        }
+        Returns: string
+      }
+      current_user_normalized_address: { Args: never; Returns: string }
+      delete_orphaned_google_auth: {
+        Args: { _email: string }
+        Returns: boolean
+      }
       fix_all_point_discrepancies: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          fixed_user_email: string;
-          new_points: number;
-          old_points: number;
-        }[];
-      };
+          fixed_user_email: string
+          new_points: number
+          old_points: number
+        }[]
+      }
       fix_duplicate_join_points: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          new_points: number;
-          old_points: number;
-          removed_duplicates: number;
-          user_id: string;
-        }[];
-      };
+          new_points: number
+          old_points: number
+          removed_duplicates: number
+          user_id: string
+        }[]
+      }
       fix_orphaned_users: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          created_record: boolean;
-          email: string;
-          error_message: string;
-          user_id: string;
-        }[];
-      };
+          created_record: boolean
+          email: string
+          error_message: string
+          user_id: string
+        }[]
+      }
       fix_specific_orphaned_user: {
-        Args: { _address?: string; _email: string; _name?: string };
+        Args: { _address?: string; _email: string; _name?: string }
         Returns: {
-          created_record: boolean;
-          email: string;
-          error_message: string;
-          user_id: string;
-        }[];
-      };
+          created_record: boolean
+          email: string
+          error_message: string
+          user_id: string
+        }[]
+      }
       get_analytics_summary: {
-        Args: { _days?: number };
+        Args: { _days?: number }
         Returns: {
-          community_breakdown: Json;
-          device_breakdown: Json;
-          top_events: Json;
-          top_pages: Json;
-          total_events: number;
-          total_sessions: number;
-          unique_users: number;
-        }[];
-      };
+          community_breakdown: Json
+          device_breakdown: Json
+          top_events: Json
+          top_pages: Json
+          total_events: number
+          total_sessions: number
+          unique_users: number
+        }[]
+      }
       get_category_summary_simple: {
-        Args: { p_category: string; p_community?: string };
-        Returns: string;
-      };
+        Args: { p_category: string; p_community?: string }
+        Returns: string
+      }
       get_community_leaderboard: {
-        Args: { _community_name: string; _limit?: number };
+        Args: { _community_name: string; _limit?: number }
         Returns: {
-          name: string;
-          points: number;
-        }[];
-      };
+          name: string
+          points: number
+          rank_position: number
+          street_name: string
+          user_id: string
+        }[]
+      }
       get_community_rating_movements: {
-        Args: { _days?: number; _hoa_name: string };
+        Args: { _days?: number; _hoa_name: string }
         Returns: {
-          avg_rating: number;
-          category: string;
-          count: number;
-          movement_type: string;
-          vendor_name: string;
-        }[];
-      };
+          avg_rating: number
+          category: string
+          count: number
+          movement_type: string
+          vendor_name: string
+        }[]
+      }
       get_community_stats: {
-        Args: { _hoa_name: string };
+        Args: { _hoa_name: string }
         Returns: {
-          active_users: number;
-          total_reviews: number;
-        }[];
-      };
-      get_email_status: {
-        Args: { _email: string };
-        Returns: string;
-      };
+          active_users: number
+          total_reviews: number
+        }[]
+      }
+      get_email_status: { Args: { _email: string }; Returns: string }
+      get_exact_vendor_matches: {
+        Args: { p_community: string }
+        Returns: {
+          all_rating_ids: string[]
+          is_same_community: boolean
+          matched_vendor_community: string
+          matched_vendor_id: string
+          matched_vendor_name: string
+          matched_vendor_phone: string
+          mention_count: number
+          survey_category: string
+          survey_rating_id: string
+          survey_vendor_name: string
+        }[]
+      }
+      get_fuzzy_vendor_matches: {
+        Args: { p_community: string }
+        Returns: {
+          all_rating_ids: string[]
+          is_same_community: boolean
+          match_confidence: number
+          mention_count: number
+          suggested_vendor_community: string
+          suggested_vendor_id: string
+          suggested_vendor_name: string
+          suggested_vendor_phone: string
+          survey_category: string
+          survey_rating_id: string
+          survey_vendor_name: string
+        }[]
+      }
       get_inviter_info: {
-        Args: { inviter_id: string };
+        Args: { inviter_id: string }
         Returns: {
-          email: string;
-          name: string;
-          points: number;
-        }[];
-      };
+          email: string
+          name: string
+          points: number
+        }[]
+      }
       get_my_hoa: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          hoa_name: string;
-        }[];
-      };
+          hoa_name: string
+        }[]
+      }
       get_pending_vendors: {
-        Args: { token: string };
+        Args: { token: string }
         Returns: {
-          category: string;
-          vendor_id: string;
-          vendor_name: string;
-        }[];
-      };
+          category: string
+          vendor_id: string
+          vendor_name: string
+        }[]
+      }
+      get_traffic_summary: {
+        Args: { _days?: number }
+        Returns: {
+          browser_breakdown: Json
+          community_breakdown: Json
+          daily_sessions: Json
+          device_breakdown: Json
+          new_users: number
+          returning_users: number
+          top_referrers: Json
+          total_sessions: number
+          unique_users: number
+          utm_sources: Json
+        }[]
+      }
+      get_unmatched_vendors: {
+        Args: { p_community: string }
+        Returns: {
+          all_rating_ids: string[]
+          mention_count: number
+          survey_rating_id: string
+          vendor_category: string
+          vendor_name: string
+          vendor_phone: string
+        }[]
+      }
       get_user_leaderboard_position: {
-        Args: { _community_name: string; _user_id: string };
+        Args: { _community_name: string; _user_id: string }
         Returns: {
-          points: number;
-          rank_position: number;
-          total_users: number;
-        }[];
-      };
+          points: number
+          rank_position: number
+          total_users: number
+        }[]
+      }
+      get_user_signup_source: { Args: { _email: string }; Returns: string }
+      get_vendor_matching_progress: {
+        Args: { p_community: string }
+        Returns: {
+          exact_match_available: number
+          fuzzy_match_available: number
+          matched_reviews: number
+          needs_creation: number
+          percent_complete: number
+          total_respondents: number
+          total_reviews: number
+          unmatched_reviews: number
+        }[]
+      }
       get_weekly_email_recipients: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          email: string;
-          name: string;
-        }[];
-      };
-      gtrgm_compress: {
-        Args: { "": unknown };
-        Returns: unknown;
-      };
-      gtrgm_decompress: {
-        Args: { "": unknown };
-        Returns: unknown;
-      };
-      gtrgm_in: {
-        Args: { "": unknown };
-        Returns: unknown;
-      };
-      gtrgm_options: {
-        Args: { "": unknown };
-        Returns: undefined;
-      };
-      gtrgm_out: {
-        Args: { "": unknown };
-        Returns: unknown;
-      };
+          email: string
+          name: string
+        }[]
+      }
       has_role: {
         Args: {
-          _role: Database["public"]["Enums"]["app_role"];
-          _user_id: string;
-        };
-        Returns: boolean;
-      };
-      is_admin: {
-        Args: Record<PropertyKey, never>;
-        Returns: boolean;
-      };
-      is_household_approved: {
-        Args: { _addr: string };
-        Returns: boolean;
-      };
-      is_user_approved: {
-        Args: Record<PropertyKey, never>;
-        Returns: boolean;
-      };
-      is_user_hoa_admin: {
-        Args: Record<PropertyKey, never>;
-        Returns: boolean;
-      };
-      is_vendor_contributor: {
-        Args: Record<PropertyKey, never>;
-        Returns: boolean;
-      };
-      is_verified: {
-        Args: { _uid: string };
-        Returns: boolean;
-      };
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: never; Returns: boolean }
+      is_household_approved: { Args: { _addr: string }; Returns: boolean }
+      is_user_approved: { Args: never; Returns: boolean }
+      is_user_hoa_admin: { Args: never; Returns: boolean }
+      is_vendor_contributor: { Args: never; Returns: boolean }
+      is_verified: { Args: { _uid: string }; Returns: boolean }
+      list_pending_survey_reviews: {
+        Args: { p_vendor_id: string; p_viewer_user_id?: string }
+        Returns: {
+          author_label: string
+          comments: string
+          created_at: string
+          id: string
+          rating: number
+        }[]
+      }
       list_vendor_costs: {
-        Args: { _vendor_id: string };
+        Args: { _vendor_id: string }
         Returns: {
-          amount: number;
-          author_label: string;
-          cost_kind: string;
-          created_at: string;
-          id: string;
-          notes: string;
-          period: string;
-          unit: string;
-        }[];
-      };
+          amount: number
+          author_label: string
+          cost_kind: string
+          created_at: string
+          id: string
+          notes: string
+          period: string
+          unit: string
+        }[]
+      }
       list_vendor_reviews: {
-        Args: { _vendor_id: string };
+        Args: { _vendor_id: string }
         Returns: {
-          author_label: string;
-          comments: string;
-          created_at: string;
-          id: string;
-          is_pending: boolean;
-          rating: number;
-        }[];
-      };
+          author_label: string
+          comments: string
+          created_at: string
+          id: string
+          is_pending: boolean
+          rating: number
+        }[]
+      }
       list_vendor_reviews_preview: {
-        Args: { _vendor_id: string };
+        Args: { _vendor_id: string }
         Returns: {
-          author_label: string;
-          comments: string;
-          created_at: string;
-          id: string;
-          rating: number;
-        }[];
-      };
-      list_vendor_stats: {
-        Args: {
-          _category?: string;
-          _hoa_name: string;
-          _limit?: number;
-          _offset?: number;
-          _sort_by?: string;
-        };
-        Returns: {
-          avg_cost_amount: number;
-          avg_cost_display: string;
-          avg_monthly_cost: number;
-          category: string;
-          community_amount: number;
-          community_sample_size: number;
-          community_unit: string;
-          contact_info: string;
-          google_place_id: string;
-          google_rating: number;
-          google_rating_count: number;
-          google_reviews_json: Json;
-          hoa_rating: number;
-          hoa_rating_count: number;
-          homes_pct: number;
-          homes_serviced: number;
-          id: string;
-          market_amount: number;
-          market_unit: string;
-          monthly_sample_size: number;
-          name: string;
-          secondary_categories: string[];
-          service_call_avg: number;
-          service_call_sample_size: number;
-          typical_cost: number;
-        }[];
-      };
+          author_label: string
+          comments: string
+          created_at: string
+          id: string
+          rating: number
+        }[]
+      }
+      list_vendor_stats:
+        | {
+            Args: { _category?: string; _community: string }
+            Returns: {
+              avg_rating: number
+              category: string
+              contact_info: string
+              cost_unit: string
+              google_place_id: string
+              google_rating: number
+              google_rating_count: number
+              grade_levels: string[]
+              hidden: boolean
+              homes_serviced: number
+              id: string
+              name: string
+              review_count: number
+              secondary_categories: string[]
+              tutoring_subjects: string[]
+              typical_cost: number
+            }[]
+          }
+        | {
+            Args: {
+              _category?: string
+              _hoa_name: string
+              _limit?: number
+              _offset?: number
+              _sort_by?: string
+            }
+            Returns: {
+              avg_cost_amount: number
+              avg_cost_display: string
+              avg_monthly_cost: number
+              category: string
+              community_amount: number
+              community_sample_size: number
+              community_unit: string
+              contact_info: string
+              google_place_id: string
+              google_rating: number
+              google_rating_count: number
+              google_reviews_json: Json
+              grade_levels: string[]
+              hoa_rating: number
+              hoa_rating_count: number
+              homes_pct: number
+              homes_serviced: number
+              id: string
+              market_amount: number
+              market_unit: string
+              monthly_sample_size: number
+              name: string
+              secondary_categories: string[]
+              service_call_avg: number
+              service_call_sample_size: number
+              tutoring_subjects: string[]
+              typical_cost: number
+            }[]
+          }
       list_vendor_stats_v2: {
         Args: {
-          _category?: string;
-          _hoa_name: string;
-          _limit?: number;
-          _offset?: number;
-          _sort_by?: string;
-        };
+          _category?: string
+          _hoa_name: string
+          _limit?: number
+          _offset?: number
+          _sort_by?: string
+        }
         Returns: {
-          avg_cost_amount: number;
-          avg_cost_display: string;
-          avg_monthly_cost: number;
-          category: string;
-          community_amount: number;
-          community_sample_size: number;
-          community_unit: string;
-          contact_info: string;
-          google_place_id: string;
-          google_rating: number;
-          google_rating_count: number;
-          google_reviews_json: Json;
-          hoa_rating: number;
-          hoa_rating_count: number;
-          homes_pct: number;
-          homes_serviced: number;
-          id: string;
-          market_amount: number;
-          market_unit: string;
-          monthly_sample_size: number;
-          name: string;
-          secondary_categories: string[];
-          service_call_avg: number;
-          service_call_sample_size: number;
-          typical_cost: number;
-        }[];
-      };
+          avg_cost_amount: number
+          avg_cost_display: string
+          avg_monthly_cost: number
+          category: string
+          community_amount: number
+          community_sample_size: number
+          community_unit: string
+          contact_info: string
+          google_place_id: string
+          google_rating: number
+          google_rating_count: number
+          google_reviews_json: Json
+          hoa_rating: number
+          hoa_rating_count: number
+          homes_pct: number
+          homes_serviced: number
+          id: string
+          market_amount: number
+          market_unit: string
+          monthly_sample_size: number
+          name: string
+          service_call_avg: number
+          service_call_sample_size: number
+          typical_cost: number
+        }[]
+      }
       match_survey_vendor_simple: {
-        Args: { _category: string; _community?: string; _survey_name: string };
-        Returns: string;
-      };
+        Args: { _category: string; _community?: string; _survey_name: string }
+        Returns: string
+      }
       match_survey_vendors: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          confidence: number;
-          match_type: string;
-          matched_vendor_id: string;
-          matched_vendor_name: string;
-          review_id: string;
-          survey_vendor_name: string;
-        }[];
-      };
+          confidence: number
+          match_type: string
+          matched_vendor_id: string
+          matched_vendor_name: string
+          review_id: string
+          survey_vendor_name: string
+        }[]
+      }
       monthlyize_cost: {
-        Args: { _amount: number; _period: string };
-        Returns: number;
-      };
-      normalize_address: {
-        Args: { _addr: string };
-        Returns: string;
-      };
+        Args: { _amount: number; _period: string }
+        Returns: number
+      }
+      needs_terms_acceptance: { Args: { user_id: string }; Returns: boolean }
+      normalize_address: { Args: { _addr: string }; Returns: string }
       normalize_category_name: {
-        Args: { input_category: string };
-        Returns: string;
-      };
+        Args: { input_category: string }
+        Returns: string
+      }
+      record_terms_acceptance: {
+        Args: { user_id: string; version?: string }
+        Returns: undefined
+      }
       redeem_invite_code: {
-        Args: { _code: string; _invited_user_id: string };
+        Args: { _code: string; _invited_user_id: string }
         Returns: {
-          inviter_email: string;
-          inviter_id: string;
-          inviter_name: string;
-          points_awarded: number;
-          success: boolean;
-        }[];
-      };
+          inviter_email: string
+          inviter_id: string
+          inviter_name: string
+          points_awarded: number
+          success: boolean
+        }[]
+      }
       reject_address_change_request: {
         Args: {
-          _admin_notes?: string;
-          _rejection_reason: string;
-          _request_id: string;
-        };
+          _admin_notes?: string
+          _rejection_reason: string
+          _request_id: string
+        }
         Returns: {
-          message: string;
-          success: boolean;
-        }[];
-      };
-      set_limit: {
-        Args: { "": number };
-        Returns: number;
-      };
-      short_name: {
-        Args: { full_name: string };
-        Returns: string;
-      };
-      show_limit: {
-        Args: Record<PropertyKey, never>;
-        Returns: number;
-      };
-      show_trgm: {
-        Args: { "": string };
-        Returns: string[];
-      };
-      slug_to_community_name: {
-        Args: { _slug: string };
-        Returns: string;
-      };
-      street_only: {
-        Args: { addr: string };
-        Returns: string;
-      };
+          message: string
+          success: boolean
+        }[]
+      }
+      short_name: { Args: { full_name: string }; Returns: string }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
+      slug_to_community_name: { Args: { _slug: string }; Returns: string }
+      street_only: { Args: { addr: string }; Returns: string }
+      survey_auto_match_vendors: {
+        Args: { _community: string }
+        Returns: {
+          copied_from_other: number
+          created_new: number
+          exact_matches: number
+          fuzzy_matches: number
+          still_unmatched: number
+          total_unmatched: number
+        }[]
+      }
+      survey_email_tracking: {
+        Args: { _community: string }
+        Returns: {
+          completion_rate: number
+          emails_failed: number
+          emails_pending: number
+          emails_sent: number
+          forms_completed: number
+          total_respondents: number
+        }[]
+      }
+      survey_get_unmatched_vendors: {
+        Args: { _community: string }
+        Returns: {
+          category: string
+          mention_count: number
+          sample_phone: string
+          suggested_matches: Json
+          vendor_name: string
+        }[]
+      }
       test_auto_upgrade: {
-        Args: { test_email: string };
+        Args: { test_email: string }
         Returns: {
-          costs_to_migrate: number;
-          email_location: string;
-          reviews_to_migrate: number;
-          session_found: boolean;
-          session_id: string;
-          survey_vendor_names: string;
-        }[];
-      };
+          costs_to_migrate: number
+          email_location: string
+          reviews_to_migrate: number
+          session_found: boolean
+          session_id: string
+          survey_vendor_names: string
+        }[]
+      }
       validate_invite: {
-        Args: { _token: string };
+        Args: { _token: string }
         Returns: {
-          accepted: boolean;
-          community_name: string;
-          community_slug: string;
-          created_at: string;
-          invite_id: string;
-          invited_email: string;
-          status: string;
-        }[];
-      };
+          accepted: boolean
+          community_name: string
+          community_slug: string
+          created_at: string
+          invite_id: string
+          invited_email: string
+          status: string
+        }[]
+      }
       vendor_cost_stats: {
-        Args: { _hoa_name: string; _vendor_id: string };
+        Args: { _hoa_name: string; _vendor_id: string }
         Returns: {
-          avg_amount: number;
-          sample_size: number;
-        }[];
-      };
-    };
+          avg_amount: number
+          sample_size: number
+        }[]
+      }
+    }
     Enums: {
-      app_role: "admin" | "vendor_contributor";
-    };
+      app_role: "admin" | "vendor_contributor"
+    }
     CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-};
+      [_ in never]: never
+    }
+  }
+}
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R;
+      Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R;
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
       }
       ? R
       : never
-    : never;
+    : never
 
 export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I;
+      Insert: infer I
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I;
+        Insert: infer I
       }
       ? I
       : never
-    : never;
+    : never
 
 export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U;
+      Update: infer U
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U;
+        Update: infer U
       }
       ? U
       : never
-    : never;
+    : never
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never;
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never;
+    : never
 
 export const Constants = {
   public: {
@@ -2400,4 +3174,4 @@ export const Constants = {
       app_role: ["admin", "vendor_contributor"],
     },
   },
-} as const;
+} as const
