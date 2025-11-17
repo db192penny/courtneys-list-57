@@ -167,13 +167,13 @@ function CategoryCard({ category, recipientName, onCopy, isCopied }: CategoryCar
   const { data: stats, isLoading: statsLoading } = useQuery<VendorStats>({
     queryKey: ['category-stats', category],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('list_vendor_stats', {
-        _hoa_name: 'Boca Bridges',
-        _category: category,
-        _sort_by: 'hoa_rating',
-        _limit: 100,
-        _offset: 0
-      });
+    const { data, error } = await supabase.rpc('list_vendor_stats', {
+      _hoa_name: 'Boca Bridges',
+      _category: category,
+      _sort_by: 'hoa_rating',
+      _limit: 100,
+      _offset: 0
+    }) as { data: any[] | null; error: any };
       
       if (error) throw error;
       
