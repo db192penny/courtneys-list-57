@@ -35,6 +35,7 @@ interface ExactMatch {
   matched_vendor_name: string;
   matched_vendor_phone: string;
   matched_vendor_community: string;
+  is_same_community: boolean;
   rating_ids: string[];
 }
 
@@ -46,6 +47,7 @@ interface FuzzyMatch {
   suggested_vendor_name: string;
   suggested_vendor_phone: string;
   suggested_vendor_community: string;
+  is_same_community: boolean;
   confidence_score: number;
   rating_ids: string[];
 }
@@ -328,6 +330,67 @@ export default function AdminVendorMatching() {
     }
   };
 
+  const handleCopyVendorToCommunity = async (
+    sourceVendorId: string,
+    sourceVendorName: string,
+    ratingIds: string[]
+  ) => {
+    setProcessingId(sourceVendorId);
+    try {
+      console.log('[Copy Vendor] Starting copy:', {
+        sourceVendorId,
+        sourceVendorName,
+        targetCommunity: community,
+        ratingIdsCount: ratingIds.length
+      });
+
+      // Call the copy_vendor_to_community RPC
+      const { data: newVendorId, error: copyError } = await supabase.rpc(
+        'copy_vendor_to_community',
+        {
+          p_source_vendor_id: sourceVendorId,
+          p_target_community: community
+        }
+      );
+      
+      if (copyError) {
+        console.error('[Copy Vendor] RPC error:', copyError);
+        throw copyError;
+      }
+
+      console.log('[Copy Vendor] New vendor created:', newVendorId);
+      
+      if (newVendorId) {
+        // Now match the ratings to the new vendor
+        const { error: matchError } = await (supabase.rpc as any)("approve_vendor_matches", {
+          p_rating_ids: ratingIds,
+          p_vendor_id: newVendorId
+        });
+        
+        if (matchError) {
+          console.error('[Copy Vendor] Match error:', matchError);
+          throw matchError;
+        }
+        
+        toast({
+          title: "✅ Vendor Copied & Matched",
+          description: `Copied ${sourceVendorName} to ${community} and matched ${ratingIds.length} review(s)`
+        });
+        
+        await refreshData();
+      }
+    } catch (error) {
+      console.error("[Copy Vendor] Error:", error);
+      toast({
+        title: "Error Copying Vendor",
+        description: error instanceof Error ? error.message : "Failed to copy vendor. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
   const getConfidenceBadgeVariant = (confidence: number) => {
     if (confidence > 85) return "default";
     if (confidence > 70) return "secondary";
@@ -454,12 +517,43 @@ export default function AdminVendorMatching() {
                           </Badge>
                         </div>
                       </div>
-                      <Button
-                        onClick={() => handleApproveMatch(match.rating_ids, match.matched_vendor_id, match.matched_vendor_name)}
-                        disabled={processingId === match.matched_vendor_id}
-                      >
-                        Approve
-                      </Button>
+                      <div className="flex flex-wrap gap-2">
+                        {match.is_same_community ? (
+                          <Button
+                            onClick={() => handleApproveMatch(match.rating_ids, match.matched_vendor_id, match.matched_vendor_name)}
+                            disabled={processingId === match.matched_vendor_id}
+                          >
+                            Approve Match
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              onClick={() => handleCopyVendorToCommunity(
+                                match.matched_vendor_id,
+                                match.matched_vendor_name,
+                                match.rating_ids
+                              )}
+                              disabled={processingId === match.matched_vendor_id}
+                            >
+                              Copy to {community}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => handleApproveMatch(match.rating_ids, match.matched_vendor_id, match.matched_vendor_name)}
+                              disabled={processingId === match.matched_vendor_id}
+                            >
+                              ⚠️ Link to {match.matched_vendor_community}
+                            </Button>
+                          </>
+                        )}
+                        
+                        <Button
+                          variant="outline"
+                          onClick={() => handleSearchVendors(match.category, match.rating_ids)}
+                        >
+                          Search Other Vendors
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -513,18 +607,42 @@ export default function AdminVendorMatching() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Button
-                      onClick={() => handleApproveMatch(match.rating_ids, match.suggested_vendor_id, match.suggested_vendor_name)}
-                      disabled={processingId === match.suggested_vendor_id}
-                    >
-                      Approve Match
-                    </Button>
+                    {match.is_same_community ? (
+                      <Button
+                        onClick={() => handleApproveMatch(match.rating_ids, match.suggested_vendor_id, match.suggested_vendor_name)}
+                        disabled={processingId === match.suggested_vendor_id}
+                      >
+                        Approve Match
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={() => handleCopyVendorToCommunity(
+                            match.suggested_vendor_id,
+                            match.suggested_vendor_name,
+                            match.rating_ids
+                          )}
+                          disabled={processingId === match.suggested_vendor_id}
+                        >
+                          Copy to {community}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => handleApproveMatch(match.rating_ids, match.suggested_vendor_id, match.suggested_vendor_name)}
+                          disabled={processingId === match.suggested_vendor_id}
+                        >
+                          ⚠️ Link to {match.suggested_vendor_community}
+                        </Button>
+                      </>
+                    )}
+                    
                     <Button
                       variant="outline"
                       onClick={() => handleSearchVendors(match.category, match.rating_ids)}
                     >
                       Search Other Vendors
                     </Button>
+                    
                     <Button variant="ghost">Skip</Button>
                   </div>
                 </CardContent>
