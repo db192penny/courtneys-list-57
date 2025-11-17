@@ -110,30 +110,17 @@ export default function AdminVendorMatching() {
     }
   }, [availableCommunities, community]);
 
-  // Fetch data when tab changes
-  useEffect(() => {
-    const fetchTabData = async () => {
-      setLoading(true);
-      try {
-        if (activeTab === "exact") await fetchExactMatches();
-        else if (activeTab === "fuzzy") await fetchFuzzyMatches();
-        else if (activeTab === "unmatched") await fetchUnmatched();
-      } catch (error) {
-        console.error(`Error fetching ${activeTab} data:`, error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTabData();
-  }, [activeTab]);
 
   const refreshData = async () => {
     setLoading(true);
     try {
-      await fetchProgress();
-      if (activeTab === "exact") await fetchExactMatches();
-      else if (activeTab === "fuzzy") await fetchFuzzyMatches();
-      else if (activeTab === "unmatched") await fetchUnmatched();
+      // Fetch all data in parallel for instant badge counts
+      await Promise.all([
+        fetchProgress(),
+        fetchExactMatches(),
+        fetchFuzzyMatches(),
+        fetchUnmatched()
+      ]);
     } catch (error) {
       console.error("Error refreshing data:", error);
       toast({
