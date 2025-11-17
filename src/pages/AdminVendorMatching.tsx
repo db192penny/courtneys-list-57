@@ -244,8 +244,12 @@ export default function AdminVendorMatching() {
     
     const { data, error } = await supabase
       .from("vendors")
-      .select("id, name, phone, community, category")
+      .select("id, name, contact_info, community, category")
       .eq("category", category);
+    
+    if (error) {
+      console.error("Error searching vendors:", error);
+    }
     
     if (!error && data) {
       setSearchResults(data);
@@ -591,7 +595,7 @@ export default function AdminVendorMatching() {
                   >
                     <CardContent className="pt-4">
                       <div className="font-medium">{vendor.name}</div>
-                      <div className="text-sm text-muted-foreground">{vendor.phone}</div>
+                      <div className="text-sm text-muted-foreground">{vendor.contact_info}</div>
                       <Badge variant="secondary" className="mt-1">
                         {vendor.community}
                       </Badge>
