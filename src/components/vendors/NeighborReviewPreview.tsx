@@ -357,7 +357,9 @@ export function NeighborReviewPreview({
           </p>
           {/* Right-aligned attribution */}
           <div className="flex justify-end">
-            <p className="text-sm font-semibold text-blue-700">— {applyPrivacyRules(selectedReview.author_label)}</p>
+            <p className="text-sm font-semibold text-blue-700">
+              — {selectedReview.is_pending ? selectedReview.author_label : applyPrivacyRules(selectedReview.author_label)}
+            </p>
           </div>
         </div>
       ) : (
@@ -366,7 +368,9 @@ export function NeighborReviewPreview({
             <RatingStars rating={selectedReview.rating} />
             <span className="font-bold text-lg">{selectedReview.rating}/5</span>
           </div>
-          <div className="text-sm text-blue-600">by {applyPrivacyRules(selectedReview.author_label)}</div>
+          <div className="text-sm text-blue-600">
+            by {selectedReview.is_pending ? selectedReview.author_label : applyPrivacyRules(selectedReview.author_label)}
+          </div>
         </div>
       )}
 
