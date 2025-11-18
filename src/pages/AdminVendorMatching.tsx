@@ -42,6 +42,7 @@ interface ExactMatch {
 
 interface FuzzyMatch {
   survey_vendor_name: string;
+  survey_vendor_phone: string;
   category: string;
   suggested_vendor_category: string;
   mention_count: number;
@@ -166,9 +167,21 @@ export default function AdminVendorMatching() {
     
     console.log('[FuzzyMatches] Fetched:', data?.length || 0);
     
-    // Transform RPC data to match FuzzyMatch interface
+    // Get unmatched vendors to find survey phone numbers
+    const { data: unmatchedData } = await (supabase.rpc as any)("survey_get_unmatched_vendors", {
+      _community: community
+    });
+    
+    // Map vendor names to phone numbers
+    const phoneMap = new Map();
+    (unmatchedData || []).forEach((vendor: any) => {
+      phoneMap.set(vendor.vendor_name, vendor.sample_phone);
+    });
+    
+    // Transform with phone numbers
     const transformedMatches: FuzzyMatch[] = (data || []).map((match: any) => ({
       survey_vendor_name: match.survey_vendor_name || '',
+      survey_vendor_phone: phoneMap.get(match.survey_vendor_name) || '',
       category: match.survey_category || 'Unknown',
       suggested_vendor_category: match.suggested_vendor_category || 'Unknown',
       mention_count: match.mention_count || 0,
@@ -615,6 +628,9 @@ export default function AdminVendorMatching() {
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {match.category} • {match.mention_count} mention(s)
+                        {match.survey_vendor_phone && (
+                          <> • 📞 {match.survey_vendor_phone}</>
+                        )}
                       </div>
                     </div>
                     
@@ -695,6 +711,25 @@ export default function AdminVendorMatching() {
                         }}
                       >
                         🔍 Search Other Vendors
+                      </Button>
+                      
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          handleCreateVendor(
+                            match.survey_vendor_name,
+                            match.category,
+                            match.rating_ids,
+                            {
+                              name: match.survey_vendor_name,
+                              phone: match.survey_vendor_phone || null,
+                              community: community
+                            }
+                          );
+                        }}
+                        disabled={processingId === match.suggested_vendor_id}
+                      >
+                        + Create New Vendor
                       </Button>
                       
                       <Button 
