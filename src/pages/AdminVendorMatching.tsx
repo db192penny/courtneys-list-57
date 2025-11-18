@@ -85,6 +85,13 @@ export default function AdminVendorMatching() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [showCrossCommunityCopyDialog, setShowCrossCommunityCopyDialog] = useState(false);
+  const [pendingVendorSelection, setPendingVendorSelection] = useState<{
+    id: string;
+    name: string;
+    community: string;
+    ratingIds: string[];
+  } | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -817,8 +824,21 @@ export default function AdminVendorMatching() {
                     key={vendor.id}
                     className="cursor-pointer hover:bg-accent"
                     onClick={() => {
-                      handleApproveMatch(currentRatingIds, vendor.id, vendor.name);
-                      setShowSearchModal(false);
+                      // Check if vendor is from a different community
+                      if (vendor.community !== community) {
+                        // Show confirmation dialog for cross-community copy
+                        setPendingVendorSelection({
+                          id: vendor.id,
+                          name: vendor.name,
+                          community: vendor.community,
+                          ratingIds: currentRatingIds
+                        });
+                        setShowCrossCommunityCopyDialog(true);
+                      } else {
+                        // Same community - link directly
+                        handleApproveMatch(currentRatingIds, vendor.id, vendor.name);
+                        setShowSearchModal(false);
+                      }
                     }}
                   >
                     <CardContent className="pt-4">
@@ -827,6 +847,11 @@ export default function AdminVendorMatching() {
                       <Badge variant="secondary" className="mt-1">
                         {vendor.community}
                       </Badge>
+                      {vendor.community !== community && (
+                        <Badge variant="outline" className="mt-1 ml-2 text-amber-600 border-amber-600">
+                          Different Community
+                        </Badge>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -834,6 +859,43 @@ export default function AdminVendorMatching() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Cross-Community Copy Confirmation Dialog */}
+      <AlertDialog open={showCrossCommunityCopyDialog} onOpenChange={setShowCrossCommunityCopyDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Copy Vendor to {community}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This vendor is in <strong>{pendingVendorSelection?.community}</strong>.
+              <br /><br />
+              Do you want to copy <strong>{pendingVendorSelection?.name}</strong> to <strong>{community}</strong> and link the review(s) there?
+              <br /><br />
+              This ensures the survey reviews appear in the correct community ({community}).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setPendingVendorSelection(null);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={async () => {
+              if (pendingVendorSelection) {
+                await handleCopyVendorToCommunity(
+                  pendingVendorSelection.id,
+                  pendingVendorSelection.name,
+                  pendingVendorSelection.ratingIds
+                );
+                setPendingVendorSelection(null);
+                setShowSearchModal(false);
+                setShowCrossCommunityCopyDialog(false);
+              }
+            }}>
+              Copy to {community}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
