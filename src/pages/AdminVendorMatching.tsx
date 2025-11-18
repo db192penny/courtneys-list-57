@@ -160,7 +160,24 @@ export default function AdminVendorMatching() {
       p_community: community
     });
     if (error) throw error;
-    setFuzzyMatches((data as FuzzyMatch[]) || []);
+    
+    console.log('[FuzzyMatches] Fetched:', data?.length || 0);
+    
+    // Transform RPC data to match FuzzyMatch interface
+    const transformedMatches: FuzzyMatch[] = (data || []).map((match: any) => ({
+      vendor_id: match.vendor_id,
+      vendor_name: match.vendor_name,
+      rating_ids: match.all_rating_ids || [],  // Transform: all_rating_ids → rating_ids
+      category: match.survey_category || 'Unknown',  // Transform: survey_category → category
+      confidence_score: match.match_confidence || 0,  // Transform: match_confidence → confidence_score
+      contact_info: match.contact_info,
+      avg_rating: match.avg_rating,
+      review_count: match.review_count,
+      communities: match.communities || []
+    }));
+    
+    console.log('[FuzzyMatches] Transformed:', transformedMatches.length);
+    setFuzzyMatches(transformedMatches);
   };
 
   const fetchUnmatched = async () => {
@@ -213,7 +230,7 @@ export default function AdminVendorMatching() {
       
       toast({
         title: "✅ Match Approved",
-        description: `Matched ${ratingIds.length} review(s) to ${vendorName}`
+        description: `Matched ${ratingIds?.length ?? 0} review(s) to ${vendorName}`
       });
       
       await refreshData();
@@ -341,7 +358,7 @@ export default function AdminVendorMatching() {
         sourceVendorId,
         sourceVendorName,
         targetCommunity: community,
-        ratingIdsCount: ratingIds.length
+        ratingIdsCount: ratingIds?.length ?? 0
       });
 
       // Call the copy_vendor_to_community RPC
@@ -374,7 +391,7 @@ export default function AdminVendorMatching() {
         
         toast({
           title: "✅ Vendor Copied & Matched",
-          description: `Copied ${sourceVendorName} to ${community} and matched ${ratingIds.length} review(s)`
+          description: `Copied ${sourceVendorName} to ${community} and matched ${ratingIds?.length ?? 0} review(s)`
         });
         
         await refreshData();
