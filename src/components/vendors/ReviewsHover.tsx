@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { createReviewCompositeKey } from "@/lib/utils";
 
 interface Review {
   id: string;
@@ -34,10 +35,13 @@ export default function ReviewsHover({ vendorId, children }) {
         })
       ]);
 
-      // Deduplicate by review ID to prevent showing the same review twice
-      const reviewMap = new Map();
+      // Deduplicate by composite key to prevent showing the same review twice
+      const reviewMap = new Map<string, any>();
       [...(verifiedReviews || []), ...(pendingReviews || [])].forEach((review: any) => {
-        reviewMap.set(review.id, review);
+        const compositeKey = createReviewCompositeKey(review);
+        if (!reviewMap.has(compositeKey)) {
+          reviewMap.set(compositeKey, review);
+        }
       });
       
       const allReviews = Array.from(reviewMap.values())

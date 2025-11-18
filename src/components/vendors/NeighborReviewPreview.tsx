@@ -6,7 +6,7 @@ import { MobileReviewsModal } from "./MobileReviewsModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { formatNameWithLastInitial } from "@/utils/nameFormatting";
 import { extractStreetName, capitalizeStreetName } from "@/utils/address";
-import { cn } from "@/lib/utils";
+import { cn, createReviewCompositeKey } from "@/lib/utils";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserData } from "@/hooks/useUserData";
@@ -106,11 +106,12 @@ export function NeighborReviewPreview({
       // Combine verified and survey reviews
       const allReviews = [...taggedVerifiedReviews, ...formattedSurveyReviews];
 
-      // Deduplicate by ID (survey reviews may appear in both list_vendor_reviews and survey_ratings)
+      // Deduplicate by composite key (rating + comments + timestamp)
       const uniqueReviewsMap = new Map<string, Review>();
       allReviews.forEach((review) => {
-        if (!uniqueReviewsMap.has(review.id)) {
-          uniqueReviewsMap.set(review.id, review);
+        const compositeKey = createReviewCompositeKey(review);
+        if (!uniqueReviewsMap.has(compositeKey)) {
+          uniqueReviewsMap.set(compositeKey, review);
         }
       });
 

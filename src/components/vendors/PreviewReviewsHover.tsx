@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { RatingStars } from "@/components/ui/rating-stars";
 import { formatDistanceToNow } from "date-fns";
+import { createReviewCompositeKey } from "@/lib/utils";
 
 export default function PreviewReviewsHover({
   vendorId, 
@@ -33,25 +34,29 @@ export default function PreviewReviewsHover({
       console.log('[VendorReviews] Verified:', verifiedResult.data?.length || 0);
       console.log('[VendorReviews] Pending:', pendingResult.data?.length || 0);
 
-      // Use a Map to deduplicate reviews by ID
-      const reviewMap = new Map();
+      // Use composite key to deduplicate reviews instead of ID
+      const reviewMap = new Map<string, any>();
       
       // Add verified reviews
       (verifiedResult.data || []).forEach((review: any) => {
-        reviewMap.set(review.id, {
-          id: review.id,
-          rating: review.rating,
-          comments: review.comments,
-          created_at: review.created_at,
-          author_label: review.author_label,
-          type: 'verified'
-        });
+        const compositeKey = createReviewCompositeKey(review);
+        if (!reviewMap.has(compositeKey)) {
+          reviewMap.set(compositeKey, {
+            id: review.id,
+            rating: review.rating,
+            comments: review.comments,
+            created_at: review.created_at,
+            author_label: review.author_label,
+            type: 'verified'
+          });
+        }
       });
 
-      // Add pending reviews (will skip if ID already exists)
+      // Add pending reviews (will skip if composite key already exists)
       (pendingResult.data || []).forEach((review: any) => {
-        if (!reviewMap.has(review.id)) {
-          reviewMap.set(review.id, {
+        const compositeKey = createReviewCompositeKey(review);
+        if (!reviewMap.has(compositeKey)) {
+          reviewMap.set(compositeKey, {
             id: review.id,
             rating: review.rating,
             comments: review.comments,
