@@ -81,6 +81,11 @@ export function NeighborsModal({
   });
 
   const formatAuthorDisplay = (authorLabel: string): { name: string; street: string } => {
+    // Pending reviews: return as-is (database already handles privacy)
+    if (authorLabel?.includes('(Pending)')) {
+      return { name: authorLabel, street: '' };
+    }
+    
     // Try pipe format first
     if (authorLabel.includes('|')) {
       const parts = String(authorLabel).split('|');
