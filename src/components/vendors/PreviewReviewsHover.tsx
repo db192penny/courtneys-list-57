@@ -33,33 +33,41 @@ export default function PreviewReviewsHover({
       console.log('[VendorReviews] Verified:', verifiedResult.data?.length || 0);
       console.log('[VendorReviews] Pending:', pendingResult.data?.length || 0);
 
-      // Format verified reviews
-      const formattedVerifiedReviews = (verifiedResult.data || []).map((review: any) => ({
-        id: review.id,
-        rating: review.rating,
-        comments: review.comments,
-        created_at: review.created_at,
-        author_label: review.author_label,
-        type: 'verified'
-      }));
+      // Use a Map to deduplicate reviews by ID
+      const reviewMap = new Map();
+      
+      // Add verified reviews
+      (verifiedResult.data || []).forEach((review: any) => {
+        reviewMap.set(review.id, {
+          id: review.id,
+          rating: review.rating,
+          comments: review.comments,
+          created_at: review.created_at,
+          author_label: review.author_label,
+          type: 'verified'
+        });
+      });
 
-      // Format pending survey reviews
-      const formattedPendingReviews = (pendingResult.data || []).map((review: any) => ({
-        id: review.id,
-        rating: review.rating,
-        comments: review.comments,
-        created_at: review.created_at,
-        author_label: review.author_label,
-        type: 'pending'
-      }));
+      // Add pending reviews (will skip if ID already exists)
+      (pendingResult.data || []).forEach((review: any) => {
+        if (!reviewMap.has(review.id)) {
+          reviewMap.set(review.id, {
+            id: review.id,
+            rating: review.rating,
+            comments: review.comments,
+            created_at: review.created_at,
+            author_label: review.author_label,
+            type: 'pending'
+          });
+        }
+      });
 
-      // Combine both types of reviews and sort by creation date
-      const allReviews = [...formattedVerifiedReviews, ...formattedPendingReviews];
-      const sortedReviews = allReviews.sort((a, b) => 
+      // Convert to array and sort by creation date
+      const sortedReviews = Array.from(reviewMap.values()).sort((a, b) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
       
-      console.log('[VendorReviews] Combined:', sortedReviews.length);
+      console.log('[VendorReviews] Combined (deduplicated):', sortedReviews.length);
       
       return sortedReviews;
     },
