@@ -34,10 +34,14 @@ export default function ReviewsHover({ vendorId, children }) {
         })
       ]);
 
-      const allReviews = [
-        ...(verifiedReviews || []),
-        ...(pendingReviews || [])
-      ].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      // Deduplicate by review ID to prevent showing the same review twice
+      const reviewMap = new Map();
+      [...(verifiedReviews || []), ...(pendingReviews || [])].forEach((review: any) => {
+        reviewMap.set(review.id, review);
+      });
+      
+      const allReviews = Array.from(reviewMap.values())
+        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       
       return allReviews as Review[];
     },
