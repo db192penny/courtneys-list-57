@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import VendorNameInput from "@/components/VendorNameInput";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 
 
@@ -42,6 +42,7 @@ interface ExactMatch {
 
 interface FuzzyMatch {
   survey_vendor_name: string;
+  survey_vendor_phone: string;
   category: string;
   suggested_vendor_category: string;
   mention_count: number;
@@ -84,6 +85,12 @@ export default function AdminVendorMatching() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [showCreateVendorModal, setShowCreateVendorModal] = useState(false);
+  const [newVendorData, setNewVendorData] = useState({
+    name: '',
+    phone: '',
+    category: ''
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -166,9 +173,21 @@ export default function AdminVendorMatching() {
     
     console.log('[FuzzyMatches] Fetched:', data?.length || 0);
     
+    // Get unmatched vendors to get survey phone numbers
+    const { data: unmatchedData } = await (supabase.rpc as any)("get_unmatched_vendors", {
+      p_community: community
+    });
+    
+    // Create a map of vendor names to phone numbers from survey
+    const phoneMap = new Map();
+    (unmatchedData || []).forEach((vendor: any) => {
+      phoneMap.set(vendor.vendor_name, vendor.sample_phone);
+    });
+    
     // Transform RPC data to match FuzzyMatch interface
     const transformedMatches: FuzzyMatch[] = (data || []).map((match: any) => ({
       survey_vendor_name: match.survey_vendor_name || '',
+      survey_vendor_phone: phoneMap.get(match.survey_vendor_name) || '',
       category: match.survey_category || 'Unknown',
       suggested_vendor_category: match.suggested_vendor_category || 'Unknown',
       mention_count: match.mention_count || 0,
@@ -615,6 +634,9 @@ export default function AdminVendorMatching() {
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {match.category} • {match.mention_count} mention(s)
+                        {match.survey_vendor_phone && (
+                          <> • 📞 {match.survey_vendor_phone}</>
+                        )}
                       </div>
                     </div>
                     
@@ -702,6 +724,22 @@ export default function AdminVendorMatching() {
                         disabled={processingId === match.suggested_vendor_id}
                       >
                         Skip
+                      </Button>
+                      
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          setCurrentSearchCategory(match.category);
+                          setCurrentRatingIds(match.rating_ids);
+                          setShowCreateVendorModal(true);
+                          setNewVendorData({
+                            name: match.survey_vendor_name,
+                            phone: match.survey_vendor_phone || '',
+                            category: match.category
+                          });
+                        }}
+                      >
+                        + Create New Vendor
                       </Button>
                     </div>
                   </div>
@@ -799,6 +837,85 @@ export default function AdminVendorMatching() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Vendor Modal */}
+      {showCreateVendorModal && (
+        <Dialog open={showCreateVendorModal} onOpenChange={setShowCreateVendorModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Vendor</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Vendor Name</Label>
+                <Input
+                  value={newVendorData.name}
+                  onChange={(e) => setNewVendorData({...newVendorData, name: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label>Category</Label>
+                <Input value={newVendorData.category} disabled />
+              </div>
+              <div>
+                <Label>Phone Number</Label>
+                <Input
+                  value={newVendorData.phone}
+                  onChange={(e) => setNewVendorData({...newVendorData, phone: e.target.value})}
+                  placeholder="(561) 555-1234"
+                />
+              </div>
+              <div className="text-sm text-muted-foreground">
+                This will create a new vendor in {community}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowCreateVendorModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={async () => {
+                try {
+                  const { data: newVendorId, error } = await supabase.rpc('create_vendor_from_survey', {
+                    p_survey_vendor_name: newVendorData.name,
+                    p_vendor_name: newVendorData.name,
+                    p_category: newVendorData.category,
+                    p_community: community,
+                    p_phone: newVendorData.phone || null,
+                    p_google_place_id: null,
+                    p_google_data: null
+                  });
+                  
+                  if (error) throw error;
+                  
+                  if (newVendorId) {
+                    await supabase.rpc('approve_vendor_matches', {
+                      p_rating_ids: currentRatingIds,
+                      p_vendor_id: newVendorId
+                    });
+                    
+                    toast({
+                      title: "✅ Vendor Created",
+                      description: `Created ${newVendorData.name} and matched reviews`
+                    });
+                    
+                    setShowCreateVendorModal(false);
+                    await refreshData();
+                  }
+                } catch (error) {
+                  console.error('Error creating vendor:', error);
+                  toast({
+                    title: "Error",
+                    description: "Failed to create vendor",
+                    variant: "destructive"
+                  });
+                }
+              }}>
+                Create & Match
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
