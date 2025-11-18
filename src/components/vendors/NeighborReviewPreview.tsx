@@ -147,20 +147,14 @@ export function NeighborReviewPreview({
   const applyPrivacyRules = (authorLabel: string): string => {
     if (!authorLabel) return 'Neighbor';
     
-    // Check if this is a pending review (contains " in " and "(Pending)")
-    const isPending = authorLabel.includes(' in ') && authorLabel.includes('(Pending)');
-    
-    // Extract location part (either "on Street" or "in Community (Pending)")
-    let locationPart = '';
-    if (isPending) {
-      // Pending format: "Name in The Oaks (Pending)" or "Neighbor in The Oaks (Pending)"
-      const inMatch = authorLabel.match(/in (.+)/);
-      locationPart = inMatch ? ` in ${inMatch[1]}` : '';
-    } else {
-      // Verified format: "Name on Street" or "Neighbor on Street"
-      const onMatch = authorLabel.match(/on ([^(]+)/);
-      locationPart = onMatch ? ` on ${onMatch[1].trim()}` : '';
+    // Pending reviews: return as-is (database already handles privacy)
+    if (authorLabel.includes('(Pending)')) {
+      return authorLabel;
     }
+    
+    // Extract location part for verified reviews ("on Street")
+    const onMatch = authorLabel.match(/on ([^(]+)/);
+    const locationPart = onMatch ? ` on ${onMatch[1].trim()}` : '';
     
     // Logged out users: Always show "Neighbor" + location
     if (!isAuthenticated) {
