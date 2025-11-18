@@ -145,29 +145,46 @@ export function NeighborReviewPreview({
   };
 
   const applyPrivacyRules = (authorLabel: string): string => {
-    if (!authorLabel) return 'Neighbor';
+    console.log('[applyPrivacyRules] INPUT:', authorLabel);
+    console.log('[applyPrivacyRules] isAuthenticated:', isAuthenticated);
+    console.log('[applyPrivacyRules] userData?.communityName:', userData?.communityName);
+    console.log('[applyPrivacyRules] communityName:', communityName);
+    
+    if (!authorLabel) {
+      console.log('[applyPrivacyRules] No label - returning Neighbor');
+      return 'Neighbor';
+    }
     
     // Pending reviews: return as-is (database already handles privacy)
     if (authorLabel.includes('(Pending)')) {
+      console.log('[applyPrivacyRules] PENDING REVIEW DETECTED - returning as-is:', authorLabel);
       return authorLabel;
     }
+    
+    console.log('[applyPrivacyRules] Processing as verified review...');
     
     // Extract location part for verified reviews ("on Street")
     const onMatch = authorLabel.match(/on ([^(]+)/);
     const locationPart = onMatch ? ` on ${onMatch[1].trim()}` : '';
     
+    console.log('[applyPrivacyRules] locationPart:', locationPart);
+    
     // Logged out users: Always show "Neighbor" + location
     if (!isAuthenticated) {
-      return locationPart ? `Neighbor${locationPart}` : 'Neighbor';
+      const result = locationPart ? `Neighbor${locationPart}` : 'Neighbor';
+      console.log('[applyPrivacyRules] Logged out - returning:', result);
+      return result;
     }
     
     // Logged in but different community: Show "Neighbor" + location
     if (userData?.communityName && communityName && userData.communityName !== communityName) {
-      return locationPart ? `Neighbor${locationPart}` : 'Neighbor';
+      const result = locationPart ? `Neighbor${locationPart}` : 'Neighbor';
+      console.log('[applyPrivacyRules] Different community - returning:', result);
+      return result;
     }
     
     // Same community: Use what the database returned
-    // (Database already checks show_name preference)
+    console.log('[applyPrivacyRules] Same community - returning original:', authorLabel);
     return authorLabel;
   };
 
