@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import VendorNameInput from "@/components/VendorNameInput";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 
 
 
@@ -42,6 +43,7 @@ interface ExactMatch {
 interface FuzzyMatch {
   survey_vendor_name: string;
   category: string;
+  suggested_vendor_category: string;
   mention_count: number;
   suggested_vendor_id: string;
   suggested_vendor_name: string;
@@ -156,6 +158,7 @@ export default function AdminVendorMatching() {
   };
 
   const fetchFuzzyMatches = async () => {
+    console.log('[FuzzyMatches] Fetching for:', community);
     const { data, error } = await (supabase.rpc as any)("get_fuzzy_vendor_matches", {
       p_community: community
     });
@@ -165,15 +168,17 @@ export default function AdminVendorMatching() {
     
     // Transform RPC data to match FuzzyMatch interface
     const transformedMatches: FuzzyMatch[] = (data || []).map((match: any) => ({
-      vendor_id: match.vendor_id,
-      vendor_name: match.vendor_name,
-      rating_ids: match.all_rating_ids || [],  // Transform: all_rating_ids → rating_ids
-      category: match.survey_category || 'Unknown',  // Transform: survey_category → category
-      confidence_score: match.match_confidence || 0,  // Transform: match_confidence → confidence_score
-      contact_info: match.contact_info,
-      avg_rating: match.avg_rating,
-      review_count: match.review_count,
-      communities: match.communities || []
+      survey_vendor_name: match.survey_vendor_name || '',
+      category: match.survey_category || 'Unknown',
+      suggested_vendor_category: match.suggested_vendor_category || 'Unknown',
+      mention_count: match.mention_count || 0,
+      suggested_vendor_id: match.suggested_vendor_id || '',
+      suggested_vendor_name: match.suggested_vendor_name || '',
+      suggested_vendor_phone: match.suggested_vendor_phone || '',
+      suggested_vendor_community: match.suggested_vendor_community || '',
+      is_same_community: match.is_same_community || false,
+      confidence_score: match.match_confidence || 0,
+      rating_ids: match.all_rating_ids || []
     }));
     
     console.log('[FuzzyMatches] Transformed:', transformedMatches.length);
@@ -599,41 +604,77 @@ export default function AdminVendorMatching() {
           {loading ? (
             <Skeleton className="h-40 w-full" />
           ) : fuzzyMatches.length > 0 ? (
-            fuzzyMatches.map((match, idx) => (
-              <Card key={idx}>
-                <CardContent className="pt-6 space-y-4">
-                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="font-semibold text-lg">{match.survey_vendor_name}</div>
-                      <div className="text-sm text-muted-foreground">{match.category}</div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        {match.mention_count} mention(s)
+            fuzzyMatches.map((match) => (
+              <Card key={match.suggested_vendor_id} className="mb-4">
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    {/* Survey vendor info */}
+                    <div>
+                      <div className="font-semibold text-lg">
+                        Survey Says: {match.survey_vendor_name}
                       </div>
-                      <div className="mt-3 border-t pt-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium">Suggested: {match.suggested_vendor_name}</span>
-                          <Badge variant={getConfidenceBadgeVariant(match.confidence_score)}>
-                            {Math.round(match.confidence_score * 100)}% confidence
-                          </Badge>
-                        </div>
-                        <div className="text-sm text-muted-foreground">{match.suggested_vendor_phone}</div>
-                        <Badge variant="secondary" className="mt-2">
-                          {match.suggested_vendor_community}
-                        </Badge>
+                      <div className="text-sm text-muted-foreground">
+                        {match.category} • {match.mention_count} mention(s)
                       </div>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {match.is_same_community ? (
-                      <Button
-                        onClick={() => handleApproveMatch(match.rating_ids, match.suggested_vendor_id, match.suggested_vendor_name)}
-                        disabled={processingId === match.suggested_vendor_id}
-                      >
-                        Approve Match
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
+                    
+                    <Separator />
+                    
+                    {/* Matched vendor info */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 mb-2">
+                        {match.is_same_community ? (
+                          <span className="text-sm text-green-600 font-medium">
+                            ✓ Already in {match.suggested_vendor_community}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-blue-600 font-medium">
+                            📍 Currently in {match.suggested_vendor_community}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="font-medium text-lg">
+                        {match.suggested_vendor_name}
+                      </div>
+                      
+                      <div className="text-sm text-muted-foreground">
+                        {match.suggested_vendor_category}
+                      </div>
+                      
+                      {/* Category mismatch warning */}
+                      {match.category !== match.suggested_vendor_category && (
+                        <div className="text-sm text-red-600 font-semibold mt-2 p-2 bg-red-50 rounded border border-red-200">
+                          ⚠️ Category Mismatch! Survey: {match.category} → Suggested: {match.suggested_vendor_category}
+                        </div>
+                      )}
+                      
+                      <div className="text-sm mt-1">
+                        {Math.round(match.confidence_score * 100)}% confidence match
+                      </div>
+                      
+                      {match.suggested_vendor_phone && (
+                        <div className="text-sm text-muted-foreground">
+                          📞 {match.suggested_vendor_phone}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Action buttons */}
+                    <div className="flex gap-2 flex-wrap pt-2">
+                      {match.is_same_community ? (
+                        <Button 
+                          onClick={() => handleApproveMatch(
+                            match.rating_ids, 
+                            match.suggested_vendor_id, 
+                            match.suggested_vendor_name
+                          )}
+                          disabled={processingId === match.suggested_vendor_id}
+                        >
+                          {processingId === match.suggested_vendor_id ? 'Processing...' : '✓ Use This Vendor'}
+                        </Button>
+                      ) : (
+                        <Button 
                           onClick={() => handleCopyVendorToCommunity(
                             match.suggested_vendor_id,
                             match.suggested_vendor_name,
@@ -641,26 +682,28 @@ export default function AdminVendorMatching() {
                           )}
                           disabled={processingId === match.suggested_vendor_id}
                         >
-                          Copy to {community}
+                          {processingId === match.suggested_vendor_id ? 'Copying...' : `📋 Copy from ${match.suggested_vendor_community} to ${community}`}
                         </Button>
-                        <Button
-                          variant="outline"
-                          onClick={() => handleApproveMatch(match.rating_ids, match.suggested_vendor_id, match.suggested_vendor_name)}
-                          disabled={processingId === match.suggested_vendor_id}
-                        >
-                          ⚠️ Link to {match.suggested_vendor_community}
-                        </Button>
-                      </>
-                    )}
-                    
-                    <Button
-                      variant="outline"
-                      onClick={() => handleSearchVendors(match.category, match.rating_ids)}
-                    >
-                      Search Other Vendors
-                    </Button>
-                    
-                    <Button variant="ghost">Skip</Button>
+                      )}
+                      
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          setCurrentSearchCategory(match.category);
+                          setCurrentRatingIds(match.rating_ids);
+                          setShowSearchModal(true);
+                        }}
+                      >
+                        🔍 Search Other Vendors
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost"
+                        disabled={processingId === match.suggested_vendor_id}
+                      >
+                        Skip
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
