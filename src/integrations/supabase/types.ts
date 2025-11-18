@@ -2690,6 +2690,7 @@ export type Database = {
           is_same_community: boolean
           match_confidence: number
           mention_count: number
+          suggested_vendor_category: string
           suggested_vendor_community: string
           suggested_vendor_id: string
           suggested_vendor_name: string
