@@ -9,6 +9,7 @@ import { useUserData } from "@/hooks/useUserData";
 import { ReviewSourceIcon } from "./ReviewSourceIcon";
 import { RatingStars } from "@/components/ui/rating-stars";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createReviewCompositeKey } from "@/lib/utils";
 
 interface Review {
   id: string;
@@ -49,10 +50,17 @@ export function MobileReviewsModal({ open, onOpenChange, vendor, onRate, communi
         })
       ]);
 
-      const allReviews = [
-        ...(verifiedReviews || []),
-        ...(pendingReviews || [])
-      ].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      // Deduplicate by composite key (rating + comments + timestamp)
+      const reviewMap = new Map<string, Review>();
+      [...(verifiedReviews || []), ...(pendingReviews || [])].forEach((review: any) => {
+        const compositeKey = createReviewCompositeKey(review);
+        if (!reviewMap.has(compositeKey)) {
+          reviewMap.set(compositeKey, review);
+        }
+      });
+
+      const allReviews = Array.from(reviewMap.values())
+        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       
       return allReviews as Review[];
     },

@@ -7,6 +7,7 @@ import { Users, Star } from "lucide-react";
 import { formatNameWithLastInitial } from "@/utils/nameFormatting";
 import { extractStreetName, capitalizeStreetName } from "@/utils/address";
 import { useUserData } from "@/hooks/useUserData";
+import { createReviewCompositeKey } from "@/lib/utils";
 
 interface Review {
   id: string;
@@ -62,10 +63,13 @@ export function NeighborsModal({
         })
       ]);
 
-      // Deduplicate by review ID to prevent showing the same review twice
-      const reviewMap = new Map();
+      // Deduplicate by composite key to prevent showing the same review twice
+      const reviewMap = new Map<string, any>();
       [...(verifiedReviews || []), ...(pendingReviews || [])].forEach((review: any) => {
-        reviewMap.set(review.id, review);
+        const compositeKey = createReviewCompositeKey(review);
+        if (!reviewMap.has(compositeKey)) {
+          reviewMap.set(compositeKey, review);
+        }
       });
       
       const allReviews = Array.from(reviewMap.values())
