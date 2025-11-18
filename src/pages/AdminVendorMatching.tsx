@@ -72,13 +72,8 @@ export default function AdminVendorMatching() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<ProgressData | null>(null);
   const [exactMatches, setExactMatches] = useState<ExactMatch[]>([]);
-  const [fuzzyMatches, setFuzzyMatches] = useState<FuzzyMatch[]>([]);
   const [unmatchedVendors, setUnmatchedVendors] = useState<UnmatchedVendor[]>([]);
   const [showApproveAllDialog, setShowApproveAllDialog] = useState(false);
-  
-  // Filter out vendors that already have fuzzy matches to get true unmatched count
-  const fuzzyVendorNames = new Set(fuzzyMatches.map(m => m.survey_vendor_name));
-  const trueUnmatched = unmatchedVendors.filter(v => !fuzzyVendorNames.has(v.vendor_name));
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [currentSearchCategory, setCurrentSearchCategory] = useState<string>("");
   const [currentRatingIds, setCurrentRatingIds] = useState<string[]>([]);
@@ -134,7 +129,6 @@ export default function AdminVendorMatching() {
       await Promise.all([
         fetchProgress(),
         fetchExactMatches(),
-        fetchFuzzyMatches(),
         fetchUnmatched()
       ]);
     } catch (error) {
@@ -165,57 +159,42 @@ export default function AdminVendorMatching() {
     setExactMatches((data as ExactMatch[]) || []);
   };
 
-  const fetchFuzzyMatches = async () => {
-    console.log('[FuzzyMatches] Fetching for:', community);
-    const { data, error } = await (supabase.rpc as any)("get_fuzzy_vendor_matches", {
-      p_community: community
-    });
-    if (error) throw error;
-    
-    console.log('[FuzzyMatches] Fetched:', data?.length || 0);
-    
-    // Get unmatched vendors to find survey phone numbers
-    const { data: unmatchedData } = await (supabase.rpc as any)("survey_get_unmatched_vendors", {
-      _community: community
-    });
-    
-    // Map vendor names to phone numbers
-    const phoneMap = new Map();
-    (unmatchedData || []).forEach((vendor: any) => {
-      phoneMap.set(vendor.vendor_name, vendor.sample_phone);
-    });
-    
-    // Transform with phone numbers
-    const transformedMatches: FuzzyMatch[] = (data || []).map((match: any) => ({
-      survey_vendor_name: match.survey_vendor_name || '',
-      survey_vendor_phone: phoneMap.get(match.survey_vendor_name) || '',
-      category: match.survey_category || 'Unknown',
-      suggested_vendor_category: match.suggested_vendor_category || 'Unknown',
-      mention_count: match.mention_count || 0,
-      suggested_vendor_id: match.suggested_vendor_id || '',
-      suggested_vendor_name: match.suggested_vendor_name || '',
-      suggested_vendor_phone: match.suggested_vendor_phone || '',
-      suggested_vendor_community: match.suggested_vendor_community || '',
-      is_same_community: match.is_same_community || false,
-      confidence_score: match.match_confidence || 0,
-      rating_ids: match.all_rating_ids || []
-    }));
-    
-    console.log('[FuzzyMatches] Transformed:', transformedMatches.length);
-    setFuzzyMatches(transformedMatches);
-  };
-
   const fetchUnmatched = async () => {
     console.log('[Unmatched] Fetching vendors for:', community);
-    const { data, error } = await (supabase.rpc as any)("get_unmatched_vendors", {
+    
+    // Get true unmatched vendors
+    const { data: unmatchedData, error: unmatchedError } = await (supabase.rpc as any)("get_unmatched_vendors", {
       p_community: community
     });
-    if (error) throw error;
-    console.log('[Unmatched] Received data:', data);
+    if (unmatchedError) throw unmatchedError;
+    console.log('[Unmatched] Received data:', unmatchedData);
+    
+    // ALSO get fuzzy matches and merge them into unmatched
+    const { data: fuzzyData, error: fuzzyError } = await (supabase.rpc as any)("get_fuzzy_vendor_matches", {
+      p_community: community
+    });
+    if (fuzzyError) console.error('[Fuzzy] Error fetching:', fuzzyError);
+    
+    // Transform fuzzy matches to look like unmatched vendors
+    const fuzzyAsUnmatched: UnmatchedVendor[] = (fuzzyData || []).map((f: any) => ({
+      survey_rating_id: f.rating_ids?.[0] || '',
+      vendor_name: f.survey_vendor_name || '',
+      vendor_category: f.survey_category || 'Unknown',
+      vendor_phone: f.survey_vendor_phone || null,
+      mention_count: f.mention_count || 0,
+      all_rating_ids: f.all_rating_ids || [],
+      respondent_community: community
+    }));
+    
+    console.log('[Unmatched] Fuzzy transformed:', fuzzyAsUnmatched.length);
+    
+    // Combine unmatched and fuzzy
+    const combined = [...(unmatchedData || []), ...fuzzyAsUnmatched];
+    console.log('[Unmatched] Total combined:', combined.length);
     
     // Enrich with respondent community from preview_sessions
     const enrichedData = await Promise.all(
-      (data || []).map(async (vendor: any) => {
+      (combined || []).map(async (vendor: any) => {
         // Get the first rating ID to look up the session
         if (vendor.all_rating_ids && vendor.all_rating_ids.length > 0) {
           const { data: rating } = await supabase
@@ -499,9 +478,8 @@ export default function AdminVendorMatching() {
               <div className="border-t pt-4">
                 <div className="text-sm font-semibold mb-2">Next steps:</div>
                 <div className="space-y-1 text-sm text-muted-foreground">
-                  <div>• {progress.exact_match_available} Exact matches</div>
-                  <div>• {progress.fuzzy_match_available} Fuzzy matches</div>
-                  <div>• {progress.needs_creation} Need creation</div>
+                  <div>• {progress.exact_match_available} Exact matches ready</div>
+                  <div>• {progress.unmatched_reviews} need manual review</div>
                 </div>
               </div>
             </>
@@ -511,23 +489,17 @@ export default function AdminVendorMatching() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="exact">
             Exact Matches
             {exactMatches.length > 0 && (
               <Badge variant="default" className="ml-2">{exactMatches.length}</Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="fuzzy">
-            Fuzzy Matches
-            {fuzzyMatches.length > 0 && (
-              <Badge variant="secondary" className="ml-2">{fuzzyMatches.length}</Badge>
-            )}
-          </TabsTrigger>
           <TabsTrigger value="unmatched">
             Unmatched
-            {trueUnmatched.length > 0 && (
-              <Badge variant="outline" className="ml-2">{trueUnmatched.length}</Badge>
+            {unmatchedVendors.length > 0 && (
+              <Badge variant="outline" className="ml-2">{unmatchedVendors.length}</Badge>
             )}
           </TabsTrigger>
         </TabsList>
@@ -619,152 +591,12 @@ export default function AdminVendorMatching() {
           )}
         </TabsContent>
 
-        {/* FUZZY MATCHES TAB */}
-        <TabsContent value="fuzzy" className="space-y-4">
-          {loading ? (
-            <Skeleton className="h-40 w-full" />
-          ) : fuzzyMatches.length > 0 ? (
-            fuzzyMatches.map((match) => (
-              <Card key={match.suggested_vendor_id} className="mb-4">
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    {/* Survey vendor info */}
-                    <div>
-                      <div className="font-semibold text-lg">
-                        Survey Says: {match.survey_vendor_name}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {match.category} • {match.mention_count} mention(s)
-                        {match.survey_vendor_phone && (
-                          <> • 📞 {match.survey_vendor_phone}</>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    {/* Matched vendor info */}
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 mb-2">
-                        {match.is_same_community ? (
-                          <span className="text-sm text-green-600 font-medium">
-                            ✓ Already in {match.suggested_vendor_community}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-blue-600 font-medium">
-                            📍 Currently in {match.suggested_vendor_community}
-                          </span>
-                        )}
-                      </div>
-                      
-                      <div className="font-medium text-lg">
-                        {match.suggested_vendor_name}
-                      </div>
-                      
-                      <div className="text-sm text-muted-foreground">
-                        {match.suggested_vendor_category}
-                      </div>
-                      
-                      {/* Category mismatch warning */}
-                      {match.category !== match.suggested_vendor_category && (
-                        <div className="text-sm text-red-600 font-semibold mt-2 p-2 bg-red-50 rounded border border-red-200">
-                          ⚠️ Category Mismatch! Survey: {match.category} → Suggested: {match.suggested_vendor_category}
-                        </div>
-                      )}
-                      
-                      <div className="text-sm mt-1">
-                        {Math.round(match.confidence_score * 100)}% confidence match
-                      </div>
-                      
-                      {match.suggested_vendor_phone && (
-                        <div className="text-sm text-muted-foreground">
-                          📞 {match.suggested_vendor_phone}
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Action buttons */}
-                    <div className="flex gap-2 flex-wrap pt-2">
-                      {match.is_same_community ? (
-                        <Button 
-                          onClick={() => handleApproveMatch(
-                            match.rating_ids, 
-                            match.suggested_vendor_id, 
-                            match.suggested_vendor_name
-                          )}
-                          disabled={processingId === match.suggested_vendor_id}
-                        >
-                          {processingId === match.suggested_vendor_id ? 'Processing...' : '✓ Use This Vendor'}
-                        </Button>
-                      ) : (
-                        <Button 
-                          onClick={() => handleCopyVendorToCommunity(
-                            match.suggested_vendor_id,
-                            match.suggested_vendor_name,
-                            match.rating_ids
-                          )}
-                          disabled={processingId === match.suggested_vendor_id}
-                        >
-                          {processingId === match.suggested_vendor_id ? 'Copying...' : `📋 Copy from ${match.suggested_vendor_community} to ${community}`}
-                        </Button>
-                      )}
-                      
-                      <Button 
-                        variant="outline"
-                        onClick={() => {
-                          setCurrentSearchCategory(match.category);
-                          setCurrentRatingIds(match.rating_ids);
-                          setShowSearchModal(true);
-                        }}
-                      >
-                        🔍 Search Other Vendors
-                      </Button>
-                      
-                      <Button 
-                        variant="outline"
-                        onClick={() => {
-                          handleCreateVendor(
-                            match.survey_vendor_name,
-                            match.category,
-                            match.rating_ids,
-                            {
-                              name: match.survey_vendor_name,
-                              phone: match.survey_vendor_phone || null,
-                              community: community
-                            }
-                          );
-                        }}
-                        disabled={processingId === match.suggested_vendor_id}
-                      >
-                        + Create New Vendor
-                      </Button>
-                      
-                      <Button 
-                        variant="ghost"
-                        disabled={processingId === match.suggested_vendor_id}
-                      >
-                        Skip
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Card>
-              <CardContent className="pt-6 text-center text-muted-foreground">
-                No fuzzy matches found
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
         {/* UNMATCHED TAB */}
         <TabsContent value="unmatched" className="space-y-4">
           {loading ? (
             <Skeleton className="h-40 w-full" />
-          ) : trueUnmatched.length > 0 ? (
-              trueUnmatched.map((vendor, idx) => (
+          ) : unmatchedVendors.length > 0 ? (
+              unmatchedVendors.map((vendor, idx) => (
                 <UnmatchedVendorCard
                   key={idx}
                   vendor={vendor}
