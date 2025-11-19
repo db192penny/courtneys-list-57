@@ -203,11 +203,27 @@ export function RespondentsTable() {
 
   const handleSendEmail = async (respondent: any) => {
     try {
+      // Get provider names from survey_ratings for this session
+      const { data: ratings } = await supabase
+        .from('survey_ratings')
+        .select('vendor_name')
+        .eq('session_id', respondent.id)
+        .not('vendor_name', 'is', null);
+      
+      // Extract unique provider names
+      const providers = ratings
+        ?.map(r => r.vendor_name)
+        .filter((name, index, self) => name && self.indexOf(name) === index) // Remove duplicates
+        || [];
+      
+      console.log(`Sending email to ${respondent.name} with ${providers.length} providers:`, providers);
+      
       const { error } = await supabase.functions.invoke('send-survey-review-emails', {
         body: { 
           community: respondent.community,
           test_mode: false,
-          session_ids: [respondent.id]
+          session_ids: [respondent.id],
+          providers: providers  // Pass providers array
         }
       });
 
@@ -215,7 +231,7 @@ export function RespondentsTable() {
 
       toast({
         title: "Email Sent",
-        description: `Survey email sent to ${respondent.name}`
+        description: `Email sent to ${respondent.name} with ${providers.length} provider${providers.length !== 1 ? 's' : ''}`
       });
       
       await refetch();
