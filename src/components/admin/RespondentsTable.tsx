@@ -203,15 +203,15 @@ export function RespondentsTable() {
 
   const handleSendEmail = async (respondent: any) => {
     try {
-      // Get provider names from survey_ratings for this session
-      const { data: ratings } = await supabase
-        .from('survey_ratings')
+      // Get provider names from survey_pending_ratings for this session
+      const { data: pendingRatings } = await supabase
+        .from('survey_pending_ratings')
         .select('vendor_name')
         .eq('session_id', respondent.id)
         .not('vendor_name', 'is', null);
       
       // Extract unique provider names
-      const providers = ratings
+      const providers = pendingRatings
         ?.map(r => r.vendor_name)
         .filter((name, index, self) => name && self.indexOf(name) === index) // Remove duplicates
         || [];
