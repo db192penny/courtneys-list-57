@@ -40,6 +40,7 @@ import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { GATracking } from "@/components/analytics/GoogleAnalytics";
 import { useAnalyticsTracking } from "@/contexts/AnalyticsContext";
 import { useUserData } from "@/hooks/useUserData";
+import { BabysittingBoard } from "@/components/babysitting/BabysittingBoard";
 
 import ReviewsHover from "@/components/vendors/ReviewsHover";
 import PreviewReviewsHover from "@/components/vendors/PreviewReviewsHover";
@@ -102,7 +103,14 @@ export default function CommunityVendorTable({
   isAuthenticated?: boolean;
   isVerified?: boolean;
 }) {
+  // Special handling for Babysitting category
   const [searchParams, setSearchParams] = useSearchParams();
+  const categoryFromUrl = searchParams.get("category");
+  
+  if (categoryFromUrl === "Babysitting") {
+    return <BabysittingBoard communityName={communityName} isAuthenticated={isAuthenticated} />;
+  }
+  
   const navigate = useNavigate();
   const [category, setCategory] = useState<string>("Pool");
   const SORTS = getSorts(communityName);

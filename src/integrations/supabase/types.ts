@@ -242,6 +242,78 @@ export type Database = {
           },
         ]
       }
+      babysitter_listings: {
+        Row: {
+          age_groups: string[] | null
+          approved_at: string | null
+          approved_by: string | null
+          availability: string | null
+          certifications: string[] | null
+          community: string
+          contact_email: string | null
+          contact_name: string
+          contact_phone: string
+          contact_relationship: string
+          created_at: string | null
+          experience_description: string | null
+          hourly_rate_range: string | null
+          id: string
+          is_adult: boolean | null
+          posted_by: string | null
+          sitter_age: number
+          sitter_first_name: string
+          status: string
+          street_name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          age_groups?: string[] | null
+          approved_at?: string | null
+          approved_by?: string | null
+          availability?: string | null
+          certifications?: string[] | null
+          community: string
+          contact_email?: string | null
+          contact_name: string
+          contact_phone: string
+          contact_relationship: string
+          created_at?: string | null
+          experience_description?: string | null
+          hourly_rate_range?: string | null
+          id?: string
+          is_adult?: boolean | null
+          posted_by?: string | null
+          sitter_age: number
+          sitter_first_name: string
+          status?: string
+          street_name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          age_groups?: string[] | null
+          approved_at?: string | null
+          approved_by?: string | null
+          availability?: string | null
+          certifications?: string[] | null
+          community?: string
+          contact_email?: string | null
+          contact_name?: string
+          contact_phone?: string
+          contact_relationship?: string
+          created_at?: string | null
+          experience_description?: string | null
+          hourly_rate_range?: string | null
+          id?: string
+          is_adult?: boolean | null
+          posted_by?: string | null
+          sitter_age?: number
+          sitter_first_name?: string
+          status?: string
+          street_name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       badge_levels: {
         Row: {
           color: string

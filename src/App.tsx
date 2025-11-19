@@ -41,6 +41,7 @@ import AdminPreviewLinks from "./pages/AdminPreviewLinks";
 import AdminPreviewUsers from "./pages/AdminPreviewUsers";
 import AdminUsers from "./pages/AdminUsers";
 import AdminVendorMatching from "@/pages/AdminVendorMatching";
+import AdminBabysitting from "@/pages/AdminBabysitting";
 
 import MessageBoardHelper from "@/components/admin/MessageBoardHelper";
 import MockupPreview from "./pages/MockupPreview";
@@ -325,6 +326,7 @@ function AppContent() {
         <Route path="/:communitySlug/rate-vendors" element={<RateVendors />} />
         <Route path="/admin/survey-ratings" element={<AdminProtectedRoute><SurveyRatingsAdmin /></AdminProtectedRoute>} />
         <Route path="/admin/vendor-matching" element={<AdminProtectedRoute><AdminVendorMatching /></AdminProtectedRoute>} />
+        <Route path="/admin/babysitting" element={<AdminProtectedRoute><AdminBabysitting /></AdminProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
