@@ -146,10 +146,10 @@ export default function Community() {
   const activeUsers = communityStats?.active_users || 0;
   
   // Calculate average rating from vendor data
-    const ratedVendorsCount = data?.filter(v => ((v as any).avg_rating || 0) > 0).length || 0;
-    const avgRating = ratedVendorsCount > 0 
-      ? (data?.reduce((sum, v) => sum + ((v as any).avg_rating || 0), 0) || 0) / ratedVendorsCount 
-      : 0;
+  const ratedVendorsCount = data?.filter(v => ((v as any).hoa_rating || 0) > 0).length || 0;
+  const avgRating = ratedVendorsCount > 0 
+    ? (data?.reduce((sum, v) => sum + ((v as any).hoa_rating || 0), 0) || 0) / ratedVendorsCount 
+    : 0;
 
   // Dynamic SEO based on community
   const seoTitle = useMemo(() => {
