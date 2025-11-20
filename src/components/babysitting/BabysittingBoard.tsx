@@ -293,37 +293,51 @@ export function BabysittingBoard({
                       <p className="text-sm font-medium">{listing.hourly_rate_range}</p>
                     )}
 
-                    {/* Contact Buttons */}
-                    <div className="pt-3 border-t flex items-center justify-between gap-2">
-                      <div className="flex gap-2 flex-1">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleCall(listing)}
-                          className="flex-1"
-                        >
-                          <Phone className="h-4 w-4 mr-1" />
-                          Call
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleText(listing)}
-                          className="flex-1"
-                        >
-                          <MessageSquare className="h-4 w-4 mr-1" />
-                          Text
-                        </Button>
+                    {/* Contact Section */}
+                    <div className="pt-3 border-t space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        {listing.is_adult 
+                          ? `Contact ${listing.sitter_first_name}`
+                          : `Contact ${listing.sitter_first_name}'s parent`
+                        }
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-2 flex-1">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleCall(listing)}
+                            className="flex-1"
+                          >
+                            <Phone className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleText(listing)}
+                            className="flex-1"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleCopyNumber(listing)}
+                            className="flex-1"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {listing.posted_by === user?.id && (
+                          <Button 
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setEditingListing(listing)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
-                      {listing.posted_by === user?.id && (
-                        <Button 
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setEditingListing(listing)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      )}
                     </div>
                   </CardContent>
                 </Card>
