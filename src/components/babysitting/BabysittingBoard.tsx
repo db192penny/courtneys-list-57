@@ -157,37 +157,9 @@ export function BabysittingBoard({
     }
   };
 
-  // If not authenticated, show sign-in prompt instead of listings
-  if (!isAuthenticated) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">Babysitting Board</h2>
-            <p className="text-muted-foreground mt-1">
-              Find trusted babysitters in {communityName}
-            </p>
-          </div>
-        </div>
-
-        <Card>
-          <CardContent className="text-center py-12">
-            <p className="text-lg font-semibold mb-2">Sign In Required</p>
-            <p className="text-muted-foreground mb-4">
-              To protect our community's children, you must be a verified neighbor to view babysitter listings.
-            </p>
-            <Button onClick={() => window.location.href = '/signin'}>
-              Sign In to View Babysitters
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      {/* Category Navigation */}
+      {/* Category Navigation - ALWAYS VISIBLE */}
       <div className="mb-4">
         <HorizontalCategoryPills
           selectedCategory="Babysitting"
@@ -197,226 +169,254 @@ export function BabysittingBoard({
         />
       </div>
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Babysitters</h2>
-          <p className="text-muted-foreground mt-1">
-            Community babysitters in {communityName}
-          </p>
-        </div>
-        {isAuthenticated && (
-          <Button onClick={() => setShowSubmitForm(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add a Babysitter
-          </Button>
-        )}
-      </div>
+      {/* Conditional Content Based on Authentication */}
+      {!isAuthenticated ? (
+        // Unauthenticated view
+        <>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold">Babysitters</h2>
+              <p className="text-muted-foreground mt-1">
+                Community babysitters in {communityName}
+              </p>
+            </div>
+          </div>
 
-      {/* Listings Grid */}
-      {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">Loading...</div>
-      ) : !listings || listings.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <p className="text-muted-foreground">No babysitters listed yet. Be the first to add one!</p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-lg font-semibold mb-2">Sign In Required</p>
+              <p className="text-muted-foreground mb-4">
+                To protect our community's children, you must be a verified neighbor to view babysitter listings.
+              </p>
+              <Button onClick={() => window.location.href = '/signin'}>
+                Sign In to View Babysitters
+              </Button>
+            </CardContent>
+          </Card>
+        </>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {listings.map((listing) => (
-            <Card key={listing.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-xl">
-                      {listing.sitter_first_name}, {listing.sitter_age}
-                    </CardTitle>
-                    {listing.street_name && (
-                      <CardDescription className="text-xs mt-1">
-                        {listing.street_name}
-                      </CardDescription>
-                    )}
-                  </div>
-                  {listing.is_adult && (
-                    <Badge variant="secondary">18+</Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {/* Certifications */}
-                {listing.certifications && listing.certifications.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {listing.certifications.map((cert, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
-                        <Award className="h-3 w-3 mr-1" />
-                        {cert}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+        // Authenticated view
+        <>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold">Babysitters</h2>
+              <p className="text-muted-foreground mt-1">
+                Community babysitters in {communityName}
+              </p>
+            </div>
+            <Button onClick={() => setShowSubmitForm(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add a Babysitter
+            </Button>
+          </div>
 
-                {/* Experience */}
-                {listing.experience_description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {listing.experience_description}
-                  </p>
-                )}
-
-                {/* Age Groups */}
-                {listing.age_groups && listing.age_groups.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {listing.age_groups.map((group, idx) => (
-                      <span key={idx} className="text-sm">
-                        {ageGroupEmojis[group] || "👤"} {group}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Availability */}
-                {listing.availability && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    <span>{listing.availability}</span>
-                  </div>
-                )}
-
-                {/* Rate */}
-                {listing.hourly_rate_range && (
-                  <p className="text-sm font-medium">{listing.hourly_rate_range}</p>
-                )}
-
-                {/* Contact Button */}
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => setSelectedListing(listing)}
-                >
-                  Contact {listing.is_adult ? "Sitter" : "Parent"}
-                </Button>
-
-                {/* Edit Button - only for poster */}
-                {listing.posted_by === user?.id && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="w-full mt-2"
-                    onClick={() => setEditingListing(listing)}
-                  >
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Edit Listing
-                  </Button>
-                )}
+          {/* Listings Grid */}
+          {isLoading ? (
+            <div className="text-center py-12 text-muted-foreground">Loading...</div>
+          ) : !listings || listings.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <p className="text-muted-foreground">No babysitters listed yet. Be the first to add one!</p>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {listings.map((listing) => (
+                <Card key={listing.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-xl">
+                          {listing.sitter_first_name}, {listing.sitter_age}
+                        </CardTitle>
+                        {listing.street_name && (
+                          <CardDescription className="text-xs mt-1">
+                            {listing.street_name}
+                          </CardDescription>
+                        )}
+                      </div>
+                      {listing.is_adult && (
+                        <Badge variant="secondary">18+</Badge>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* Certifications */}
+                    {listing.certifications && listing.certifications.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {listing.certifications.map((cert, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            <Award className="h-3 w-3 mr-1" />
+                            {cert}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
 
-      {/* Contact Modal */}
-      <Dialog open={!!selectedListing} onOpenChange={() => setSelectedListing(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Contact for {selectedListing?.sitter_first_name}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">
-                {selectedListing?.contact_relationship === "parent" 
-                  ? "Parent Contact:" 
-                  : "Contact:"}
-              </p>
-              <p className="font-medium">{selectedListing?.contact_name}</p>
-            </div>
-            
-            {/* Phone number display */}
-            <div className="text-sm font-medium text-center bg-blue-50 py-2 px-3 rounded border border-blue-200">
-              {formatUSPhoneDisplay(selectedListing?.contact_phone || "")}
-            </div>
+                    {/* Experience */}
+                    {listing.experience_description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {listing.experience_description}
+                      </p>
+                    )}
 
-            {/* Call, Text, Copy buttons */}
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => selectedListing && handleCall(selectedListing)}
-                className="flex-1"
-              >
-                <Phone className="h-4 w-4 mr-2" />
-                Call
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => selectedListing && handleText(selectedListing)}
-                className="flex-1"
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Text
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => selectedListing && handleCopyNumber(selectedListing)}
-                className="flex-1"
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Copy
-              </Button>
-            </div>
+                    {/* Age Groups */}
+                    {listing.age_groups && listing.age_groups.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {listing.age_groups.map((group, idx) => (
+                          <span key={idx} className="text-sm">
+                            {ageGroupEmojis[group] || "👤"} {group}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-            {selectedListing?.contact_email && (
-              <div className="pt-2 border-t">
-                <div className="flex items-center gap-2 justify-center">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <a 
-                    href={`mailto:${selectedListing?.contact_email}`}
-                    className="text-primary hover:underline text-sm"
-                  >
-                    {selectedListing?.contact_email}
-                  </a>
+                    {/* Availability */}
+                    {listing.availability && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        <span>{listing.availability}</span>
+                      </div>
+                    )}
+
+                    {/* Rate */}
+                    {listing.hourly_rate_range && (
+                      <p className="text-sm font-medium">{listing.hourly_rate_range}</p>
+                    )}
+
+                    {/* Contact Button */}
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => setSelectedListing(listing)}
+                    >
+                      Contact {listing.is_adult ? "Sitter" : "Parent"}
+                    </Button>
+
+                    {/* Edit Button - only for poster */}
+                    {listing.posted_by === user?.id && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={() => setEditingListing(listing)}
+                      >
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Edit Listing
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Contact Modal */}
+          <Dialog open={!!selectedListing} onOpenChange={() => setSelectedListing(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  Contact for {selectedListing?.sitter_first_name}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {selectedListing?.contact_relationship === "parent" 
+                      ? "Parent Contact:" 
+                      : "Contact:"}
+                  </p>
+                  <p className="font-medium">{selectedListing?.contact_name}</p>
                 </div>
+                
+                {/* Phone number display */}
+                <div className="text-sm font-medium text-center bg-blue-50 py-2 px-3 rounded border border-blue-200">
+                  {formatUSPhoneDisplay(selectedListing?.contact_phone || "")}
+                </div>
+
+                {/* Call, Text, Copy buttons */}
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => selectedListing && handleCall(selectedListing)}
+                    className="flex-1"
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Call
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => selectedListing && handleText(selectedListing)}
+                    className="flex-1"
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Text
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => selectedListing && handleCopyNumber(selectedListing)}
+                    className="flex-1"
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy
+                  </Button>
+                </div>
+
+                {selectedListing?.contact_email && (
+                  <div className="pt-2 border-t">
+                    <div className="flex items-center gap-2 justify-center">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <a 
+                        href={`mailto:${selectedListing?.contact_email}`}
+                        className="text-primary hover:underline text-sm"
+                      >
+                        {selectedListing?.contact_email}
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+            </DialogContent>
+          </Dialog>
 
-      {/* Submit Form Modal */}
-      <Dialog open={showSubmitForm} onOpenChange={setShowSubmitForm}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add a Babysitter</DialogTitle>
-          </DialogHeader>
-          <SubmitBabysitterForm 
-            communityName={communityName}
-            onSuccess={() => {
-              setShowSubmitForm(false);
-              queryClient.invalidateQueries({ queryKey: ["babysitter-listings", communityName] });
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+          {/* Submit Form Modal */}
+          <Dialog open={showSubmitForm} onOpenChange={setShowSubmitForm}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Add a Babysitter</DialogTitle>
+              </DialogHeader>
+              <SubmitBabysitterForm 
+                communityName={communityName}
+                onSuccess={() => {
+                  setShowSubmitForm(false);
+                  queryClient.invalidateQueries({ queryKey: ["babysitter-listings", communityName] });
+                }}
+              />
+            </DialogContent>
+          </Dialog>
 
-      {/* Edit Form Modal */}
-      <Dialog open={!!editingListing} onOpenChange={() => setEditingListing(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Babysitter Listing</DialogTitle>
-          </DialogHeader>
-          <SubmitBabysitterForm 
-            communityName={communityName}
-            editMode={editingListing || undefined}
-            onSuccess={() => {
-              setEditingListing(null);
-              queryClient.invalidateQueries({ queryKey: ["babysitter-listings", communityName] });
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+          {/* Edit Form Modal */}
+          <Dialog open={!!editingListing} onOpenChange={() => setEditingListing(null)}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Edit Babysitter Listing</DialogTitle>
+              </DialogHeader>
+              <SubmitBabysitterForm 
+                communityName={communityName}
+                editMode={editingListing || undefined}
+                onSuccess={() => {
+                  setEditingListing(null);
+                  queryClient.invalidateQueries({ queryKey: ["babysitter-listings", communityName] });
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
     </div>
   );
 }
