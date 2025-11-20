@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Phone, Mail, Clock, Award } from "lucide-react";
+import { Plus, Phone, Mail, Clock, Award, MessageSquare, Copy } from "lucide-react";
 import { SubmitBabysitterForm } from "./SubmitBabysitterForm";
 import { HorizontalCategoryPills } from "@/components/vendors/HorizontalCategoryPills";
 import { CATEGORIES } from "@/data/categories";
+import { useToast } from "@/hooks/use-toast";
+import { formatUSPhoneDisplay } from "@/utils/phone";
 
 interface BabysitterListing {
   id: string;
@@ -39,6 +41,7 @@ export function BabysittingBoard({
   const [searchParams, setSearchParams] = useSearchParams();
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [selectedListing, setSelectedListing] = useState<BabysitterListing | null>(null);
+  const { toast } = useToast();
 
   const { data: listings, isLoading } = useQuery({
     queryKey: ["babysitter-listings", communityName],
@@ -65,6 +68,82 @@ export function BabysittingBoard({
   const handleCategoryChange = (newCategory: string) => {
     setSearchParams({ category: newCategory });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCall = (listing: BabysitterListing) => {
+    if (typeof window !== "undefined" && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Called Babysitter: ${listing.sitter_first_name}`, {
+          listing_id: listing.id,
+          sitter_name: listing.sitter_first_name,
+          phone: listing.contact_phone,
+          action: "call",
+          community: listing.community,
+        });
+        window.mixpanel.people.increment("babysitters_called", 1);
+        console.log("📊 Tracked babysitter call:", listing.sitter_first_name);
+      } catch (error) {
+        console.error("Mixpanel tracking error:", error);
+      }
+    }
+    window.location.href = `tel:${listing.contact_phone}`;
+  };
+
+  const handleText = (listing: BabysitterListing) => {
+    if (typeof window !== "undefined" && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Texted Babysitter: ${listing.sitter_first_name}`, {
+          listing_id: listing.id,
+          sitter_name: listing.sitter_first_name,
+          phone: listing.contact_phone,
+          action: "text",
+          community: listing.community,
+        });
+        window.mixpanel.people.increment("babysitters_texted", 1);
+        console.log("📊 Tracked babysitter text:", listing.sitter_first_name);
+      } catch (error) {
+        console.error("Mixpanel tracking error:", error);
+      }
+    }
+    window.location.href = `sms:${listing.contact_phone}`;
+  };
+
+  const handleCopyNumber = async (listing: BabysitterListing) => {
+    if (typeof window !== "undefined" && window.mixpanel) {
+      try {
+        window.mixpanel.track(`Copied Babysitter Number: ${listing.sitter_first_name}`, {
+          listing_id: listing.id,
+          sitter_name: listing.sitter_first_name,
+          phone: listing.contact_phone,
+          action: "copy",
+          community: listing.community,
+        });
+        window.mixpanel.people.increment("babysitter_numbers_copied", 1);
+        console.log("📊 Tracked number copy:", listing.sitter_first_name);
+      } catch (error) {
+        console.error("Mixpanel tracking error:", error);
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(listing.contact_phone || "");
+      toast({
+        title: "Number copied",
+        description: "Phone number copied to clipboard",
+      });
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = listing.contact_phone || "";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      toast({
+        title: "Number copied",
+        description: "Phone number copied to clipboard",
+      });
+    }
   };
 
   return (
@@ -201,25 +280,53 @@ export function BabysittingBoard({
               <p className="font-medium">{selectedListing?.contact_name}</p>
             </div>
             
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <a 
-                href={`tel:${selectedListing?.contact_phone}`}
-                className="text-primary hover:underline"
+            {/* Phone number display */}
+            <div className="text-sm font-medium text-center bg-blue-50 py-2 px-3 rounded border border-blue-200">
+              {formatUSPhoneDisplay(selectedListing?.contact_phone || "")}
+            </div>
+
+            {/* Call, Text, Copy buttons */}
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => selectedListing && handleCall(selectedListing)}
+                className="flex-1"
               >
-                {selectedListing?.contact_phone}
-              </a>
+                <Phone className="h-4 w-4 mr-2" />
+                Call
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => selectedListing && handleText(selectedListing)}
+                className="flex-1"
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Text
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => selectedListing && handleCopyNumber(selectedListing)}
+                className="flex-1"
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Copy
+              </Button>
             </div>
 
             {selectedListing?.contact_email && (
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <a 
-                  href={`mailto:${selectedListing?.contact_email}`}
-                  className="text-primary hover:underline"
-                >
-                  {selectedListing?.contact_email}
-                </a>
+              <div className="pt-2 border-t">
+                <div className="flex items-center gap-2 justify-center">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <a 
+                    href={`mailto:${selectedListing?.contact_email}`}
+                    className="text-primary hover:underline text-sm"
+                  >
+                    {selectedListing?.contact_email}
+                  </a>
+                </div>
               </div>
             )}
           </div>
