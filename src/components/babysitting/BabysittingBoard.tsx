@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Phone, Mail, Clock, Award, MessageSquare, Copy } from "lucide-react";
+import { Plus, Phone, Mail, Clock, Award, MessageSquare, Copy, Pencil } from "lucide-react";
 import { SubmitBabysitterForm } from "./SubmitBabysitterForm";
 import { HorizontalCategoryPills } from "@/components/vendors/HorizontalCategoryPills";
 import { CATEGORIES } from "@/data/categories";
@@ -29,6 +29,7 @@ interface BabysitterListing {
   contact_relationship: string;
   community: string;
   street_name: string | null;
+  posted_by: string | null;
 }
 
 export function BabysittingBoard({ 
@@ -41,7 +42,17 @@ export function BabysittingBoard({
   const [searchParams, setSearchParams] = useSearchParams();
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [selectedListing, setSelectedListing] = useState<BabysitterListing | null>(null);
+  const [editingListing, setEditingListing] = useState<BabysitterListing | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: { user } = {} } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getUser();
+      return data;
+    },
+  });
 
   const { data: listings, isLoading } = useQuery({
     queryKey: ["babysitter-listings", communityName],
@@ -256,6 +267,19 @@ export function BabysittingBoard({
                 >
                   Contact {listing.is_adult ? "Sitter" : "Parent"}
                 </Button>
+
+                {/* Edit Button - only for poster */}
+                {listing.posted_by === user?.id && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={() => setEditingListing(listing)}
+                  >
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit Listing
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -341,7 +365,27 @@ export function BabysittingBoard({
           </DialogHeader>
           <SubmitBabysitterForm 
             communityName={communityName}
-            onSuccess={() => setShowSubmitForm(false)}
+            onSuccess={() => {
+              setShowSubmitForm(false);
+              queryClient.invalidateQueries({ queryKey: ["babysitter-listings", communityName] });
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Form Modal */}
+      <Dialog open={!!editingListing} onOpenChange={() => setEditingListing(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Babysitter Listing</DialogTitle>
+          </DialogHeader>
+          <SubmitBabysitterForm 
+            communityName={communityName}
+            editMode={editingListing || undefined}
+            onSuccess={() => {
+              setEditingListing(null);
+              queryClient.invalidateQueries({ queryKey: ["babysitter-listings", communityName] });
+            }}
           />
         </DialogContent>
       </Dialog>
