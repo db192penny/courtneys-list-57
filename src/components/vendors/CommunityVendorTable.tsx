@@ -121,9 +121,10 @@ export default function CommunityVendorTable({
   useEffect(() => {
     const urlCategory = searchParams.get('category');
     if (urlCategory) {
+      // Handle both specific categories and "all"
       setCategory(urlCategory);
     } else {
-      // Set default category in URL when none is present
+      // Set default category to Pool on first visit (no parameter)
       setSearchParams({ category: 'Pool' });
     }
   }, [searchParams, setSearchParams]);
@@ -324,14 +325,8 @@ export default function CommunityVendorTable({
     GATracking.trackCategoryChange(category, newCategory);
     await trackCategoryClick(newCategory);
     setCategory(newCategory);
-    // Update URL parameter
-    const newSearchParams = new URLSearchParams(searchParams);
-    if (newCategory === 'all') {
-      newSearchParams.delete('category');
-    } else {
-      newSearchParams.set('category', newCategory);
-    }
-    setSearchParams(newSearchParams);
+    // Update URL parameter - set 'all' explicitly instead of deleting
+    setSearchParams({ category: newCategory });
     
     // Scroll to top of vendor list with smooth animation
     window.scrollTo({ top: 0, behavior: 'smooth' });
