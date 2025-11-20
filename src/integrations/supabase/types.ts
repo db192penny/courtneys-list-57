@@ -250,6 +250,8 @@ export type Database = {
           availability: string | null
           certifications: string[] | null
           community: string
+          consent_ip_address: string | null
+          consented_at: string | null
           contact_email: string | null
           contact_name: string
           contact_phone: string
@@ -260,6 +262,9 @@ export type Database = {
           id: string
           is_adult: boolean | null
           posted_by: string | null
+          removal_reason: string | null
+          removed_at: string | null
+          removed_by: string | null
           sitter_age: number
           sitter_first_name: string
           status: string
@@ -273,6 +278,8 @@ export type Database = {
           availability?: string | null
           certifications?: string[] | null
           community: string
+          consent_ip_address?: string | null
+          consented_at?: string | null
           contact_email?: string | null
           contact_name: string
           contact_phone: string
@@ -283,6 +290,9 @@ export type Database = {
           id?: string
           is_adult?: boolean | null
           posted_by?: string | null
+          removal_reason?: string | null
+          removed_at?: string | null
+          removed_by?: string | null
           sitter_age: number
           sitter_first_name: string
           status?: string
@@ -296,6 +306,8 @@ export type Database = {
           availability?: string | null
           certifications?: string[] | null
           community?: string
+          consent_ip_address?: string | null
+          consented_at?: string | null
           contact_email?: string | null
           contact_name?: string
           contact_phone?: string
@@ -306,6 +318,9 @@ export type Database = {
           id?: string
           is_adult?: boolean | null
           posted_by?: string | null
+          removal_reason?: string | null
+          removed_at?: string | null
+          removed_by?: string | null
           sitter_age?: number
           sitter_first_name?: string
           status?: string

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Check, X } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AdminBabysitting() {
@@ -14,13 +14,13 @@ export default function AdminBabysitting() {
   const queryClient = useQueryClient();
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  const { data: pendingListings, isLoading } = useQuery({
-    queryKey: ["admin-babysitting-pending"],
+  const { data: listings, isLoading } = useQuery({
+    queryKey: ["admin-babysitting-all"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("babysitter_listings")
         .select("*")
-        .eq("status", "pending")
+        .neq("status", "removed")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -28,7 +28,10 @@ export default function AdminBabysitting() {
     },
   });
 
-  const handleApprove = async (id: string) => {
+  const handleRemove = async (id: string, sitterName: string) => {
+    const reason = prompt(`Why are you removing ${sitterName}'s listing?`);
+    if (!reason) return;
+
     setProcessingId(id);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -36,39 +39,17 @@ export default function AdminBabysitting() {
       const { error } = await supabase
         .from("babysitter_listings")
         .update({
-          status: "approved",
-          approved_at: new Date().toISOString(),
-          approved_by: user?.id || null,
+          status: "removed",
+          removal_reason: reason,
+          removed_at: new Date().toISOString(),
+          removed_by: user?.id,
         })
         .eq("id", id);
 
       if (error) throw error;
 
-      toast({ title: "Approved", description: "Listing is now public" });
-      queryClient.invalidateQueries({ queryKey: ["admin-babysitting-pending"] });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
-  const handleDecline = async (id: string) => {
-    setProcessingId(id);
-    try {
-      const { error } = await supabase
-        .from("babysitter_listings")
-        .update({ status: "declined" })
-        .eq("id", id);
-
-      if (error) throw error;
-
-      toast({ title: "Declined", description: "Listing has been declined" });
-      queryClient.invalidateQueries({ queryKey: ["admin-babysitting-pending"] });
+      toast({ title: "Removed", description: "Listing has been removed from the board" });
+      queryClient.invalidateQueries({ queryKey: ["admin-babysitting-all"] });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -96,21 +77,21 @@ export default function AdminBabysitting() {
         <header className="mb-6">
           <h1 className="text-3xl font-bold">Babysitting Board Management</h1>
           <p className="text-muted-foreground mt-2">
-            Review and approve babysitter listings
+            View and manage all babysitter listings
           </p>
         </header>
 
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading...</div>
-        ) : !pendingListings || pendingListings.length === 0 ? (
+        ) : !listings || listings.length === 0 ? (
           <Card>
             <CardContent className="text-center py-12">
-              <p className="text-muted-foreground">No pending listings</p>
+              <p className="text-muted-foreground">No listings found</p>
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-4">
-            {pendingListings.map((listing: any) => (
+            {listings.map((listing: any) => (
               <Card key={listing.id}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -120,6 +101,9 @@ export default function AdminBabysitting() {
                       </CardTitle>
                       <div className="flex gap-2 mt-2">
                         <Badge variant="outline">{listing.community}</Badge>
+                        <Badge variant={listing.status === 'approved' ? 'default' : 'secondary'}>
+                          {listing.status}
+                        </Badge>
                         {listing.is_adult && <Badge>18+</Badge>}
                       </div>
                     </div>
@@ -171,21 +155,13 @@ export default function AdminBabysitting() {
 
                   <div className="flex gap-3 pt-4">
                     <Button
-                      onClick={() => handleApprove(listing.id)}
-                      disabled={processingId === listing.id}
-                      className="flex-1"
-                    >
-                      <Check className="h-4 w-4 mr-2" />
-                      Approve
-                    </Button>
-                    <Button
                       variant="destructive"
-                      onClick={() => handleDecline(listing.id)}
+                      onClick={() => handleRemove(listing.id, listing.sitter_first_name)}
                       disabled={processingId === listing.id}
                       className="flex-1"
                     >
-                      <X className="h-4 w-4 mr-2" />
-                      Decline
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Remove Listing
                     </Button>
                   </div>
                 </CardContent>
