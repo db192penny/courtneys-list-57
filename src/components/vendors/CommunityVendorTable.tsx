@@ -122,8 +122,11 @@ export default function CommunityVendorTable({
     const urlCategory = searchParams.get('category');
     if (urlCategory) {
       setCategory(urlCategory);
+    } else {
+      // Set default category in URL when none is present
+      setSearchParams({ category: 'Pool' });
     }
-  }, [searchParams]);
+  }, [searchParams, setSearchParams]);
 
   // Remove animation after initial attention
   useEffect(() => {
