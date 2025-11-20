@@ -61,7 +61,7 @@ export function BabysittingBoard({
         .from("babysitter_listings")
         .select("*")
         .eq("community", communityName)
-        .eq("status", "approved")
+        .neq("status", "removed")
         .order("created_at", { ascending: false });
 
       if (error) throw error;

@@ -139,7 +139,9 @@ export function SubmitBabysitterForm({
           .insert({
             ...listingData,
             posted_by: user.id,
-            status: "pending",
+            status: "approved",
+            approved_at: new Date().toISOString(),
+            approved_by: user.id,
           });
         error = result.error;
       }
@@ -147,10 +149,10 @@ export function SubmitBabysitterForm({
       if (error) throw error;
 
       toast({
-        title: editMode ? "Updated!" : "Submitted!",
+        title: editMode ? "Updated!" : "Live!",
         description: editMode 
           ? "Your listing has been updated." 
-          : "Your listing is pending admin approval.",
+          : "Your babysitter is now live on the board!",
       });
       
       onSuccess();
@@ -339,8 +341,8 @@ export function SubmitBabysitterForm({
       <div className="flex gap-3">
         <Button type="submit" disabled={submitting} className="flex-1">
           {submitting 
-            ? (editMode ? "Updating..." : "Submitting...") 
-            : (editMode ? "Update Listing" : "Submit for Approval")}
+            ? (editMode ? "Updating..." : "Publishing...") 
+            : (editMode ? "Update Listing" : "Publish Listing")}
         </Button>
       </div>
     </form>
