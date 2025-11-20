@@ -72,6 +72,24 @@ export function SubmitBabysitterForm({
       return;
     }
 
+    if (selectedAgeGroups.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please select at least one age group.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!data.availability || data.availability.trim() === "") {
+      toast({
+        title: "Validation Error",
+        description: "Please provide availability information.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -219,7 +237,7 @@ export function SubmitBabysitterForm({
 
       {/* Age Groups */}
       <div>
-        <Label>Age Groups (Optional)</Label>
+        <Label>Age Groups *</Label>
         <div className="grid gap-2 mt-2">
           {ageGroupOptions.map((option) => (
             <div key={option.value} className="flex items-center space-x-2">
@@ -244,12 +262,15 @@ export function SubmitBabysitterForm({
 
       {/* Availability */}
       <div>
-        <Label htmlFor="availability">Availability (Optional)</Label>
+        <Label htmlFor="availability">Availability *</Label>
         <Input
           id="availability"
-          {...register("availability")}
+          {...register("availability", { required: "Required" })}
           placeholder="Weekends and summer"
         />
+        {errors.availability && (
+          <p className="text-sm text-red-500 mt-1">{errors.availability.message}</p>
+        )}
       </div>
 
       {/* Certifications */}
