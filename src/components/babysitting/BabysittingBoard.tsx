@@ -172,7 +172,7 @@ export function BabysittingBoard({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Babysitting Board</h2>
+          <h2 className="text-2xl font-bold">Babysitters</h2>
           <p className="text-muted-foreground mt-1">
             Community babysitters in {communityName}
           </p>
@@ -180,7 +180,7 @@ export function BabysittingBoard({
         {isAuthenticated && (
           <Button onClick={() => setShowSubmitForm(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            Add to Board
+            Add a Babysitter
           </Button>
         )}
       </div>
@@ -361,7 +361,7 @@ export function BabysittingBoard({
       <Dialog open={showSubmitForm} onOpenChange={setShowSubmitForm}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add Babysitter to Board</DialogTitle>
+            <DialogTitle>Add a Babysitter</DialogTitle>
           </DialogHeader>
           <SubmitBabysitterForm 
             communityName={communityName}
