@@ -304,10 +304,10 @@ export function BabysittingBoard({
 
                     {/* Contact Section */}
                     <div className="pt-3 border-t space-y-2">
-                      <p className="text-xs font-medium text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         {listing.is_adult 
-                          ? `Contact ${formatContactName(listing.contact_name)}`
-                          : `Contact ${formatContactName(listing.contact_name)}, ${listing.sitter_first_name}'s parent`
+                          ? <>Contact <span className="font-bold text-foreground">{formatContactName(listing.contact_name)}</span></>
+                          : <>Contact <span className="font-bold text-foreground">{formatContactName(listing.contact_name)}</span>, {listing.sitter_first_name}'s parent</>
                         }
                       </p>
                       <div className="flex items-center gap-2">
