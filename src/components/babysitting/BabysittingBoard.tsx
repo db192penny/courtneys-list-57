@@ -76,6 +76,14 @@ export function BabysittingBoard({
     teens: "🧑",
   };
 
+  const formatContactName = (fullName: string) => {
+    const parts = fullName.trim().split(' ');
+    if (parts.length === 1) return parts[0];
+    const firstName = parts[0];
+    const lastInitial = parts[parts.length - 1].charAt(0);
+    return `${firstName} ${lastInitial}.`;
+  };
+
   const handleCategoryChange = (newCategory: string) => {
     setSearchParams({ category: newCategory });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -202,12 +210,13 @@ export function BabysittingBoard({
             <div>
               <h2 className="text-2xl font-bold">Babysitters</h2>
               <p className="text-muted-foreground mt-1">
-                Community babysitters in {communityName}
+                Community babysitters
               </p>
             </div>
             <Button onClick={() => setShowSubmitForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Add a Babysitter
+              <span className="hidden sm:inline">Add a Babysitter</span>
+              <span className="sm:hidden">Add a Sitter</span>
             </Button>
           </div>
 
@@ -297,8 +306,8 @@ export function BabysittingBoard({
                     <div className="pt-3 border-t space-y-2">
                       <p className="text-xs font-medium text-muted-foreground">
                         {listing.is_adult 
-                          ? `Contact ${listing.sitter_first_name}`
-                          : `Contact ${listing.sitter_first_name}'s parent`
+                          ? `Contact ${formatContactName(listing.contact_name)}`
+                          : `Contact ${formatContactName(listing.contact_name)}, ${listing.sitter_first_name}'s parent`
                         }
                       </p>
                       <div className="flex items-center gap-2">
