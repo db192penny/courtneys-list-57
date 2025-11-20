@@ -25,17 +25,34 @@ interface FormData {
 
 export function SubmitBabysitterForm({ 
   communityName,
+  editMode,
   onSuccess 
 }: { 
   communityName: string;
+  editMode?: any;
   onSuccess: () => void;
 }) {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+    defaultValues: editMode ? {
+      sitter_first_name: editMode.sitter_first_name,
+      sitter_age: editMode.sitter_age,
+      contact_relationship: editMode.contact_relationship,
+      experience_description: editMode.experience_description || '',
+      availability: editMode.availability || '',
+      certifications: editMode.certifications?.join(', ') || '',
+      hourly_rate_range: editMode.hourly_rate_range || '',
+      contact_name: editMode.contact_name,
+      contact_phone: editMode.contact_phone,
+      contact_email: editMode.contact_email || '',
+    } : {}
+  });
   
   const sitterAge = watch("sitter_age");
-  const [selectedAgeGroups, setSelectedAgeGroups] = useState<string[]>([]);
+  const [selectedAgeGroups, setSelectedAgeGroups] = useState<string[]>(
+    editMode?.age_groups || []
+  );
 
   const ageGroupOptions = [
     { value: "infants", label: "Infants (0-2)" },
@@ -73,37 +90,56 @@ export function SubmitBabysitterForm({
         ? data.certifications.split(",").map(c => c.trim()).filter(Boolean)
         : [];
 
-      const { error } = await supabase
-        .from("babysitter_listings")
-        .insert({
-          sitter_first_name: data.sitter_first_name,
-          sitter_age: Number(data.sitter_age),
-          experience_description: data.experience_description || null,
-          age_groups: selectedAgeGroups.length > 0 ? selectedAgeGroups : null,
-          availability: data.availability || null,
-          certifications: certArray.length > 0 ? certArray : null,
-          hourly_rate_range: data.hourly_rate_range || null,
-          contact_name: data.contact_name,
-          contact_phone: data.contact_phone,
-          contact_email: data.contact_email || null,
-          contact_relationship: data.contact_relationship,
-          community: communityName,
-          posted_by: user.id,
-          status: "pending",
-        });
+      const listingData = {
+        sitter_first_name: data.sitter_first_name,
+        sitter_age: Number(data.sitter_age),
+        experience_description: data.experience_description || null,
+        age_groups: selectedAgeGroups.length > 0 ? selectedAgeGroups : null,
+        availability: data.availability || null,
+        certifications: certArray.length > 0 ? certArray : null,
+        hourly_rate_range: data.hourly_rate_range || null,
+        contact_name: data.contact_name,
+        contact_phone: data.contact_phone,
+        contact_email: data.contact_email || null,
+        contact_relationship: data.contact_relationship,
+        community: communityName,
+      };
+
+      let error;
+      
+      if (editMode) {
+        // UPDATE existing listing
+        const result = await supabase
+          .from("babysitter_listings")
+          .update(listingData)
+          .eq("id", editMode.id);
+        error = result.error;
+      } else {
+        // INSERT new listing
+        const result = await supabase
+          .from("babysitter_listings")
+          .insert({
+            ...listingData,
+            posted_by: user.id,
+            status: "pending",
+          });
+        error = result.error;
+      }
 
       if (error) throw error;
 
       toast({
-        title: "Submitted!",
-        description: "Your listing is pending admin approval.",
+        title: editMode ? "Updated!" : "Submitted!",
+        description: editMode 
+          ? "Your listing has been updated." 
+          : "Your listing is pending admin approval.",
       });
       
       onSuccess();
     } catch (error: any) {
       console.error("Submit error:", error);
       toast({
-        title: "Submission Failed",
+        title: editMode ? "Update Failed" : "Submission Failed",
         description: error.message || "Please try again.",
         variant: "destructive",
       });
@@ -149,7 +185,7 @@ export function SubmitBabysitterForm({
       {/* Relationship */}
       <div>
         <Label>Your Relationship *</Label>
-        <RadioGroup defaultValue="parent">
+        <RadioGroup defaultValue={editMode?.contact_relationship || "parent"}>
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="parent" id="parent" {...register("contact_relationship", { required: true })} />
             <Label htmlFor="parent" className="font-normal cursor-pointer">
@@ -281,7 +317,9 @@ export function SubmitBabysitterForm({
       {/* Submit */}
       <div className="flex gap-3">
         <Button type="submit" disabled={submitting} className="flex-1">
-          {submitting ? "Submitting..." : "Submit for Approval"}
+          {submitting 
+            ? (editMode ? "Updating..." : "Submitting...") 
+            : (editMode ? "Update Listing" : "Submit for Approval")}
         </Button>
       </div>
     </form>
