@@ -213,10 +213,14 @@ export function BabysittingBoard({
                 Community babysitters
               </p>
             </div>
-            <Button onClick={() => setShowSubmitForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Add a Babysitter</span>
-              <span className="sm:hidden">Add a Sitter</span>
+            <Button
+              onClick={() => setShowSubmitForm(true)}
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+            >
+              <Plus className="h-4 w-4" />
+              Add Sitter
             </Button>
           </div>
 
