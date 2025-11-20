@@ -300,6 +300,9 @@ export default function CommunityVendorTable({
   const userCosts = useUserCosts();
   const { data: userData } = useUserData();
   
+  // Format vendor data - must be before any conditional returns
+  const formatted = useMemo(() => data || [], [data]);
+  
   // Modal states
   const [rateModalOpen, setRateModalOpen] = useState(false);
   const [costModalOpen, setCostModalOpen] = useState(false);
@@ -412,8 +415,6 @@ export default function CommunityVendorTable({
       navigate(`/submit?community=${communityName}&category=${category}`);
     }
   };
-
-  const formatted = useMemo(() => data || [], [data]);
 
   return (
     <TooltipProvider>
