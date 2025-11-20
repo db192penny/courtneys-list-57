@@ -225,6 +225,12 @@ export default function CommunityVendorTable({
       
       // Get unique categories from the results
       const uniqueCategories = [...new Set(data?.map((v: any) => v.category) || [])];
+      
+      // Always include Babysitting since it uses a separate table (babysitter_listings)
+      if (!uniqueCategories.includes("Babysitting")) {
+        uniqueCategories.push("Babysitting");
+      }
+      
       return uniqueCategories.sort();
     },
     enabled: !!communityName,
