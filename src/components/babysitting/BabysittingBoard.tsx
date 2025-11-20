@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Phone, Mail, Clock, Award } from "lucide-react";
 import { SubmitBabysitterForm } from "./SubmitBabysitterForm";
+import { HorizontalCategoryPills } from "@/components/vendors/HorizontalCategoryPills";
+import { CATEGORIES } from "@/data/categories";
 
 interface BabysitterListing {
   id: string;
@@ -33,6 +36,7 @@ export function BabysittingBoard({
   communityName: string;
   isAuthenticated: boolean;
 }) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [selectedListing, setSelectedListing] = useState<BabysitterListing | null>(null);
 
@@ -58,8 +62,23 @@ export function BabysittingBoard({
     teens: "🧑",
   };
 
+  const handleCategoryChange = (newCategory: string) => {
+    setSearchParams({ category: newCategory });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="space-y-6">
+      {/* Category Navigation */}
+      <div className="mb-4">
+        <HorizontalCategoryPills
+          selectedCategory="Babysitting"
+          onCategoryChange={handleCategoryChange}
+          categories={[...CATEGORIES]}
+          isBannerVisible={false}
+        />
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
