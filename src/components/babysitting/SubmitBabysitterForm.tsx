@@ -50,9 +50,22 @@ export function SubmitBabysitterForm({
   });
   
   const sitterAge = watch("sitter_age");
+  const isUnder18 = sitterAge && Number(sitterAge) < 18;
   const [selectedAgeGroups, setSelectedAgeGroups] = useState<string[]>(
     editMode?.age_groups || []
   );
+  
+  const [consentChecked, setConsentChecked] = useState({
+    parentGuardian: false,
+    accuracy: false,
+    liability: false,
+    responsibility: false,
+    terms: false,
+  });
+
+  const allConsentsChecked = isUnder18
+    ? Object.values(consentChecked).every(v => v === true)
+    : consentChecked.accuracy && consentChecked.liability && consentChecked.terms;
 
   const ageGroupOptions = [
     { value: "infants", label: "Infants (0-2)" },
@@ -85,6 +98,25 @@ export function SubmitBabysitterForm({
       toast({
         title: "Validation Error",
         description: "Please provide availability information.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate consents
+    if (isUnder18 && !allConsentsChecked) {
+      toast({
+        title: "Consent Required",
+        description: "Please accept all consent statements to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isUnder18 && (!consentChecked.accuracy || !consentChecked.liability || !consentChecked.terms)) {
+      toast({
+        title: "Consent Required", 
+        description: "Please accept all consent statements to continue.",
         variant: "destructive",
       });
       return;
@@ -142,6 +174,7 @@ export function SubmitBabysitterForm({
             status: "approved",
             approved_at: new Date().toISOString(),
             approved_by: user.id,
+            consented_at: new Date().toISOString(),
           });
         error = result.error;
       }
@@ -337,9 +370,114 @@ export function SubmitBabysitterForm({
         </div>
       </div>
 
+      {/* Safety Disclaimer & Consent */}
+      <div className="border-t pt-6">
+        <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
+          <div className="flex gap-2">
+            <span className="text-xl">🛡️</span>
+            <div>
+              <h3 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                Safety Notice
+              </h3>
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                Courtney's List is a neighborhood directory. We do not conduct background checks or verify qualifications. 
+                Parents must independently verify references, conduct interviews, and assess qualifications before hiring.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="font-semibold text-base">
+            {isUnder18 ? "Parental Consent Required" : "Consent & Acknowledgment"}
+          </h3>
+
+          {isUnder18 && (
+            <div className="flex items-start space-x-3">
+              <Checkbox 
+                id="consent-parent"
+                checked={consentChecked.parentGuardian}
+                onCheckedChange={(checked) => 
+                  setConsentChecked(prev => ({ ...prev, parentGuardian: checked as boolean }))
+                }
+              />
+              <Label htmlFor="consent-parent" className="text-sm font-normal cursor-pointer leading-tight">
+                I am the parent or legal guardian of the babysitter listed above
+              </Label>
+            </div>
+          )}
+
+          <div className="flex items-start space-x-3">
+            <Checkbox 
+              id="consent-accuracy"
+              checked={consentChecked.accuracy}
+              onCheckedChange={(checked) => 
+                setConsentChecked(prev => ({ ...prev, accuracy: checked as boolean }))
+              }
+            />
+            <Label htmlFor="consent-accuracy" className="text-sm font-normal cursor-pointer leading-tight">
+              I confirm all information is accurate and I {isUnder18 ? 'have permission to share my child\'s first name and my' : 'consent to sharing my'} contact information with verified community members
+            </Label>
+          </div>
+
+          <div className="flex items-start space-x-3">
+            <Checkbox 
+              id="consent-liability"
+              checked={consentChecked.liability}
+              onCheckedChange={(checked) => 
+                setConsentChecked(prev => ({ ...prev, liability: checked as boolean }))
+              }
+            />
+            <Label htmlFor="consent-liability" className="text-sm font-normal cursor-pointer leading-tight">
+              I understand Courtney's List does not conduct background checks, verify credentials, or provide vetting services. 
+              I release Courtney's List from any liability related to babysitting arrangements made through this directory.
+            </Label>
+          </div>
+
+          {isUnder18 && (
+            <div className="flex items-start space-x-3">
+              <Checkbox 
+                id="consent-responsibility"
+                checked={consentChecked.responsibility}
+                onCheckedChange={(checked) => 
+                  setConsentChecked(prev => ({ ...prev, responsibility: checked as boolean }))
+                }
+              />
+              <Label htmlFor="consent-responsibility" className="text-sm font-normal cursor-pointer leading-tight">
+                I acknowledge all families must conduct their own background checks, reference checks, and interviews. 
+                I am solely responsible for supervising my child's babysitting activities and ensuring their safety.
+              </Label>
+            </div>
+          )}
+
+          <div className="flex items-start space-x-3">
+            <Checkbox 
+              id="consent-terms"
+              checked={consentChecked.terms}
+              onCheckedChange={(checked) => 
+                setConsentChecked(prev => ({ ...prev, terms: checked as boolean }))
+              }
+            />
+            <Label htmlFor="consent-terms" className="text-sm font-normal cursor-pointer leading-tight">
+              I agree to the Terms of Service and Privacy Policy
+            </Label>
+          </div>
+
+          {!allConsentsChecked && (
+            <p className="text-sm text-amber-600 dark:text-amber-500">
+              ⚠️ All consent statements must be accepted to continue
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* Submit */}
-      <div className="flex gap-3">
-        <Button type="submit" disabled={submitting} className="flex-1">
+      <div className="flex gap-3 mt-6">
+        <Button 
+          type="submit" 
+          disabled={submitting || !allConsentsChecked} 
+          className="flex-1"
+        >
           {submitting 
             ? (editMode ? "Updating..." : "Publishing...") 
             : (editMode ? "Update Listing" : "Publish Listing")}
