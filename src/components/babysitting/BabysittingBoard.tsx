@@ -157,6 +157,34 @@ export function BabysittingBoard({
     }
   };
 
+  // If not authenticated, show sign-in prompt instead of listings
+  if (!isAuthenticated) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Babysitting Board</h2>
+            <p className="text-muted-foreground mt-1">
+              Find trusted babysitters in {communityName}
+            </p>
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="text-center py-12">
+            <p className="text-lg font-semibold mb-2">Sign In Required</p>
+            <p className="text-muted-foreground mb-4">
+              To protect our community's children, you must be a verified neighbor to view babysitter listings.
+            </p>
+            <Button onClick={() => window.location.href = '/signin'}>
+              Sign In to View Babysitters
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Category Navigation */}
