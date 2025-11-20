@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 interface FormData {
   sitter_first_name: string;
   sitter_age: number;
+  street_name: string;
   contact_relationship: string;
   experience_description: string;
   age_groups: string[];
@@ -38,6 +39,7 @@ export function SubmitBabysitterForm({
     defaultValues: editMode ? {
       sitter_first_name: editMode.sitter_first_name,
       sitter_age: editMode.sitter_age,
+      street_name: editMode.street_name || '',
       contact_relationship: editMode.contact_relationship,
       experience_description: editMode.experience_description || '',
       availability: editMode.availability || '',
@@ -143,6 +145,7 @@ export function SubmitBabysitterForm({
       const listingData = {
         sitter_first_name: data.sitter_first_name,
         sitter_age: Number(data.sitter_age),
+        street_name: data.street_name || null,
         experience_description: data.experience_description || null,
         age_groups: selectedAgeGroups.length > 0 ? selectedAgeGroups : null,
         availability: data.availability || null,
@@ -204,33 +207,51 @@ export function SubmitBabysitterForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Sitter Info */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <Label htmlFor="sitter_first_name">Sitter First Name *</Label>
-          <Input
-            id="sitter_first_name"
-            {...register("sitter_first_name", { required: "Required" })}
-            placeholder="Sarah"
-          />
-          {errors.sitter_first_name && (
-            <p className="text-sm text-red-500 mt-1">{errors.sitter_first_name.message}</p>
-          )}
+      <div className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <Label htmlFor="sitter_first_name">Sitter First Name *</Label>
+            <Input
+              id="sitter_first_name"
+              {...register("sitter_first_name", { required: "Required" })}
+              placeholder="Sarah"
+            />
+            {errors.sitter_first_name && (
+              <p className="text-sm text-red-500 mt-1">{errors.sitter_first_name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="sitter_age">Age *</Label>
+            <Input
+              id="sitter_age"
+              type="number"
+              {...register("sitter_age", { 
+                required: "Required",
+                min: { value: 12, message: "Must be at least 12" },
+                max: { value: 25, message: "Must be 25 or under" }
+              })}
+              placeholder="16"
+            />
+            {errors.sitter_age && (
+              <p className="text-sm text-red-500 mt-1">{errors.sitter_age.message}</p>
+            )}
+          </div>
         </div>
 
+        {/* Street Name */}
         <div>
-          <Label htmlFor="sitter_age">Age *</Label>
+          <Label htmlFor="street_name">Street Name *</Label>
           <Input
-            id="sitter_age"
-            type="number"
-            {...register("sitter_age", { 
-              required: "Required",
-              min: { value: 12, message: "Must be at least 12" },
-              max: { value: 25, message: "Must be 25 or under" }
-            })}
-            placeholder="16"
+            id="street_name"
+            {...register("street_name", { required: "Required" })}
+            placeholder="e.g., Maple Street"
           />
-          {errors.sitter_age && (
-            <p className="text-sm text-red-500 mt-1">{errors.sitter_age.message}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            The street where the babysitter is based
+          </p>
+          {errors.street_name && (
+            <p className="text-sm text-red-500 mt-1">{errors.street_name.message}</p>
           )}
         </div>
       </div>

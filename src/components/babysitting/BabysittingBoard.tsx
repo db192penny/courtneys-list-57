@@ -224,24 +224,32 @@ export function BabysittingBoard({
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {listings.map((listing) => (
                 <Card key={listing.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-xl">
+                  <CardContent className="p-4 space-y-3">
+                    {/* Category Badge */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg">👶</span>
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Babysitting
+                      </span>
+                    </div>
+
+                    {/* Name, Age, and Street */}
+                    <div>
+                      <div className="flex items-start justify-between">
+                        <h3 className="text-lg font-semibold">
                           {listing.sitter_first_name}, {listing.sitter_age}
-                        </CardTitle>
-                        {listing.street_name && (
-                          <CardDescription className="text-xs mt-1">
-                            {listing.street_name}
-                          </CardDescription>
+                        </h3>
+                        {listing.is_adult && (
+                          <Badge variant="secondary" className="ml-2">18+</Badge>
                         )}
                       </div>
-                      {listing.is_adult && (
-                        <Badge variant="secondary">18+</Badge>
+                      {listing.street_name && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {listing.street_name}
+                        </p>
                       )}
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
+
                     {/* Certifications */}
                     {listing.certifications && listing.certifications.length > 0 && (
                       <div className="flex flex-wrap gap-1">
@@ -285,27 +293,38 @@ export function BabysittingBoard({
                       <p className="text-sm font-medium">{listing.hourly_rate_range}</p>
                     )}
 
-                    {/* Contact Button */}
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => setSelectedListing(listing)}
-                    >
-                      Contact {listing.is_adult ? "Sitter" : "Parent"}
-                    </Button>
-
-                    {/* Edit Button - only for poster */}
-                    {listing.posted_by === user?.id && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        className="w-full mt-2"
-                        onClick={() => setEditingListing(listing)}
-                      >
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Edit Listing
-                      </Button>
-                    )}
+                    {/* Contact Buttons */}
+                    <div className="pt-3 border-t flex items-center justify-between gap-2">
+                      <div className="flex gap-2 flex-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleCall(listing)}
+                          className="flex-1"
+                        >
+                          <Phone className="h-4 w-4 mr-1" />
+                          Call
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleText(listing)}
+                          className="flex-1"
+                        >
+                          <MessageSquare className="h-4 w-4 mr-1" />
+                          Text
+                        </Button>
+                      </div>
+                      {listing.posted_by === user?.id && (
+                        <Button 
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setEditingListing(listing)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
