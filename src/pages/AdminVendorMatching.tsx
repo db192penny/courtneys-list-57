@@ -296,6 +296,20 @@ export default function AdminVendorMatching() {
         ratingIds
       });
 
+      // Update survey_ratings to mark as matched (with matched_at but no vendor_id)
+      const { error: ratingsError } = await supabase
+        .from('survey_ratings')
+        .update({ 
+          matched_at: new Date().toISOString()
+          // vendor_id remains NULL - dismissed without creating/linking
+        })
+        .in('id', ratingIds);
+
+      if (ratingsError) {
+        console.error('[Dismiss Vendor] Error updating survey ratings:', ratingsError);
+        throw ratingsError;
+      }
+
       // Update survey_pending_ratings to mark as rated (without linking to vendor)
       const { error: pendingError } = await supabase
         .from('survey_pending_ratings')
