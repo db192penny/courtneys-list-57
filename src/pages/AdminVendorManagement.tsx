@@ -85,13 +85,34 @@ const AdminVendorManagement = () => {
     loadVendors();
   }, [isAdmin, adminLoading, navigate, toast]);
 
+  // Helper function to check if phone number is missing or placeholder
+  const isPhoneMissing = (contactInfo: string | null): boolean => {
+    if (!contactInfo || contactInfo.trim() === "") return true;
+    
+    const normalized = contactInfo.toLowerCase().trim();
+    const placeholderPatterns = [
+      /^pending/i,
+      /phone pending/i,
+      /^tbd$/i,
+      /to be determined/i,
+      /^n\/?a$/i,
+      /^none$/i,
+      /^unknown$/i,
+      /pending_contact_info/i,
+      /\bpending\b/i,
+      /\btbd\b/i
+    ];
+    
+    return placeholderPatterns.some(pattern => pattern.test(normalized));
+  };
+
   // Filter vendors
   const filteredVendors = vendors.filter((vendor) => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.contact_info.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === "all" || vendor.category === categoryFilter;
     const matchesCommunity = communityFilter === "all" || vendor.community === communityFilter;
-    const matchesMissingPhone = !showMissingPhone || !vendor.contact_info || vendor.contact_info.trim() === "";
+    const matchesMissingPhone = !showMissingPhone || isPhoneMissing(vendor.contact_info);
     
     return matchesSearch && matchesCategory && matchesCommunity && matchesMissingPhone;
   });
