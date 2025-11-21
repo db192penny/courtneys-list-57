@@ -807,18 +807,12 @@ function UnmatchedVendorCard({
         ) : (
           <div className="space-y-4 border-t pt-4">
             <div className="space-y-2">
-              <Label>Google Places (Optional)</Label>
-              <VendorNameInput
-                placeholder="Search Google Places..."
-                onSelected={handleGoogleSelect}
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label>Vendor Name</Label>
-              <Input
-                value={vendorName}
-                onChange={(e) => setVendorName(e.target.value)}
+              <VendorNameInput
+                placeholder="Search Google Places or enter manually..."
+                defaultValue={vendor.vendor_name}
+                onSelected={handleGoogleSelect}
+                onManualInput={(name) => setVendorName(name)}
               />
             </div>
 
