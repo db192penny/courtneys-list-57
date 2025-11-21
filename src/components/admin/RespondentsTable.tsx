@@ -286,12 +286,12 @@ export function RespondentsTable() {
     setMatchingSessionId(sessionId);
     setMatchingRespondentName(name);
     
-    // Load unmatched vendors for this session
+    // Load unmatched vendors from survey_pending_ratings
     const { data: vendors, error } = await supabase
-      .from('survey_ratings')
+      .from('survey_pending_ratings')
       .select('*')
       .eq('session_id', sessionId)
-      .is('vendor_id', null)
+      .eq('rated', false)
       .order('vendor_name');
     
     if (error) {

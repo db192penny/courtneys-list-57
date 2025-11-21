@@ -2637,6 +2637,18 @@ export type Database = {
         }[]
       }
       can_seed_vendors: { Args: { _community?: string }; Returns: boolean }
+      check_exact_vendor_match: {
+        Args: {
+          p_category: string
+          p_community?: string
+          p_vendor_name: string
+        }
+        Returns: {
+          contact_info: string
+          vendor_id: string
+          vendor_name: string
+        }[]
+      }
       check_orphaned_users: {
         Args: never
         Returns: {
@@ -2807,6 +2819,26 @@ export type Database = {
           category: string
           vendor_id: string
           vendor_name: string
+        }[]
+      }
+      get_session_match_stats: {
+        Args: { p_session_id: string }
+        Returns: {
+          match_percentage: number
+          matched_vendors: number
+          total_vendors: number
+          unmatched_vendors: number
+        }[]
+      }
+      get_session_unmatched_vendors: {
+        Args: { p_session_id: string }
+        Returns: {
+          comments: string
+          id: string
+          rating: number
+          vendor_category: string
+          vendor_name: string
+          vendor_phone: string
         }[]
       }
       get_traffic_summary: {
@@ -3015,6 +3047,14 @@ export type Database = {
           service_call_sample_size: number
           typical_cost: number
         }[]
+      }
+      match_survey_to_vendor: {
+        Args: {
+          p_match_type?: string
+          p_rating_id: string
+          p_vendor_id: string
+        }
+        Returns: boolean
       }
       match_survey_vendor_simple: {
         Args: { _category: string; _community?: string; _survey_name: string }
