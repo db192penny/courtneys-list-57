@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ChevronDown, Upload, Copy } from "lucide-react";
 import Papa from "papaparse";
 import { normalizeCommunityName } from "@/utils/communityNormalization";
+import { normalizeCategoryName } from "@/utils/categoryNormalization";
 
 interface CSVUploadProps {
   onUploadSuccess: () => void;
@@ -93,7 +94,9 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
               }
               // Skip "No selection" entries
               if (vendorValue.toLowerCase() !== "no selection" && vendorValue !== "") {
-                vendors.push({ name: vendorValue, category });
+                // Normalize category name for consistent storage
+                const normalizedCategory = normalizeCategoryName(category);
+                vendors.push({ name: vendorValue, category: normalizedCategory.displayName });
               }
             }
           });
@@ -105,10 +108,12 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             additionalVendors.forEach((entry: string) => {
               const colonIndex = entry.indexOf(":");
               if (colonIndex > -1) {
-                const category = entry.substring(0, colonIndex).trim();
+                const rawCategory = entry.substring(0, colonIndex).trim();
                 const vendorName = entry.substring(colonIndex + 1).trim();
-                if (vendorName && category) {
-                  vendors.push({ name: vendorName, category });
+                if (vendorName && rawCategory) {
+                  // Normalize category name for consistent storage
+                  const normalizedCategory = normalizeCategoryName(rawCategory);
+                  vendors.push({ name: vendorName, category: normalizedCategory.displayName });
                 }
               }
             });
