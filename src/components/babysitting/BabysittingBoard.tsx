@@ -277,7 +277,7 @@ export function BabysittingBoard({
 
                     {/* Experience */}
                     {listing.experience_description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
+                      <p className="text-sm text-muted-foreground line-clamp-3">
                         {listing.experience_description}
                       </p>
                     )}
