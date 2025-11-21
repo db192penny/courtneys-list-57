@@ -194,7 +194,7 @@ export function BabysittingBoard({
             <CardContent className="text-center py-12">
               <p className="text-lg font-semibold mb-2">Sign In Required</p>
               <p className="text-muted-foreground mb-4">
-                To protect our community's children, you must be a verified neighbor to view babysitter listings.
+                For privacy and safety, babysitter contact information is only shared with verified neighbors.
               </p>
               <Button onClick={() => window.location.href = '/signin'}>
                 Sign In to View Babysitters
@@ -277,7 +277,7 @@ export function BabysittingBoard({
 
                     {/* Experience */}
                     {listing.experience_description && (
-                      <p className="text-sm text-muted-foreground line-clamp-3">
+                      <p className="text-sm text-muted-foreground">
                         {listing.experience_description}
                       </p>
                     )}
