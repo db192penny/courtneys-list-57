@@ -58,7 +58,7 @@ interface FuzzyMatch {
 interface UnmatchedVendor {
   survey_rating_id: string;
   vendor_name: string;
-  vendor_category: string;
+  category: string;
   vendor_phone: string | null;
   mention_count: number;
   all_rating_ids: string[];
@@ -179,7 +179,7 @@ export default function AdminVendorMatching() {
     const fuzzyAsUnmatched: UnmatchedVendor[] = (fuzzyData || []).map((f: any) => ({
       survey_rating_id: f.rating_ids?.[0] || '',
       vendor_name: f.survey_vendor_name || '',
-      vendor_category: f.survey_category || 'Unknown',
+      category: f.survey_category || 'Unknown',
       vendor_phone: f.survey_vendor_phone || null,
       mention_count: f.mention_count || 0,
       all_rating_ids: f.all_rating_ids || [],
@@ -762,7 +762,7 @@ function UnmatchedVendorCard({
   };
 
   const handleCreate = () => {
-    onCreateVendor(vendor.vendor_name, vendor.vendor_category || 'Unknown', vendor.all_rating_ids, {
+    onCreateVendor(vendor.vendor_name, vendor.category || 'Unknown', vendor.all_rating_ids, {
       name: vendorName,
       phone: vendorPhone || null,
       community: vendorCommunity,
@@ -777,7 +777,7 @@ function UnmatchedVendorCard({
       <CardContent className="pt-6 space-y-4">
         <div>
           <div className="font-semibold text-lg">{vendor.vendor_name}</div>
-          <div className="text-sm text-muted-foreground">📂 {vendor.vendor_category} | 👥 {vendor.mention_count} mention(s)</div>
+          <div className="text-sm text-muted-foreground">📂 {vendor.category} | 👥 {vendor.mention_count} mention(s)</div>
           {vendor.vendor_phone ? (
             <div className="text-sm text-muted-foreground mt-1">
               📞 {vendor.vendor_phone}
@@ -796,7 +796,7 @@ function UnmatchedVendorCard({
             </Button>
             <Button
               variant="outline"
-              onClick={() => onSearchVendors(vendor.vendor_category, vendor.all_rating_ids)}
+              onClick={() => onSearchVendors(vendor.category, vendor.all_rating_ids)}
             >
               Search Existing
             </Button>
