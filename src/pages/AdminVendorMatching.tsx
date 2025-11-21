@@ -318,9 +318,9 @@ export default function AdminVendorMatching() {
         vendor_name: vendorData.name,
         category: category,
         community: vendorData.community,
-        contact_info: vendorData.phone || undefined,
-        google_place_id: vendorData.google_place_id || undefined,
-        google_data: vendorData.google_data || undefined
+        contact_info: vendorData.phone || null,
+        google_place_id: vendorData.google_place_id || null,
+        google_data: vendorData.google_data || null
       });
       
       if (error) throw error;
