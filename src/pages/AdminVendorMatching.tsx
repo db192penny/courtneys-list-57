@@ -795,7 +795,7 @@ function UnmatchedVendorCard({
   };
 
   const handleCreate = () => {
-    onCreateVendor(vendor.vendor_name, vendor.vendor_category, vendor.all_rating_ids, {
+    onCreateVendor(vendor.vendor_name, vendor.vendor_category || 'Unknown', vendor.all_rating_ids, {
       name: vendorName,
       phone: vendorPhone || null,
       community: vendorCommunity,
