@@ -313,13 +313,12 @@ export default function AdminVendorMatching() {
   ) => {
     setProcessingId(surveyName);
     try {
-      const { data, error } = await (supabase.rpc as any)("create_vendor_from_survey", {
-        p_survey_vendor_name: surveyName,
-        p_category: category,
-        p_vendor_name: vendorData.name,
-        p_phone: vendorData.phone,
-        p_community: vendorData.community,
-        p_google_place_id: vendorData.google_place_id || null
+      const { data, error } = await supabase.rpc("create_vendor_from_survey", {
+        vendor_name: vendorData.name,
+        category: category,
+        community: vendorData.community,
+        contact_info: vendorData.phone || undefined,
+        google_place_id: vendorData.google_place_id || undefined
       });
       
       if (error) throw error;
