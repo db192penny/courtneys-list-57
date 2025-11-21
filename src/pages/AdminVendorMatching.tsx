@@ -314,6 +314,13 @@ export default function AdminVendorMatching() {
   ) => {
     setProcessingId(surveyName);
     try {
+      // Get the current authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        throw new Error("You must be logged in to create vendors");
+      }
+
       // Extract Google data fields if present
       const googleData = vendorData.google_data || {};
       const hasGoogleData = vendorData.google_data && Object.keys(vendorData.google_data).length > 0;
@@ -328,7 +335,8 @@ export default function AdminVendorMatching() {
         google_rating: hasGoogleData ? (googleData.rating || null) : null,
         google_rating_count: hasGoogleData ? (googleData.user_ratings_total || null) : null,
         google_reviews_json: hasGoogleData ? googleData : null,
-        google_last_updated: hasGoogleData ? new Date().toISOString() : null
+        google_last_updated: hasGoogleData ? new Date().toISOString() : null,
+        created_by: user.id
       };
 
       // Use upsert to handle potential duplicates (same name + community)
