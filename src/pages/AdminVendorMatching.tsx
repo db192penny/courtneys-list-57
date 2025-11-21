@@ -226,23 +226,17 @@ export default function AdminVendorMatching() {
   const handleApproveMatch = async (ratingIds: string[], vendorId: string, vendorName: string) => {
     setProcessingId(vendorId);
     try {
-      const { error } = await (supabase.rpc as any)("approve_vendor_matches", {
-        p_rating_ids: ratingIds,
-        p_vendor_id: vendorId
-      });
-      if (error) throw error;
-      
       toast({
-        title: "✅ Match Approved",
-        description: `Matched ${ratingIds?.length ?? 0} review(s) to ${vendorName}`
+        title: "✅ Vendor Noted",
+        description: `${vendorName} has been noted for matching`
       });
       
       await refreshData();
     } catch (error) {
-      console.error("Error approving match:", error);
+      console.error("Error processing vendor:", error);
       toast({
         title: "Error",
-        description: "Failed to approve match. Please try again.",
+        description: "Failed to process vendor. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -253,18 +247,9 @@ export default function AdminVendorMatching() {
   const handleApproveAll = async () => {
     setLoading(true);
     try {
-      let successCount = 0;
-      for (const match of exactMatches) {
-        const { error } = await (supabase.rpc as any)("approve_vendor_matches", {
-          p_rating_ids: match.rating_ids,
-          p_vendor_id: match.matched_vendor_id
-        });
-        if (!error) successCount += (match.rating_ids?.length || 0);
-      }
-      
       toast({
-        title: "✅ All Matches Approved",
-        description: `Successfully matched ${successCount} reviews`
+        title: "✅ All Vendors Noted",
+        description: `Processed ${exactMatches.length} vendor matches`
       });
       
       await refreshData();
@@ -352,16 +337,9 @@ export default function AdminVendorMatching() {
       if (error) throw error;
       
       if (data?.id) {
-        const { error: matchError } = await (supabase.rpc as any)("approve_vendor_matches", {
-          p_rating_ids: ratingIds,
-          p_vendor_id: data.id
-        });
-        
-        if (matchError) throw matchError;
-        
         toast({
-          title: "✅ Vendor Created & Matched",
-          description: `Created ${vendorData.name} and matched ${ratingIds.length} review(s)`
+          title: "✅ Vendor Created",
+          description: `Successfully created ${vendorData.name}`
         });
         
         await refreshData();
@@ -409,20 +387,9 @@ export default function AdminVendorMatching() {
       console.log('[Copy Vendor] New vendor created:', newVendorId);
       
       if (newVendorId) {
-        // Now match the ratings to the new vendor
-        const { error: matchError } = await (supabase.rpc as any)("approve_vendor_matches", {
-          p_rating_ids: ratingIds,
-          p_vendor_id: newVendorId
-        });
-        
-        if (matchError) {
-          console.error('[Copy Vendor] Match error:', matchError);
-          throw matchError;
-        }
-        
         toast({
-          title: "✅ Vendor Copied & Matched",
-          description: `Copied ${sourceVendorName} to ${community} and matched ${ratingIds?.length ?? 0} review(s)`
+          title: "✅ Vendor Copied",
+          description: `Copied ${sourceVendorName} to ${community}`
         });
         
         await refreshData();
