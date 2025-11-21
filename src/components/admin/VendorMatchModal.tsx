@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { CheckCircle2, X, Search, Plus, Loader2 } from "lucide-react";
-import VendorNameInput, { type VendorSelectedPayload } from "@/components/VendorNameInput";
 
 interface VendorMatchModalProps {
   open: boolean;
@@ -38,25 +37,7 @@ export function VendorMatchModal({
   const [community, setCommunity] = useState("The Bridges");
   
   const currentVendor = vendors[currentIndex];
-  const unmatchedCount = vendors.length - currentIndex;
-  
-  // Check for exact match when vendor changes
-  useEffect(() => {
-    if (currentVendor && open) {
-      checkExactMatch();
-    }
-  }, [currentIndex, currentVendor, open]);
-  
-  // Reset search when changing vendors
-  useEffect(() => {
-    setShowSearch(false);
-    setShowCreate(false);
-    setSearchResults([]);
-    if (currentVendor) {
-      setNewVendorName(currentVendor.vendor_name);
-      setNewVendorPhone(currentVendor.vendor_phone || "");
-    }
-  }, [currentIndex]);
+  const remainingCount = vendors.length - currentIndex;
   
   // Get community from session
   useEffect(() => {
@@ -77,6 +58,24 @@ export function VendorMatchModal({
     }
   };
   
+  // Check for exact match when vendor changes
+  useEffect(() => {
+    if (currentVendor && open) {
+      checkExactMatch();
+    }
+  }, [currentIndex, currentVendor, open]);
+  
+  // Reset search when changing vendors
+  useEffect(() => {
+    setShowSearch(false);
+    setShowCreate(false);
+    setSearchResults([]);
+    if (currentVendor) {
+      setNewVendorName(currentVendor.vendor_name);
+      setNewVendorPhone("");
+    }
+  }, [currentIndex]);
+  
   // Check if exact vendor match exists
   const checkExactMatch = async () => {
     if (!currentVendor) return;
@@ -85,11 +84,12 @@ export function VendorMatchModal({
       .from('vendors')
       .select('*')
       .eq('community', community)
-      .eq('category', currentVendor.vendor_category)
+      .eq('category', currentVendor.category)
       .ilike('name', currentVendor.vendor_name)
       .maybeSingle();
       
     setExactMatch(data);
+    setShowSearch(!data);
   };
   
   // Match to exact vendor
@@ -97,11 +97,10 @@ export function VendorMatchModal({
     if (!exactMatch) return;
     
     const { error } = await supabase
-      .from('survey_ratings')
+      .from('survey_pending_ratings')
       .update({ 
-        vendor_id: exactMatch.id,
-        matched_at: new Date().toISOString()
-      })
+        vendor_id: exactMatch.id
+      } as any)
       .eq('id', currentVendor.id);
       
     if (error) {
@@ -130,7 +129,7 @@ export function VendorMatchModal({
       .from('vendors')
       .select('*')
       .or(`name.ilike.%${searchTerm}%,contact_info.ilike.%${searchTerm}%`)
-      .eq('category', currentVendor.vendor_category)
+      .eq('category', currentVendor.category)
       .limit(10);
     
     setSearchResults(data || []);
@@ -195,7 +194,7 @@ export function VendorMatchModal({
       .from('vendors')
       .insert({
         name: newVendorName,
-        category: currentVendor.vendor_category,
+        category: currentVendor.category,
         community: community,
         contact_info: newVendorPhone || null,
         google_place_id: null
@@ -221,14 +220,13 @@ export function VendorMatchModal({
     moveToNext();
   };
   
-  // Match survey rating to vendor
+  // Match survey_pending_ratings to vendor
   const matchToVendor = async (vendorId: string) => {
     await supabase
-      .from('survey_ratings')
+      .from('survey_pending_ratings')
       .update({ 
-        vendor_id: vendorId,
-        matched_at: new Date().toISOString()
-      })
+        vendor_id: vendorId
+      } as any)
       .eq('id', currentVendor.id);
   };
   
@@ -273,7 +271,7 @@ export function VendorMatchModal({
             Vendor Matching - {respondentName}
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Reviewing {currentIndex + 1} of {vendors.length} ({unmatchedCount - 1} remaining)
+            Reviewing {currentIndex + 1} of {vendors.length} ({remainingCount - 1} remaining)
           </p>
         </DialogHeader>
         
@@ -282,12 +280,10 @@ export function VendorMatchModal({
           <Card className="border-2 border-primary">
             <CardContent className="p-4">
               <h3 className="text-lg font-semibold">{currentVendor.vendor_name}</h3>
-              <p className="text-sm text-muted-foreground">{currentVendor.vendor_category}</p>
-              {currentVendor.vendor_phone && (
-                <p className="text-sm">📞 {currentVendor.vendor_phone}</p>
-              )}
-              <p className="text-sm">⭐ Rating: {currentVendor.rating}/5</p>
-              <p className="text-sm text-muted-foreground">Community: {community}</p>
+              <p className="text-sm text-muted-foreground">{currentVendor.category}</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                From survey response (not yet rated) - {community}
+              </p>
             </CardContent>
           </Card>
           
@@ -301,7 +297,7 @@ export function VendorMatchModal({
                 </div>
                 <div className="mb-4">
                   <p className="font-medium">{exactMatch.name}</p>
-                  <p className="text-sm text-muted-foreground">{exactMatch.category} - {exactMatch.community}</p>
+                  <p className="text-sm text-muted-foreground">{exactMatch.category} - {community}</p>
                   {exactMatch.contact_info && (
                     <p className="text-sm">📞 {exactMatch.contact_info}</p>
                   )}
