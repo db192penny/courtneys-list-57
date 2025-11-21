@@ -309,6 +309,7 @@ export default function AdminVendorMatching() {
       phone: string | null;
       community: string;
       google_place_id?: string;
+      google_data?: any;
     }
   ) => {
     setProcessingId(surveyName);
@@ -318,7 +319,8 @@ export default function AdminVendorMatching() {
         category: category,
         community: vendorData.community,
         contact_info: vendorData.phone || undefined,
-        google_place_id: vendorData.google_place_id || undefined
+        google_place_id: vendorData.google_place_id || undefined,
+        google_data: vendorData.google_data || undefined
       });
       
       if (error) throw error;
@@ -747,7 +749,7 @@ function UnmatchedVendorCard({
     surveyName: string,
     category: string,
     ratingIds: string[],
-    vendorData: { name: string; phone: string | null; community: string; google_place_id?: string }
+    vendorData: { name: string; phone: string | null; community: string; google_place_id?: string; google_data?: any }
   ) => Promise<void>;
   onSearchVendors: (category: string, ratingIds: string[]) => Promise<void>;
   processingId: string | null;
@@ -757,11 +759,13 @@ function UnmatchedVendorCard({
   const [vendorPhone, setVendorPhone] = useState(vendor.vendor_phone || "");
   const [vendorCommunity, setVendorCommunity] = useState(vendor.respondent_community);
   const [googlePlaceId, setGooglePlaceId] = useState<string | undefined>();
+  const [googleData, setGoogleData] = useState<any>(undefined);
 
   const handleGoogleSelect = (payload: any) => {
     setVendorName(payload.name);
     setVendorPhone(payload.phone || vendorPhone);
     setGooglePlaceId(payload.place_id);
+    setGoogleData(payload); // Store full Google Place data
   };
 
   const handleCreate = () => {
@@ -769,7 +773,8 @@ function UnmatchedVendorCard({
       name: vendorName,
       phone: vendorPhone || null,
       community: vendorCommunity,
-      google_place_id: googlePlaceId
+      google_place_id: googlePlaceId,
+      google_data: googleData
     });
     setShowCreateForm(false);
   };
