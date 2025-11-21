@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSurveyRespondents } from "@/hooks/useSurveyAdmin";
 import { ReviewsModal } from "./ReviewsModal";
+import { VendorMatchModal } from "./VendorMatchModal";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -58,6 +59,10 @@ export function RespondentsTable() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [selectedRespondent, setSelectedRespondent] = useState<any>(null);
   const [showReviewsModal, setShowReviewsModal] = useState(false);
+  const [showVendorMatchModal, setShowVendorMatchModal] = useState(false);
+  const [matchingSessionId, setMatchingSessionId] = useState<string | null>(null);
+  const [matchingRespondentName, setMatchingRespondentName] = useState<string | null>(null);
+  const [vendorsToMatch, setVendorsToMatch] = useState<any[]>([]);
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -278,10 +283,36 @@ export function RespondentsTable() {
   };
 
   const handleMatchVendors = async (sessionId: string, name: string) => {
-    toast({
-      title: "Auto-match unavailable",
-      description: "Vendor matching temporarily disabled. Contact admin for manual matching.",
-    });
+    setMatchingSessionId(sessionId);
+    setMatchingRespondentName(name);
+    
+    // Load unmatched vendors for this session
+    const { data: vendors, error } = await supabase
+      .from('survey_ratings')
+      .select('*')
+      .eq('session_id', sessionId)
+      .is('vendor_id', null)
+      .order('vendor_name');
+    
+    if (error) {
+      toast({
+        title: "Error Loading Vendors",
+        description: error.message,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!vendors || vendors.length === 0) {
+      toast({
+        title: "No Unmatched Vendors",
+        description: "All vendors for this respondent are already matched."
+      });
+      return;
+    }
+    
+    setVendorsToMatch(vendors);
+    setShowVendorMatchModal(true);
   };
 
   const handleAutoMatchAll = async () => {
@@ -599,6 +630,20 @@ export function RespondentsTable() {
           totalVendors={selectedRespondent.totalVendors}
           completedVendors={selectedRespondent.completedVendors}
           community={selectedRespondent.community}
+        />
+      )}
+
+      {showVendorMatchModal && (
+        <VendorMatchModal
+          open={showVendorMatchModal}
+          onOpenChange={setShowVendorMatchModal}
+          sessionId={matchingSessionId}
+          respondentName={matchingRespondentName}
+          vendors={vendorsToMatch}
+          onComplete={() => {
+            setShowVendorMatchModal(false);
+            refetch();
+          }}
         />
       )}
 
