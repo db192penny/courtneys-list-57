@@ -285,6 +285,50 @@ export default function AdminVendorMatching() {
     }
   };
 
+  const handleDismissVendor = async (
+    surveyName: string,
+    ratingIds: string[]
+  ) => {
+    setProcessingId(surveyName);
+    try {
+      console.log('[Dismiss Vendor] Marking as handled:', {
+        surveyName,
+        ratingIds
+      });
+
+      // Update survey_pending_ratings to mark as rated (without linking to vendor)
+      const { error: pendingError } = await supabase
+        .from('survey_pending_ratings')
+        .update({ 
+          rated: true, 
+          rated_at: new Date().toISOString()
+          // vendor_id remains NULL - not linking to any vendor
+        })
+        .in('id', ratingIds);
+
+      if (pendingError) {
+        console.error('[Dismiss Vendor] Error updating pending ratings:', pendingError);
+        throw pendingError;
+      }
+
+      toast({
+        title: "✅ Vendor Dismissed",
+        description: `Removed "${surveyName}" from unmatched list`
+      });
+      
+      await refreshData();
+    } catch (error) {
+      console.error("[Dismiss Vendor] Error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to dismiss vendor. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
   const handleCreateVendor = async (
     surveyName: string,
     category: string,
@@ -337,9 +381,41 @@ export default function AdminVendorMatching() {
       if (error) throw error;
       
       if (data?.id) {
+        // Link the survey ratings to the newly created vendor
+        console.log('[Create Vendor] Linking ratings to new vendor:', {
+          vendorId: data.id,
+          ratingIds
+        });
+
+        // Call approve_vendor_matches RPC to link survey_ratings
+        const { error: approveError } = await supabase.rpc('approve_vendor_matches', {
+          p_rating_ids: ratingIds,
+          p_vendor_id: data.id
+        });
+
+        if (approveError) {
+          console.error('[Create Vendor] Error linking ratings:', approveError);
+          throw approveError;
+        }
+
+        // Update survey_pending_ratings to mark as rated
+        const { error: pendingError } = await supabase
+          .from('survey_pending_ratings')
+          .update({ 
+            rated: true, 
+            rated_at: new Date().toISOString(),
+            vendor_id: data.id
+          })
+          .in('id', ratingIds);
+
+        if (pendingError) {
+          console.error('[Create Vendor] Error updating pending ratings:', pendingError);
+          throw pendingError;
+        }
+
         toast({
           title: "✅ Vendor Created",
-          description: `Successfully created ${vendorData.name}`
+          description: `Successfully created ${vendorData.name} and linked ${ratingIds.length} rating(s)`
         });
         
         await refreshData();
@@ -598,6 +674,7 @@ export default function AdminVendorMatching() {
                   availableCommunities={availableCommunities}
                   onCreateVendor={handleCreateVendor}
                   onSearchVendors={handleSearchVendors}
+                  onDismissVendor={handleDismissVendor}
                   processingId={processingId}
                 />
               ))
@@ -733,6 +810,7 @@ function UnmatchedVendorCard({
   availableCommunities,
   onCreateVendor,
   onSearchVendors,
+  onDismissVendor,
   processingId
 }: {
   vendor: UnmatchedVendor;
@@ -745,9 +823,11 @@ function UnmatchedVendorCard({
     vendorData: { name: string; phone: string | null; community: string; google_place_id?: string; google_data?: any }
   ) => Promise<void>;
   onSearchVendors: (category: string, ratingIds: string[]) => Promise<void>;
+  onDismissVendor: (surveyName: string, ratingIds: string[]) => Promise<void>;
   processingId: string | null;
 }) {
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showDismissConfirm, setShowDismissConfirm] = useState(false);
   const [vendorName, setVendorName] = useState(vendor.vendor_name);
   const [vendorPhone, setVendorPhone] = useState(vendor.vendor_phone || "");
   const [vendorCommunity, setVendorCommunity] = useState(vendor.respondent_community);
@@ -770,6 +850,11 @@ function UnmatchedVendorCard({
       google_data: googleData
     });
     setShowCreateForm(false);
+  };
+
+  const handleDismiss = () => {
+    onDismissVendor(vendor.vendor_name, vendor.all_rating_ids);
+    setShowDismissConfirm(false);
   };
 
   return (
@@ -799,6 +884,13 @@ function UnmatchedVendorCard({
               onClick={() => onSearchVendors(vendor.category, vendor.all_rating_ids)}
             >
               Search Existing
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setShowDismissConfirm(true)}
+              disabled={processingId === vendor.vendor_name}
+            >
+              Dismiss
             </Button>
           </div>
         ) : (
@@ -853,6 +945,25 @@ function UnmatchedVendorCard({
             </div>
           </div>
         )}
+
+        {/* Dismiss Confirmation Dialog */}
+        <AlertDialog open={showDismissConfirm} onOpenChange={setShowDismissConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Dismiss Vendor?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove "{vendor.vendor_name}" from the unmatched list without creating a vendor or linking it to an existing one.
+                The survey rating will be marked as handled.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDismiss}>
+                Dismiss
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );
