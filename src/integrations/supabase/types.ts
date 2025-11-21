@@ -2685,9 +2685,9 @@ export type Database = {
         Args: {
           category: string
           community: string
-          contact_info?: string
-          google_data?: Json
-          google_place_id?: string
+          contact_info: string
+          google_data: Json
+          google_place_id: string
           vendor_name: string
         }
         Returns: string

@@ -314,21 +314,39 @@ export default function AdminVendorMatching() {
   ) => {
     setProcessingId(surveyName);
     try {
-      const { data, error } = await supabase.rpc("create_vendor_from_survey", {
-        vendor_name: vendorData.name,
+      // Extract Google data fields if present
+      const googleData = vendorData.google_data || {};
+      const hasGoogleData = vendorData.google_data && Object.keys(vendorData.google_data).length > 0;
+
+      // Prepare vendor insert data
+      const vendorInsertData = {
+        name: vendorData.name,
         category: category,
         community: vendorData.community,
-        contact_info: vendorData.phone || null,
+        contact_info: vendorData.phone || 'Phone pending',
         google_place_id: vendorData.google_place_id || null,
-        google_data: vendorData.google_data || null
-      });
+        google_rating: hasGoogleData ? (googleData.rating || null) : null,
+        google_rating_count: hasGoogleData ? (googleData.user_ratings_total || null) : null,
+        google_reviews_json: hasGoogleData ? googleData : null,
+        google_last_updated: hasGoogleData ? new Date().toISOString() : null
+      };
+
+      // Use upsert to handle potential duplicates (same name + community)
+      const { data, error } = await supabase
+        .from('vendors')
+        .upsert(vendorInsertData, {
+          onConflict: 'name,community',
+          ignoreDuplicates: false
+        })
+        .select('id')
+        .single();
       
       if (error) throw error;
       
-      if (data) {
+      if (data?.id) {
         const { error: matchError } = await (supabase.rpc as any)("approve_vendor_matches", {
           p_rating_ids: ratingIds,
-          p_vendor_id: data
+          p_vendor_id: data.id
         });
         
         if (matchError) throw matchError;
