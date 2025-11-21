@@ -2683,13 +2683,22 @@ export type Database = {
       count_my_costs: { Args: never; Returns: number }
       create_vendor_from_survey: {
         Args: {
-          p_category: string
-          p_community: string
-          p_google_data?: Json
-          p_google_place_id?: string
-          p_phone: string
-          p_survey_vendor_name: string
-          p_vendor_name: string
+          category: string
+          community: string
+          contact_info?: string
+          google_data?: Json
+          google_place_id?: string
+          vendor_name: string
+        }
+        Returns: string
+      }
+      create_vendor_simple: {
+        Args: {
+          category: string
+          community: string
+          google_place_id?: string
+          phone?: string
+          vendor_name: string
         }
         Returns: string
       }
@@ -2829,6 +2838,8 @@ export type Database = {
           category: string
           id: string
           rated: boolean
+          respondent_email: string
+          respondent_name: string
           session_id: string
           vendor_id: string
           vendor_name: string
