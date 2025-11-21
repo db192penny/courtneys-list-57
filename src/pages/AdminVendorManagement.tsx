@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { CATEGORIES } from "@/data/categories";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +42,7 @@ const AdminVendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [communityFilter, setCommunityFilter] = useState("all");
+  const [showMissingPhone, setShowMissingPhone] = useState(false);
 
 
   const canonical = typeof window !== "undefined" ? window.location.href : undefined;
@@ -89,8 +91,9 @@ const AdminVendorManagement = () => {
                          vendor.contact_info.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === "all" || vendor.category === categoryFilter;
     const matchesCommunity = communityFilter === "all" || vendor.community === communityFilter;
+    const matchesMissingPhone = !showMissingPhone || !vendor.contact_info || vendor.contact_info.trim() === "";
     
-    return matchesSearch && matchesCategory && matchesCommunity;
+    return matchesSearch && matchesCategory && matchesCommunity && matchesMissingPhone;
   });
 
   // Get unique communities for filter
@@ -192,43 +195,57 @@ const AdminVendorManagement = () => {
         </header>
 
         {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <Label htmlFor="search">Search</Label>
-            <Input
-              id="search"
-              placeholder="Search by name or contact info..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <Label htmlFor="search">Search</Label>
+              <Input
+                id="search"
+                placeholder="Search by name or contact info..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="w-48">
+              <Label htmlFor="category-filter">Category</Label>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger id="category-filter">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {CATEGORIES.map((category) => (
+                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-48">
+              <Label htmlFor="community-filter">Community</Label>
+              <Select value={communityFilter} onValueChange={setCommunityFilter}>
+                <SelectTrigger id="community-filter">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Communities</SelectItem>
+                  {communities.map((community) => (
+                    <SelectItem key={community} value={community}>{community}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          {/* Missing Phone Filter */}
+          <div className="flex items-center gap-2">
+            <Checkbox 
+              id="missing-phone-filter"
+              checked={showMissingPhone}
+              onCheckedChange={(checked) => setShowMissingPhone(checked === true)}
             />
-          </div>
-          <div className="w-48">
-            <Label htmlFor="category-filter">Category</Label>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger id="category-filter">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {CATEGORIES.map((category) => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="w-48">
-            <Label htmlFor="community-filter">Community</Label>
-            <Select value={communityFilter} onValueChange={setCommunityFilter}>
-              <SelectTrigger id="community-filter">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Communities</SelectItem>
-                {communities.map((community) => (
-                  <SelectItem key={community} value={community}>{community}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="missing-phone-filter" className="cursor-pointer">
+              Show only vendors missing phone numbers
+            </Label>
           </div>
         </div>
 
@@ -311,6 +328,7 @@ const AdminVendorManagement = () => {
         {/* Results count */}
         <div className="mt-4 text-sm text-muted-foreground">
           Showing {filteredVendors.length} of {vendors.length} vendors
+          {showMissingPhone && " (missing phone numbers)"}
         </div>
 
       </section>
