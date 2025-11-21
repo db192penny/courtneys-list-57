@@ -1131,6 +1131,7 @@ export type Database = {
           rated: boolean | null
           rated_at: string | null
           session_id: string | null
+          vendor_id: string | null
           vendor_name: string
         }
         Insert: {
@@ -1140,6 +1141,7 @@ export type Database = {
           rated?: boolean | null
           rated_at?: string | null
           session_id?: string | null
+          vendor_id?: string | null
           vendor_name: string
         }
         Update: {
@@ -1149,6 +1151,7 @@ export type Database = {
           rated?: boolean | null
           rated_at?: string | null
           session_id?: string | null
+          vendor_id?: string | null
           vendor_name?: string
         }
         Relationships: [
@@ -1157,6 +1160,13 @@ export type Database = {
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "preview_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "survey_pending_ratings_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -2814,9 +2824,12 @@ export type Database = {
         }[]
       }
       get_pending_vendors: {
-        Args: { token: string }
+        Args: { p_community: string }
         Returns: {
           category: string
+          id: string
+          rated: boolean
+          session_id: string
           vendor_id: string
           vendor_name: string
         }[]
@@ -2856,15 +2869,25 @@ export type Database = {
           utm_sources: Json
         }[]
       }
+      get_unmatched_survey_vendors: {
+        Args: { p_community: string }
+        Returns: {
+          community: string
+          respondent_email: string
+          respondent_name: string
+          session_id: string
+          vendor_count: number
+        }[]
+      }
       get_unmatched_vendors: {
         Args: { p_community: string }
         Returns: {
-          all_rating_ids: string[]
-          mention_count: number
-          survey_rating_id: string
-          vendor_category: string
+          category: string
+          id: string
+          rated: boolean
+          session_id: string
+          vendor_id: string
           vendor_name: string
-          vendor_phone: string
         }[]
       }
       get_user_leaderboard_position: {
