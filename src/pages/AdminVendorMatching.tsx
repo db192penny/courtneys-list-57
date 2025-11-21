@@ -56,13 +56,15 @@ interface FuzzyMatch {
 }
 
 interface UnmatchedVendor {
-  survey_rating_id: string;
+  id: string;                    // The actual ID from survey_pending_ratings
+  session_id: string;            
   vendor_name: string;
   category: string;
-  vendor_phone: string | null;
-  mention_count: number;
-  all_rating_ids: string[];
-  respondent_community: string;
+  rated: boolean;
+  vendor_id: string | null;
+  respondent_community?: string; // Added during enrichment
+  vendor_phone?: string | null;  // May be added during processing
+  mention_count?: number;        // May be added during aggregation
 }
 
 export default function AdminVendorMatching() {
@@ -196,11 +198,11 @@ export default function AdminVendorMatching() {
     const enrichedData = await Promise.all(
       (combined || []).map(async (vendor: any) => {
         // Get the first rating ID to look up the session
-        if (vendor.all_rating_ids && vendor.all_rating_ids.length > 0) {
+        if (vendor.id) {
           const { data: rating } = await supabase
             .from('survey_ratings')
             .select('session_id')
-            .eq('id', vendor.all_rating_ids[0])
+            .eq('id', vendor.id)
             .single();
           
           if (rating) {
@@ -856,7 +858,7 @@ function UnmatchedVendorCard({
   };
 
   const handleCreate = () => {
-    onCreateVendor(vendor.vendor_name, vendor.category || 'Unknown', vendor.all_rating_ids, {
+    onCreateVendor(vendor.vendor_name, vendor.category || 'Unknown', [vendor.id], {
       name: vendorName,
       phone: vendorPhone || null,
       community: vendorCommunity,
@@ -867,7 +869,7 @@ function UnmatchedVendorCard({
   };
 
   const handleDismiss = () => {
-    onDismissVendor(vendor.vendor_name, vendor.all_rating_ids);
+    onDismissVendor(vendor.vendor_name, [vendor.id]);
     setShowDismissConfirm(false);
   };
 
@@ -895,7 +897,7 @@ function UnmatchedVendorCard({
             </Button>
             <Button
               variant="outline"
-              onClick={() => onSearchVendors(vendor.category, vendor.all_rating_ids)}
+              onClick={() => onSearchVendors(vendor.category, [vendor.id])}
             >
               Search Existing
             </Button>
