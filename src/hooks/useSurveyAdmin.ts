@@ -8,6 +8,8 @@ export interface SurveyStats {
   notStartedPeople: number;
   totalVendors: number;
   vendorsRated: number;
+  phoneProvidedCount: number;
+  phoneProvidedPercentage: number;
 }
 
 export interface Respondent {
@@ -17,6 +19,7 @@ export interface Respondent {
   contact: string;
   contactMethod: string;
   email: string | null;
+  phone: string | null;
   emailSentAt: string | null;
   community: string;
   totalVendors: number;
@@ -70,6 +73,8 @@ export function useSurveyStats() {
           notStartedPeople: 0,
           totalVendors: 0,
           vendorsRated: 0,
+          phoneProvidedCount: 0,
+          phoneProvidedPercentage: 0,
         };
       }
 
@@ -108,6 +113,7 @@ export function useSurveyStats() {
       let inProgressPeople = 0;
       let notStartedPeople = 0;
       let vendorsRated = 0;
+      let phoneProvidedCount = 0;
 
       sessions?.forEach((session: any) => {
         const totalForSession = totalVendorsBySession.get(session.id) || 0;
@@ -122,7 +128,16 @@ export function useSurveyStats() {
         }
 
         vendorsRated += completedForSession;
+
+        // Count phone numbers provided
+        if (session.metadata?.phone && session.metadata.phone.trim() !== '') {
+          phoneProvidedCount++;
+        }
       });
+
+      const phoneProvidedPercentage = totalPeople > 0 
+        ? Math.round((phoneProvidedCount / totalPeople) * 100)
+        : 0;
 
       return {
         totalPeople,
@@ -131,6 +146,8 @@ export function useSurveyStats() {
         notStartedPeople,
         totalVendors,
         vendorsRated,
+        phoneProvidedCount,
+        phoneProvidedPercentage,
       };
     },
   });
@@ -199,6 +216,7 @@ export function useSurveyRespondents() {
           }
 
           const contact = s.email || s.metadata?.phone || "No contact provided";
+          const phone = s.metadata?.phone || null;
 
           return {
             id: s.id,
@@ -207,6 +225,7 @@ export function useSurveyRespondents() {
             contact: contact,
             contactMethod: s.metadata?.contact_method || "Unknown",
             email: s.email,
+            phone: phone,
             emailSentAt: s.email_sent_at,
             community: s.community || "Unknown",
             totalVendors: totalVendors,
