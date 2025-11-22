@@ -462,6 +462,7 @@ export function RespondentsTable() {
                     Community {sortColumn === "community" && (sortDirection === "asc" ? "↑" : "↓")}
                   </TableHead>
                   <TableHead className="hidden md:table-cell">Contact</TableHead>
+                  <TableHead className="hidden lg:table-cell">Phone</TableHead>
                   <TableHead className="cursor-pointer" onClick={() => handleSort("totalVendors")}>
                     Vendors {sortColumn === "totalVendors" && (sortDirection === "asc" ? "↑" : "↓")}
                   </TableHead>
@@ -473,7 +474,7 @@ export function RespondentsTable() {
               <TableBody>
                 {!filteredData || filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                       No respondents found
                     </TableCell>
                   </TableRow>
@@ -492,6 +493,11 @@ export function RespondentsTable() {
                           <div className="text-muted-foreground truncate max-w-[200px]">
                             {respondent.contact}
                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <div className="text-sm text-muted-foreground">
+                          {respondent.phone || "—"}
                         </div>
                       </TableCell>
                       <TableCell>{respondent.totalVendors}</TableCell>

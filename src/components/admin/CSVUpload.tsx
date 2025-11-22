@@ -21,6 +21,7 @@ interface ParsedRespondent {
   name: string;
   contactMethod: string;
   contact: string;
+  phone: string | null;
   community: string;
   vendors: Array<{ name: string; category: string }>;
   isDuplicate: boolean;
@@ -71,6 +72,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
 
           console.log(`Processing ${row.Name}:`, {
             contact: row.Contact,
+            phoneNumber: row["Phone Number"],
             contactMethod: row["Contact Method"],
             community: row.Community,
             poolService: row["Pool Service"],
@@ -132,6 +134,7 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             name: row.Name,
             contactMethod: row["Contact Method"] || "email",
             contact: row.Contact,
+            phone: row["Phone Number"] || null,
             community: normalizedCommunity.displayName,
             vendors,
             isDuplicate,
@@ -221,9 +224,9 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
               community: person.community,
               address: `${person.community}, Delray Beach, FL`,
               normalized_address: person.community.toLowerCase().replace(/\s+/g, ' '),
-              email: person.contactMethod?.toLowerCase() === "email" ? person.contact : null,
+              email: person.contact, // Always store email
               metadata: {
-                phone: person.contactMethod?.toLowerCase() === "phone" ? person.contact : null,
+                phone: person.phone || null, // Store phone from separate column
                 contact_method: person.contactMethod,
                 from_survey: true,
                 last_updated: new Date().toISOString(),
@@ -246,13 +249,13 @@ export function CSVUpload({ onUploadSuccess }: CSVUploadProps) {
             .insert({
               session_token: token,
               name: person.name,
-              email: person.contactMethod?.toLowerCase() === "email" ? person.contact : null,
+              email: person.contact, // Always store email
               address: `${person.community}, Delray Beach, FL`,
               normalized_address: person.community.toLowerCase().replace(/\s+/g, ' '),
               community: person.community,
               source: "admin_csv_upload",
               metadata: {
-                phone: person.contactMethod?.toLowerCase() === "phone" ? person.contact : null,
+                phone: person.phone || null, // Store phone from separate column
                 contact_method: person.contactMethod,
                 from_survey: true,
                 upload_batch: batchId,

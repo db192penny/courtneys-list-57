@@ -68,7 +68,7 @@ export function SurveyStatsCard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-4">
           <div>
             <div className="text-sm text-muted-foreground mb-1">Total Vendors</div>
             <div className="text-2xl font-bold">{stats.totalVendors}</div>
@@ -80,6 +80,16 @@ export function SurveyStatsCard() {
               {stats.vendorsRated}
               <span className="text-sm font-normal text-muted-foreground ml-2">
                 ({completionRate}%)
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-sm text-muted-foreground mb-1">Provided Phone</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {stats.phoneProvidedCount}
+              <span className="text-sm font-normal text-muted-foreground ml-2">
+                ({stats.phoneProvidedPercentage}%)
               </span>
             </div>
           </div>
