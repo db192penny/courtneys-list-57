@@ -202,6 +202,12 @@ const AuthCallback = () => {
 
         console.log('[AuthCallback] User community display name:', userCommunityDisplay);
 
+        // Determine if this is a new user (created within last 2 minutes)
+        const createdAt = new Date(session.user.created_at);
+        const now = new Date();
+        const isNewUser = (now.getTime() - createdAt.getTime()) < 2 * 60 * 1000; // 2 minutes
+        const welcomeParam = isNewUser ? 'welcome=new' : 'welcome=returning';
+
         // If we have a valid return path, check if communities match
         if (returnPath && isValidReturnPath(returnPath)) {
           const returnCommunity = extractCommunityFromPath(returnPath);
@@ -210,7 +216,7 @@ const AuthCallback = () => {
             // ✅ Same community - return to exact page they were on (including category)
             console.log("✅ Returning to original page:", returnPath);
             setCommunityName(userCommunityDisplay);
-            navigate(returnPath + (returnPath.includes("?") ? "&" : "?") + "welcome=true", { replace: true });
+            navigate(returnPath + (returnPath.includes("?") ? "&" : "?") + welcomeParam, { replace: true });
             return;
           } else {
             // ⚠️ Different community - redirect to their community's default page
@@ -223,14 +229,14 @@ const AuthCallback = () => {
             });
 
             setCommunityName(userCommunityDisplay);
-            navigate(`/communities/${userCommunity}?welcome=true`, { replace: true });
+            navigate(`/communities/${userCommunity}?${welcomeParam}`, { replace: true });
             return;
           }
         }
 
         // No return path - go to their community's default page
         setCommunityName(userCommunityDisplay);
-        navigate(`/communities/${userCommunity}?welcome=true`, { replace: true });
+        navigate(`/communities/${userCommunity}?${welcomeParam}`, { replace: true });
       } catch (error) {
         console.error("Callback error:", error);
         const authUrl = contextParam ? `/auth?community=${contextParam}` : "/auth";

@@ -17,7 +17,10 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
-  const hasWelcomeParam = searchParams.get("welcome") === "true";
+  const welcomeParam = searchParams.get("welcome"); // 'new', 'returning', or null
+  const isNewUser = welcomeParam === "new";
+  const isReturningUser = welcomeParam === "returning";
+  const hasWelcomeParam = isNewUser || isReturningUser;
   const autoHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cleanupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isMobile = useIsMobile();
@@ -115,7 +118,11 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
         <PartyPopper className="h-5 w-5 text-green-600" />
         <div className="pr-8">
           <AlertDescription className="text-sm leading-relaxed text-green-900">
-            <strong>Welcome aboard!</strong> Start rating providers to help neighbors and earn points! Climb the leaderboard and unlock new badges!
+            {isNewUser ? (
+              <><strong>Welcome aboard!</strong> Start rating providers to help neighbors and earn points! Climb the leaderboard and unlock new badges!</>
+            ) : (
+              <><strong>Welcome back!</strong> Please rate and add providers to help neighbors and earn points! Climb the leaderboard and unlock new badges!</>
+            )}
           </AlertDescription>
         </div>
         <Button
