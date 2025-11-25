@@ -13,30 +13,25 @@ interface WelcomeToolbarProps {
 export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
-  const welcome = searchParams.get("welcome");
+  const hasWelcomeParam = searchParams.get("welcome") === "true";
   const autoHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cleanupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isMobile = useIsMobile();
+  const hasShownRef = useRef(false);
 
   const cleanupURL = () => {
     if (searchParams.has("welcome")) {
       const newSearchParams = new URLSearchParams(searchParams);
       newSearchParams.delete("welcome");
-      navigate({ 
-        pathname: location.pathname,
-        search: newSearchParams.toString() 
-      }, { replace: true });
+      setSearchParams(newSearchParams, { replace: true });
     }
   };
 
   const handleDismiss = (isManual = true) => {
-    const storageKey = `welcome_dismissed_${communitySlug}`;
-    localStorage.setItem(storageKey, "1");
-    
     // Clear any pending timeouts
     if (autoHideTimeoutRef.current) {
       clearTimeout(autoHideTimeoutRef.current);
@@ -52,7 +47,7 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
     if (isManual) {
       cleanupURL();
     } else {
-      cleanupTimeoutRef.current = setTimeout(cleanupURL, 400); // After fade animation
+      cleanupTimeoutRef.current = setTimeout(cleanupURL, 400);
     }
     
     // Hide after fade animation
@@ -60,11 +55,12 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
   };
 
   useEffect(() => {
-    // Only show if user is authenticated and hasn't dismissed it before
-    const storageKey = `welcome_dismissed_${communitySlug}`;
-    const dismissed = localStorage.getItem(storageKey);
-    
-    if (isAuthenticated && dismissed !== "1") {
+    // Show welcome toast when:
+    // 1. User is authenticated AND
+    // 2. URL has welcome=true parameter AND
+    // 3. We haven't already shown it this session
+    if (isAuthenticated && hasWelcomeParam && !hasShownRef.current) {
+      hasShownRef.current = true;
       setIsVisible(true);
       
       // Scroll to top on mobile to ensure welcome message is visible
@@ -72,7 +68,6 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
         setTimeout(() => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 100);
-        // Additional scroll attempt to ensure positioning after any late content loads
         setTimeout(() => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 500);
@@ -80,7 +75,7 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
       
       // Auto-hide after 6 seconds
       autoHideTimeoutRef.current = setTimeout(() => {
-        handleDismiss(false); // Auto dismiss
+        handleDismiss(false);
       }, 6000);
     }
 
@@ -102,7 +97,7 @@ export function WelcomeToolbar({ communitySlug }: WelcomeToolbarProps) {
         clearTimeout(cleanupTimeoutRef.current);
       }
     };
-  }, [isAuthenticated, communitySlug, isVisible, isExiting, isMobile]);
+  }, [isAuthenticated, hasWelcomeParam, isVisible, isExiting, isMobile]);
 
   if (!isVisible) return null;
 

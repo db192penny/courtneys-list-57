@@ -124,8 +124,10 @@ export default function CommunityVendorTable({
       // Handle both specific categories and "all"
       setCategory(urlCategory);
     } else {
-      // Set default category to Pool on first visit (no parameter)
-      setSearchParams({ category: 'Pool' });
+      // Set default category to Pool on first visit - preserve other params like welcome
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('category', 'Pool');
+      setSearchParams(newParams);
     }
   }, [searchParams, setSearchParams]);
 
@@ -325,8 +327,10 @@ export default function CommunityVendorTable({
     GATracking.trackCategoryChange(category, newCategory);
     await trackCategoryClick(newCategory);
     setCategory(newCategory);
-    // Update URL parameter - set 'all' explicitly instead of deleting
-    setSearchParams({ category: newCategory });
+    // Update URL parameter - preserve other params like welcome
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('category', newCategory);
+    setSearchParams(newParams);
     
     // Scroll to top of vendor list with smooth animation
     window.scrollTo({ top: 0, behavior: 'smooth' });
