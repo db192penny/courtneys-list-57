@@ -85,7 +85,9 @@ export function BabysittingBoard({
   };
 
   const handleCategoryChange = (newCategory: string) => {
-    setSearchParams({ category: newCategory });
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('category', newCategory);
+    setSearchParams(newParams);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
