@@ -47,6 +47,7 @@ import {
   GraduationCap,
   Fence,
   Baby,
+  ChefHat,
   LucideIcon
 } from "lucide-react";
 import { Category } from "@/data/categories";
@@ -109,6 +110,7 @@ export const categoryIconMap: Record<Category, LucideIcon> = {
   "Tutoring": GraduationCap,
   "Hair & Beauty (At Home)": Sparkles,
   "Fence Installation & Repair": Fence,
+  "Outdoor Kitchen Installation": ChefHat,
   "Babysitting": Baby,
 };
 

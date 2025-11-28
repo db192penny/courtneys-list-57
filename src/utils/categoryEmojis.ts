@@ -62,6 +62,7 @@ export const categoryEmojiMap: Record<string, string> = {
   'Tutoring': '📚',
   'Hair & Beauty (At Home)': '💅',
   'Fence Installation & Repair': '🏡',
+  'Outdoor Kitchen Installation': '🔥',
   'Babysitting': '👶'
 };
 

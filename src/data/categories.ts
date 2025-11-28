@@ -56,6 +56,7 @@ export const CATEGORIES = [
   "Tutoring",
   "Hair & Beauty (At Home)",
   "Fence Installation & Repair",
+  "Outdoor Kitchen Installation",
   "Babysitting",
 ] as const;
 
