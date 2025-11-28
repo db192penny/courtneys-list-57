@@ -249,6 +249,14 @@ export function buildDefaultCosts(category?: string): CostEntry[] {
     ];
   }
 
+  // Outdoor Kitchen Installation: Project fee + Installation per linear ft
+  if (c === "outdoor kitchen installation") {
+    return [
+      { cost_kind: "project_fee", amount: null, unit: "project", notes: null },
+      { cost_kind: "installation", amount: null, unit: "linear ft", notes: null },
+    ];
+  }
+
   // General Contractor: Project fee + hourly rate
   if (c === "general contractor") {
     return [
